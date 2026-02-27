@@ -40,8 +40,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#item4" class="nav-link" aria-label="Games" data-target="container-4">
-                    <i class="bi bi-controller"></i>
+                <a href="#todo" class="nav-link" aria-label="To-do List" data-target="container-4">
+                    <i class="bi bi-journal-check"></i>
                 </a>
             </li>
         </ul>
