@@ -97,10 +97,19 @@ $jsConfig = json_encode([
     </div>
 </div>
 <div id="container-3" class="container-3">
-    <div class="section-1">
-        Section 1
-        <button class="button">Button</button>
-    </div>
+    <?php if (!isset($_SESSION['access_token'])): ?>
+        <div class="spotify-login-wrapper">
+            <h1 class="spotify-login-title">My Music App</h1>
+            <a href="login.php" class="btn-spotify">
+                <i class="bi bi-spotify"></i> Login with Spotify
+            </a>
+        </div>
+    <?php else: ?>
+        <div class="spotify-login-wrapper">
+            <p class="spotify-connected"><i class="bi bi-spotify"></i> Spotify connected</p>
+            <a href="logout.php" class="btn-spotify btn-spotify--disconnect">Disconnect</a>
+        </div>
+    <?php endif; ?>
 </div>
 
 <div id="container-4" class="container-4">
