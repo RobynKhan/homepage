@@ -1,0 +1,435 @@
+body {
+  position: relative;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  font-family: "Courier New", monospace;
+  background-image: url("https://i.pinimg.com/originals/41/fd/4b/41fd4b8362d93cb0bdc7117bf92ee8a2.jpg");
+}
+
+.navbar {
+  position: absolute;
+  top: 10%;
+  left: 3%;
+  border-radius: 50px;
+  background-color: rgba(98, 94, 51, 0.7);
+  height: 75%;
+  width: 60px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 10px;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  margin: 20px 0;
+}
+
+.nav-link {
+  color: rgba(229, 196, 165, 1);
+  text-decoration: none;
+  display: block;
+  padding: 6px 10px;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.nav-link:hover {
+  background-color: rgba(32, 19, 15, 1);
+  color: #ddd;
+  border-radius: 5px;
+}
+
+.bi {
+  font-size: 24px;
+}
+
+.settings {
+  position: absolute;
+  background-color: transparent;
+  border: none;
+  padding: 5px;
+  border-radius: 50%;
+  cursor: pointer;
+  top: 3%;
+  left: 6px;
+  text-align: center;
+}
+
+.timer-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: 10px;
+  background-color: rgba(222, 199, 157, 0.8);
+  text-align: center;
+  width: 400px;
+}
+
+.runner,
+.config {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+}
+
+.timers {
+  text-align: center;
+  font-size: 24px;
+}
+
+.timers button,
+.runner button,
+.config button {
+  margin: 5px;
+  cursor: pointer;
+  font-family: "Press Start 2P", cursive;
+  border-radius: 10px;
+  background-color: transparent;
+  border: 1px solid #ddd;
+  padding: 10px;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.timers button:hover,
+.runner button:hover,
+.config button:hover {
+  background-color: rgba(32, 19, 15, 1);
+  color: #ddd;
+}
+
+.time-button {
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.timer-display {
+  font-size: 50px;
+  font-weight: bold;
+  text-align: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.pomodoro-count button {
+  font-size: 18px;
+  color: rgba(32, 19, 15, 1);
+}
+
+.start-button {
+  margin-left: 20px;
+}
+
+.container-3,
+.container-4 {
+  display: none;
+  text-align: center;
+  padding: 20px;
+}
+
+#container-3 {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  left: 90px;
+  z-index: 900;
+  width: 340px;
+  max-width: calc(100vw - 110px);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+  background: #000;
+}
+
+.settings-container {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  background-color: rgba(222, 199, 157, 0.97);
+  border: 2px solid rgba(98, 94, 51, 0.8);
+  border-radius: 14px;
+  padding: 30px 28px 24px;
+  width: 340px;
+  max-width: 90vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  text-align: left;
+}
+
+.settings-container h2 {
+  margin: 0 0 18px;
+  font-size: 1.1rem;
+  color: rgba(32, 19, 15, 1);
+  text-align: center;
+}
+
+.setting-option {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 14px;
+}
+
+.setting-option label {
+  font-size: 0.85rem;
+  color: rgba(32, 19, 15, 0.85);
+  font-weight: bold;
+}
+
+.setting-option input,
+.setting-option select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(98, 94, 51, 0.6);
+  background: rgba(255, 255, 255, 0.7);
+  font-family: "Courier New", monospace;
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#save-settings-btn {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(98, 94, 51, 0.7);
+  background-color: rgba(98, 94, 51, 0.85);
+  color: rgba(229, 196, 165, 1);
+  font-family: "Courier New", monospace;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#save-settings-btn:hover {
+  background-color: rgba(32, 19, 15, 1);
+}
+
+.bi-x-circle {
+  cursor: pointer;
+  float: right;
+  font-size: 20px;
+  color: rgba(32, 19, 15, 0.7);
+  transition: color 0.2s;
+}
+
+.bi-x-circle:hover {
+  color: rgba(32, 19, 15, 1);
+}
+
+.clock {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.outer-clock-face {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  border: 5px solid #333;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.number {
+  position: absolute;
+  font-size: 18px;
+  color: #333;
+}
+
+.hand {
+  position: absolute;
+  width: 50%;
+  height: 4px;
+  background-color: #333;
+  transform-origin: 100%;
+  transform: rotate(90deg);
+  transition: all 0.5s;
+}
+
+.hour-hand {
+  width: 40%;
+}
+
+#container-2 {
+  position: absolute;
+  bottom: 20px; /* Adjust as needed */
+  right: 20px; /* Changed from right to left */
+  background-color: rgba(32, 19, 15, 1); /* Black background */
+  border: 3px solid rgba(129, 50, 11, 1);
+  padding-top: 1%;
+  padding-left: 1%;
+  padding-right: 1%;
+  padding-bottom: 1%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border-radius: 20px;
+  width: 320px; /* Maintain size */
+  height: auto; /* Allow height to adjust */
+}
+
+#date {
+  position: relative;
+  margin-top: 5px;
+  font-family: Courier, monospace;
+  width: 100%;
+  letter-spacing: 0.05rem;
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  border-radius: 10px;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  color: #d19d5b;
+  text-shadow: none;
+}
+
+#time {
+  position: relative;
+  font-family: Courier, monospace;
+  width: 100%;
+  letter-spacing: 0.05rem;
+  text-align: center;
+  font-size: 2.4rem;
+  padding: 0.5rem;
+  border-radius: 10px;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  color: #d19d5b;
+  text-shadow: none;
+}
+
+/* Additional styling for the container to enhance the modern look */
+#digital-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: #1f1914; /* Dark background for contrast */
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+}
+.spotify-login-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #1db954;
+  color: white;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+#spotify-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  width: 100%;
+}
+
+#album-art {
+  width: 180px;
+  height: 180px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+#track-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+#track-name {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+#artist-name {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+#player-controls {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+#player-controls button {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+#progress-bar-container,
+#volume-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+#progress-bar,
+#volume-bar {
+  flex: 1;
+  cursor: pointer;
+}
+
+#logout-btn {
+  display: block;
+  margin-top: 12px;
+  text-align: center;
+  color: rgba(229, 196, 165, 0.75);
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: color 0.2s;
+}
+
+#logout-btn:hover {
+  color: rgba(229, 196, 165, 1);
+}
