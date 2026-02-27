@@ -9,8 +9,7 @@ define('DEFAULT_LONG_BREAK',           15);
 define('DEFAULT_POMODOROS_UNTIL_LONG',  4);
 
 // ─── Spotify credentials ──────────────────────────────────────────────────
-// Replace these values with your real Spotify app credentials.
-define('SPOTIFY_CLIENT_ID',     'YOUR_CLIENT_ID');
-define('SPOTIFY_CLIENT_SECRET', 'YOUR_CLIENT_SECRET');
-define('SPOTIFY_REDIRECT_URI',  'https://your-render-app.onrender.com/callback.php');
+define('SPOTIFY_CLIENT_ID',     getenv('SPOTIFY_CLIENT_ID'));
+define('SPOTIFY_CLIENT_SECRET', getenv('SPOTIFY_CLIENT_SECRET'));
+define('SPOTIFY_REDIRECT_URI',  getenv('SPOTIFY_REDIRECT_URI'));
 define('SPOTIFY_SCOPES',        'streaming user-read-email user-read-private user-modify-playback-state');
