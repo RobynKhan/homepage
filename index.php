@@ -28,16 +28,10 @@ $jsConfig = json_encode([
 ?>
 <?php require_once __DIR__ . '/includes/header.php'; ?>
 
-<div class="admin-bar">
-    <?php if (is_admin_logged_in()): ?>
-        <!-- Logged in: show admin name + logout -->
-        <span>👋 <?php echo htmlspecialchars(current_admin()['display_name']); ?></span>
-        <a href="logout_admin.php">Logout</a>
-    <?php else: ?>
-        <!-- Not logged in: show login button -->
-        <a href="login_admin.php">Admin Login</a>
-    <?php endif; ?>
-</div>
+<!-- Lofi FAB (desktop mini-player toggle) -->
+<button class="lofi-fab" id="lofi-fab" aria-label="Toggle music player">
+    <i class="bi bi-music-note-beamed"></i>
+</button>
 
 <!-- Lofi Study Widget -->
 <div class="lofi-widget" id="lofi-widget">
@@ -140,12 +134,7 @@ $jsConfig = json_encode([
     </div>
 </section>
 
-<div id="container-2" class="container-2">
-    <div id="digital-clock">
-        <div id="time"></div>
-        <div id="date"></div>
-    </div>
-</div>
+<!-- Clock is now in the top bar -->
 <div id="container-3" class="container-3">
 
     <!-- Spotify Embed Player (always visible) -->
@@ -212,7 +201,7 @@ $jsConfig = json_encode([
     </div>
 </div>
 
-<div id="container-4" class="container-4">
+<div id="container-4" class="container-4" data-show-as="flex">
     <?php require_once __DIR__ . '/todo_widget.php'; ?>
 </div>
 

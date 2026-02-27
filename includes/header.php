@@ -12,51 +12,91 @@
 </head>
 
 <body>
-    <nav class="navbar">
+    <!-- ── Top Bar: hamburger + clock + admin ── -->
+    <header class="top-bar">
+        <button class="top-bar__hamburger" id="hamburger-btn" aria-label="Open menu">
+            <i class="bi bi-list"></i>
+        </button>
+        <div class="top-bar__clock">
+            <span id="time"></span>
+            <span class="top-bar__dot">·</span>
+            <span id="date"></span>
+        </div>
+        <div class="top-bar__actions">
+            <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
+                <span class="admin-greeting">👋 <?php echo htmlspecialchars(current_admin()['display_name']); ?></span>
+                <a href="logout_admin.php" class="admin-btn" title="Logout">
+                    <i class="bi bi-person-check-fill"></i> Logout
+                </a>
+            <?php else: ?>
+                <a href="login_admin.php" class="admin-btn" title="Admin Login">
+                    <i class="bi bi-person-lock"></i>
+                </a>
+            <?php endif; ?>
+        </div>
+    </header>
+
+    <!-- ── Nav Drawer (desktop, slides from left) ── -->
+    <div class="nav-overlay" id="nav-overlay"></div>
+    <nav class="nav-drawer" id="nav-drawer">
+        <div class="nav-drawer__head">
+            <span class="nav-drawer__title">Menu</span>
+            <button class="nav-drawer__close" id="nav-drawer-close" aria-label="Close menu">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
         <ul class="nav-list">
             <li class="nav-item">
-                <a href="#settings" class="nav-link" aria-label="Settings" data-target="settings-container">
-                    <i class="bi bi-sliders2"></i>
+                <a href="#timer" class="nav-link" data-target="timer-container">
+                    <i class="bi bi-hourglass-split"></i> <span>Timer</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#timer" class="nav-link" aria-label="Timer" data-target="timer-container">
-                    <i class="bi bi-hourglass-split"></i>
+                <a href="#lofi" class="nav-link" data-target="lofi-widget">
+                    <i class="bi bi-youtube"></i> <span>YouTube</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#item2" class="nav-link" aria-label="Clock" data-target="container-2">
-                    <i class="bi bi-clock"></i>
+                <a href="#spotify" class="nav-link" data-target="container-3">
+                    <i class="bi bi-spotify"></i> <span>Spotify</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#lofi" class="nav-link" aria-label="Lofi Radio" data-target="lofi-widget">
-                    <i class="bi bi-youtube"></i>
+                <a href="#todo" class="nav-link" data-target="container-4">
+                    <i class="bi bi-journal-check"></i> <span>Tasks</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#spotify" class="nav-link" aria-label="Spotify" data-target="container-3">
-                    <i class="bi bi-spotify"></i>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#todo" class="nav-link" aria-label="To-do List" data-target="container-4">
-                    <i class="bi bi-journal-check"></i>
+                <a href="#settings" class="nav-link" data-target="settings-container">
+                    <i class="bi bi-sliders2"></i> <span>Settings</span>
                 </a>
             </li>
         </ul>
     </nav>
 
-    <!-- Admin login/logout button — top right -->
-    <div class="admin-corner">
-        <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
-            <span class="admin-greeting">👋 <?php echo htmlspecialchars(current_admin()['display_name']); ?></span>
-            <a href="logout_admin.php" class="admin-btn" title="Logout">
-                <i class="bi bi-person-check-fill"></i> Logout
-            </a>
-        <?php else: ?>
-            <a href="login_admin.php" class="admin-btn" title="Admin Login">
-                <i class="bi bi-person-lock"></i> Admin Login
-            </a>
-        <?php endif; ?>
-    </div>
+    <!-- ── Mobile Bottom Dock ── -->
+    <nav class="bottom-dock" id="bottom-dock">
+        <button class="dock-btn" data-target="timer-container" aria-label="Timer">
+            <i class="bi bi-hourglass-split"></i>
+            <span>Timer</span>
+        </button>
+        <button class="dock-btn" data-target="lofi-widget" aria-label="Music">
+            <i class="bi bi-music-note-beamed"></i>
+            <span>Music</span>
+        </button>
+        <button class="dock-btn" data-target="container-3" aria-label="Spotify">
+            <i class="bi bi-spotify"></i>
+            <span>Spotify</span>
+        </button>
+        <button class="dock-btn" data-target="container-4" aria-label="Tasks">
+            <i class="bi bi-journal-check"></i>
+            <span>Tasks</span>
+        </button>
+        <button class="dock-btn" data-target="settings-container" aria-label="Settings">
+            <i class="bi bi-sliders2"></i>
+            <span>More</span>
+        </button>
+    </nav>
+
+    <!-- ── Bottom Sheet Backdrop (mobile) ── -->
+    <div class="sheet-backdrop" id="sheet-backdrop"></div>

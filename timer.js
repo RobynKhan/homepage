@@ -36,18 +36,110 @@ const addEventListeners = () => {
   elements.longbrkBtn.addEventListener("click", () => setTimeType("LONGBREAK"));
   elements.resetBtn.addEventListener("click", resetTimer);
 
-  document.querySelectorAll(".nav-link").forEach((link) => {
-    link.addEventListener("click", handleNavClick);
+  // ─── Nav drawer (hamburger menu) ───────────────────
+  const hamburgerBtn = document.getElementById("hamburger-btn");
+  const navDrawer = document.getElementById("nav-drawer");
+  const navOverlay = document.getElementById("nav-overlay");
+  const navDrawerClose = document.getElementById("nav-drawer-close");
+
+  if (hamburgerBtn && navDrawer && navOverlay) {
+    const openDrawer = () => {
+      navDrawer.classList.add("open");
+      navOverlay.classList.add("visible");
+    };
+    const closeDrawer = () => {
+      navDrawer.classList.remove("open");
+      navOverlay.classList.remove("visible");
+    };
+    hamburgerBtn.addEventListener("click", openDrawer);
+    navOverlay.addEventListener("click", closeDrawer);
+    if (navDrawerClose) navDrawerClose.addEventListener("click", closeDrawer);
+
+    // Nav drawer link clicks toggle panels (desktop)
+    navDrawer.querySelectorAll(".nav-link").forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        const targetId = link.dataset.target;
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) {
+          handleNavClick(e); // reuse existing toggle
+        }
+        closeDrawer();
+      });
+    });
+  }
+
+  // ─── Lofi FAB (desktop floating music button) ──────
+  const lofiFab = document.getElementById("lofi-fab");
+  const lofiWidget = document.getElementById("lofi-widget");
+  if (lofiFab && lofiWidget) {
+    lofiFab.addEventListener("click", () => {
+      const isHidden =
+        lofiWidget.style.display === "none" ||
+        window.getComputedStyle(lofiWidget).display === "none";
+      if (isHidden) {
+        lofiWidget.style.display = "flex";
+        lofiFab.classList.add("active");
+      } else {
+        lofiWidget.style.display = "none";
+        lofiFab.classList.remove("active");
+      }
+    });
+  }
+
+  // ─── Mobile bottom dock + bottom sheets ────────────
+  const sheetBackdrop = document.getElementById("sheet-backdrop");
+  const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
+
+  function closeAllSheets() {
+    document
+      .querySelectorAll(".sheet-open")
+      .forEach((el) => el.classList.remove("sheet-open"));
+    document
+      .querySelectorAll(".dock-btn.active")
+      .forEach((btn) => btn.classList.remove("active"));
+    if (sheetBackdrop) sheetBackdrop.classList.remove("visible");
+  }
+
+  document.querySelectorAll(".dock-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (!isMobile()) return;
+      const targetId = btn.dataset.target;
+      const target = document.getElementById(targetId);
+      if (!target) return;
+
+      const wasOpen = target.classList.contains("sheet-open");
+      closeAllSheets();
+
+      if (!wasOpen) {
+        target.classList.add("sheet-open");
+        btn.classList.add("active");
+        if (sheetBackdrop) sheetBackdrop.classList.add("visible");
+      }
+    });
   });
+
+  if (sheetBackdrop) {
+    sheetBackdrop.addEventListener("click", closeAllSheets);
+  }
 
   // Gear button opens settings panel
   const timerSettingsBtn = document.getElementById("timer-settings");
   if (timerSettingsBtn) {
     timerSettingsBtn.addEventListener("click", () => {
       const panel = document.getElementById("settings-container");
-      if (panel)
+      if (!panel) return;
+      if (isMobile()) {
+        const wasOpen = panel.classList.contains("sheet-open");
+        closeAllSheets();
+        if (!wasOpen) {
+          panel.classList.add("sheet-open");
+          if (sheetBackdrop) sheetBackdrop.classList.add("visible");
+        }
+      } else {
         panel.style.display =
           panel.style.display === "block" ? "none" : "block";
+      }
     });
   }
 
@@ -56,7 +148,12 @@ const addEventListeners = () => {
   if (closeSettingsBtn) {
     closeSettingsBtn.addEventListener("click", () => {
       const panel = document.getElementById("settings-container");
-      if (panel) panel.style.display = "none";
+      if (!panel) return;
+      if (isMobile()) {
+        closeAllSheets();
+      } else {
+        panel.style.display = "none";
+      }
     });
   }
 
@@ -85,9 +182,9 @@ const handleNavClick = (event) => {
     if (isHidden) {
       // Clear inline style so CSS default takes over (flex, block, etc.)
       targetElement.style.display = "";
-      // If CSS default is also none, force block
+      // If CSS default is also none, use data-show-as value or fall back to block
       if (window.getComputedStyle(targetElement).display === "none") {
-        targetElement.style.display = "block";
+        targetElement.style.display = targetElement.dataset.showAs || "block";
       }
     } else {
       targetElement.style.display = "none";
