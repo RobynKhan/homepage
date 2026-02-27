@@ -50,12 +50,13 @@
     <!-- Admin login/logout button — top right -->
     <div class="admin-corner">
         <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
+            <span class="admin-greeting">👋 <?php echo htmlspecialchars(current_admin()['display_name']); ?></span>
             <a href="logout_admin.php" class="admin-btn" title="Logout">
-                <i class="bi bi-person-check-fill"></i>
+                <i class="bi bi-person-check-fill"></i> Logout
             </a>
         <?php else: ?>
             <a href="login_admin.php" class="admin-btn" title="Admin Login">
-                <i class="bi bi-person-lock"></i>
+                <i class="bi bi-person-lock"></i> Admin Login
             </a>
         <?php endif; ?>
     </div>
