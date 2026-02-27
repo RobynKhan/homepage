@@ -62,7 +62,7 @@ const addEventListeners = () => {
         const targetId = link.dataset.target;
         const targetEl = document.getElementById(targetId);
         if (targetEl) {
-          handleNavClick(e); // reuse existing toggle
+          togglePanel(targetEl);
         }
         closeDrawer();
       });
@@ -164,25 +164,14 @@ const addEventListeners = () => {
   }
 };
 
-const handleNavClick = (event) => {
-  event.preventDefault();
-
-  // Get the ID of the target container
-  const targetId = event.target.closest("a").dataset.target;
-
-  // Get the target container
-  const targetElement = document.getElementById(targetId);
-
-  // Toggle visibility of the target container
+const togglePanel = (targetElement) => {
   if (targetElement) {
     const isHidden =
       targetElement.style.display === "none" ||
       window.getComputedStyle(targetElement).display === "none";
 
     if (isHidden) {
-      // Clear inline style so CSS default takes over (flex, block, etc.)
       targetElement.style.display = "";
-      // If CSS default is also none, use data-show-as value or fall back to block
       if (window.getComputedStyle(targetElement).display === "none") {
         targetElement.style.display = targetElement.dataset.showAs || "block";
       }
@@ -190,6 +179,20 @@ const handleNavClick = (event) => {
       targetElement.style.display = "none";
     }
   }
+};
+
+const handleNavClick = (event) => {
+  event.preventDefault();
+
+  // Get the ID of the target container
+  const link = event.target.closest("a");
+  if (!link) return;
+  const targetId = link.dataset.target;
+
+  // Get the target container
+  const targetElement = document.getElementById(targetId);
+
+  togglePanel(targetElement);
 };
 
 const handleStart = () => {

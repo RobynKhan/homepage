@@ -1,16 +1,17 @@
 <?php
 // db.php — Supabase PostgreSQL connection
 // Credentials are loaded from Render environment variables:
-//   DB_HOST, DB_NAME, DB_USER, DB_PASS, DB_PORT
+//   DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, DB_PORT
 
-function getDB(): PDO {
+function getDB(): PDO
+{
     static $pdo = null;
     if ($pdo) return $pdo;
 
     $host = getenv('DB_HOST');
     $name = getenv('DB_NAME');
     $user = getenv('DB_USER');
-    $pass = getenv('DB_PASS');
+    $pass = getenv('DB_PASSWORD');
     $port = getenv('DB_PORT') ?: '5432';
 
     try {

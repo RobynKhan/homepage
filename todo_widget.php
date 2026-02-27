@@ -22,6 +22,10 @@ $isAdmin = function_exists('is_admin_logged_in') && is_admin_logged_in();
             </button>
         </div>
         <ul class="todo-list" id="todo-list"></ul>
+        <div class="todo-error" id="todo-error" style="display:none;">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span id="todo-error-msg">Could not load tasks</span>
+        </div>
         <div class="todo-footer">
             <span id="todo-count" class="todo-count">0 tasks</span>
             <button class="todo-clear-btn" onclick="todoClearDone()" title="Clear completed">Clear done</button>
@@ -46,22 +50,44 @@ $isAdmin = function_exists('is_admin_logged_in') && is_admin_logged_in();
                 const opts = {
                     headers: {
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    credentials: 'same-origin'
                 };
                 if (body) {
                     opts.method = 'POST';
                     opts.body = JSON.stringify(body);
                 }
                 const res = await fetch(`${API}?action=${action}`, opts);
-                if (!res.ok) throw new Error(await res.text());
+                if (!res.ok) {
+                    const errText = await res.text();
+                    console.error(`todo_api ${action} failed (${res.status}):`, errText);
+                    throw new Error(errText);
+                }
                 return res.json();
+            }
+
+            function showError(msg) {
+                const el = document.getElementById('todo-error');
+                const msgEl = document.getElementById('todo-error-msg');
+                if (el) {
+                    el.style.display = 'flex';
+                    if (msgEl) msgEl.textContent = msg || 'Could not load tasks';
+                }
+            }
+
+            function hideError() {
+                const el = document.getElementById('todo-error');
+                if (el) el.style.display = 'none';
             }
 
             async function loadAndRender() {
                 try {
                     todos = await api('list');
-                } catch {
+                    hideError();
+                } catch (err) {
                     todos = [];
+                    showError('Could not load tasks — check connection');
+                    console.error('Todo list load error:', err);
                 }
                 render();
             }
