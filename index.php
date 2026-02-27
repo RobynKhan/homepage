@@ -109,6 +109,85 @@ $jsConfig = json_encode([
             <p class="spotify-connected"><i class="bi bi-spotify"></i> Spotify connected</p>
             <a href="logout.php" class="btn-spotify btn-spotify--disconnect">Disconnect</a>
         </div>
+
+        <!-- ── Full Spotify Player ────────────────────────────── -->
+        <div class="spotify-player-section">
+
+            <div class="app-layout">
+
+                <!-- Sidebar: playlists -->
+                <div class="sidebar">
+                    <h3>Your Playlists</h3>
+                    <ul id="playlist-list"></ul>
+                </div>
+
+                <!-- Main content: search + tracklist -->
+                <div class="main-content">
+                    <div class="search-bar">
+                        <input type="text" id="search-input" placeholder="Search for songs…"
+                            onkeydown="if(event.key==='Enter') searchSongs()" />
+                        <button onclick="searchSongs()">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                    </div>
+                    <div class="tracklist-panel">
+                        <h3 id="playlist-title">Select a Playlist</h3>
+                        <ul id="track-list"></ul>
+                    </div>
+                </div>
+
+                <!-- Right panel: player + queue -->
+                <div class="right-panel">
+
+                    <!-- Player -->
+                    <div class="player-container">
+                        <h2>Now Playing</h2>
+                        <img id="album-art" src="" alt="Album Art" />
+                        <p id="track-name">Nothing playing</p>
+                        <p id="artist-name"></p>
+
+                        <div class="progress-row">
+                            <span id="current-time">0:00</span>
+                            <input type="range" id="progress-bar" value="0" min="0" max="100" />
+                            <span id="total-time">0:00</span>
+                        </div>
+
+                        <div class="controls">
+                            <button class="btn-skip" onclick="previousTrack()" aria-label="Previous">
+                                <i class="bi bi-skip-start-fill"></i>
+                            </button>
+                            <button id="play-btn" onclick="togglePlay()" aria-label="Play / Pause">
+                                <i class="bi bi-play-fill" id="play-icon"></i>
+                            </button>
+                            <button class="btn-skip" onclick="nextTrack()" aria-label="Next">
+                                <i class="bi bi-skip-end-fill"></i>
+                            </button>
+                        </div>
+
+                        <div class="volume-row">
+                            <i class="bi bi-volume-down"></i>
+                            <input type="range" id="volume-bar" value="100" min="0" max="100" />
+                            <i class="bi bi-volume-up"></i>
+                        </div>
+                    </div>
+
+                    <!-- Queue -->
+                    <div class="queue-panel">
+                        <div class="queue-header">
+                            <h3>Queue <span id="queue-count">(0)</span></h3>
+                            <button class="clear-btn" onclick="clearQueue()">Clear</button>
+                        </div>
+                        <ul id="queue-list"></ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Spotify Web Playback SDK — only load when logged in -->
+        <script src="https://sdk.scdn.co/spotify-player.js"></script>
+        <script src="player.js"></script>
+
     <?php endif; ?>
 </div>
 
