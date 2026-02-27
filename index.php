@@ -2,38 +2,7 @@
 session_start();
 require 'config.php';
 
-// ─── Proactively refresh Spotify token if it expires within 5 minutes ─────
-if (
-    isset($_SESSION['access_token']) &&
-    isset($_SESSION['expires_at']) &&
-    $_SESSION['expires_at'] - time() < 300
-) {
-    $response = file_get_contents('https://accounts.spotify.com/api/token', false, stream_context_create([
-        'http' => [
-            'method'  => 'POST',
-            'header'  => [
-                'Content-Type: application/x-www-form-urlencoded',
-                'Authorization: Basic ' . base64_encode(SPOTIFY_CLIENT_ID . ':' . SPOTIFY_CLIENT_SECRET),
-            ],
-            'content' => http_build_query([
-                'grant_type'    => 'refresh_token',
-                'refresh_token' => $_SESSION['refresh_token'],
-            ]),
-        ],
-    ]));
-
-    $data = json_decode($response, true);
-
-    if (isset($data['access_token'])) {
-        $_SESSION['access_token'] = $data['access_token'];
-        $_SESSION['expires_at']   = time() + $data['expires_in'];
-        if (isset($data['refresh_token'])) {
-            $_SESSION['refresh_token'] = $data['refresh_token'];
-        }
-    }
-}
-
-// ─── Default timer settings (no database required) ────────────────────────
+// ─── Default timer settings ────────────────────────────────────────────────
 $settings = [
     'pomodoro_duration'          => DEFAULT_POMODORO,
     'short_break_duration'       => DEFAULT_SHORT_BREAK,
