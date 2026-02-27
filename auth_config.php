@@ -8,12 +8,12 @@
 //   php -r "echo password_hash('yourPassword', PASSWORD_BCRYPT);"
 
 define('ADMIN_ACCOUNTS', array_filter([
-    'admin1' => (getenv('ADMIN1_USERNAME') && getenv('ADMIN1_PASSWORD_HASH')) ? [
+    getenv('ADMIN1_USERNAME') => (getenv('ADMIN1_USERNAME') && getenv('ADMIN1_PASSWORD_HASH')) ? [
         'username'      => getenv('ADMIN1_USERNAME'),
         'display_name'  => getenv('ADMIN1_USERNAME'),
         'password_hash' => getenv('ADMIN1_PASSWORD_HASH'),
     ] : null,
-    'admin2' => (getenv('ADMIN2_USERNAME') && getenv('ADMIN2_PASSWORD_HASH')) ? [
+    getenv('ADMIN2_USERNAME') => (getenv('ADMIN2_USERNAME') && getenv('ADMIN2_PASSWORD_HASH')) ? [
         'username'      => getenv('ADMIN2_USERNAME'),
         'display_name'  => getenv('ADMIN2_USERNAME'),
         'password_hash' => getenv('ADMIN2_PASSWORD_HASH'),
