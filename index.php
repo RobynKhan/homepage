@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/auth_config.php';
 require 'config.php';
 
 // ─── Default timer settings ────────────────────────────────────────────────
@@ -26,6 +27,44 @@ $jsConfig = json_encode([
 ]);
 ?>
 <?php require_once __DIR__ . '/includes/header.php'; ?>
+
+<!-- Lofi Study Widget -->
+<div class="lofi-widget" id="lofi-widget">
+
+    <div class="lofi-search-row">
+        <input
+            class="lofi-url-input"
+            id="lofi-url-input"
+            type="text"
+            placeholder="paste youtube url..."
+            onkeydown="if(event.key==='Enter') loadLofiURL()" />
+        <button class="lofi-url-btn" onclick="loadLofiURL()">Go</button>
+        <button class="lofi-reset-btn" onclick="resetLofiDefault()" title="reset to default">↺</button>
+    </div>
+    <div class="lofi-error-msg" id="lofi-error-msg">⚠ invalid youtube url</div>
+
+    <div class="lofi-player-wrap" id="lofi-player-wrap">
+        <iframe
+            id="lofi-yt-player"
+            src="https://www.youtube.com/embed/76GStMlLF_Y?enablejsapi=1&autoplay=1&rel=0&modestbranding=1"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            allowfullscreen></iframe>
+        <div class="lofi-loading-overlay" id="lofi-loading">
+            <div class="lofi-spinner"></div>
+            loading...
+        </div>
+    </div>
+
+    <div class="lofi-controls">
+        <button class="lofi-btn-main" id="lofi-play-btn" onclick="toggleLofiPlay()">▶ Play</button>
+        <div class="lofi-volume-wrap">
+            <span class="lofi-vol-icon" id="lofi-vol-icon">🔈</span>
+            <input type="range" id="lofi-vol" min="0" max="100" value="70" oninput="lofiSetVolume(this.value)" />
+        </div>
+    </div>
+
+</div>
 
 <section>
     <div id="timer-container" class="timer-container">
@@ -179,7 +218,6 @@ $jsConfig = json_encode([
             <option value="theme1" <?php echo $settings['background_theme'] === 'theme1'  ? 'selected' : ''; ?>>Theme 1</option>
             <option value="theme2" <?php echo $settings['background_theme'] === 'theme2'  ? 'selected' : ''; ?>>Theme 2</option>
             <option value="theme3" <?php echo $settings['background_theme'] === 'theme3'  ? 'selected' : ''; ?>>Theme 3</option>
-            <option value="theme4" <?php echo $settings['background_theme'] === 'theme4'  ? 'selected' : ''; ?>>Hogwarts</option>
         </select>
     </div>
 </div>
@@ -194,5 +232,140 @@ $jsConfig = json_encode([
 <?php if (isset($_SESSION['access_token'])): ?>
     <script src="player.js"></script>
 <?php endif; ?>
+
+<!-- Lofi Widget Script -->
+<script>
+    const DEFAULT = {
+        id: '76GStMlLF_Y',
+        title: 'why the rush?',
+        sub: 'lo-fi beats · cat jazz',
+        label: 'cat jazz · live radio'
+    };
+
+    let isPlaying = false;
+    let player = null;
+
+    /* ── YouTube IFrame API ── */
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+
+    window.onYouTubeIframeAPIReady = function() {
+        player = new YT.Player('lofi-yt-player', {
+            events: {
+                onReady: lofiPlayerReady,
+                onStateChange: lofiStateChange
+            }
+        });
+    };
+
+    function lofiPlayerReady(e) {
+        e.target.setVolume(parseInt(document.getElementById('lofi-vol').value));
+    }
+
+    function lofiStateChange(e) {
+        if (e.data === YT.PlayerState.PLAYING) {
+            lofiSetPlaying(true);
+            document.getElementById('lofi-loading').classList.remove('visible');
+        } else if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) {
+            lofiSetPlaying(false);
+        }
+    }
+
+    function swapLofiVideo(videoId, title, sub, label) {
+        document.getElementById('lofi-loading').classList.add('visible');
+        lofiSetPlaying(false);
+
+        if (player) {
+            try {
+                player.destroy();
+            } catch (err) {}
+            player = null;
+        }
+
+        // Safely remove old iframe
+        const wrap = document.getElementById('lofi-player-wrap');
+        const oldIframe = document.getElementById('lofi-yt-player');
+        if (oldIframe) oldIframe.remove();
+
+        // Create fresh iframe
+        const iframe = document.createElement('iframe');
+        iframe.id = 'lofi-yt-player';
+        iframe.style.cssText = 'display:block;width:100%;height:160px;';
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('allow', 'autoplay; encrypted-media');
+        iframe.setAttribute('allowfullscreen', '');
+        iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&rel=0&modestbranding=1`;
+        wrap.insertBefore(iframe, document.getElementById('lofi-loading'));
+
+        // Bind new player
+        player = new YT.Player('lofi-yt-player', {
+            events: {
+                onReady: function(e) {
+                    e.target.setVolume(parseInt(document.getElementById('lofi-vol').value));
+                    e.target.playVideo();
+                },
+                onStateChange: lofiStateChange
+            }
+        });
+
+        document.getElementById('lofi-track-title').textContent = title;
+    }
+
+    function lofiExtractId(url) {
+        url = url.trim();
+        const patterns = [
+            /[?&]v=([a-zA-Z0-9_-]{11})/,
+            /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+            /youtube\.com\/live\/([a-zA-Z0-9_-]{11})/,
+            /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+            /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
+        ];
+        for (const p of patterns) {
+            const m = url.match(p);
+            if (m) return m[1];
+        }
+        if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
+        return null;
+    }
+
+    function loadLofiURL() {
+        const input = document.getElementById('lofi-url-input');
+        const errorMsg = document.getElementById('lofi-error-msg');
+
+        input.classList.remove('error');
+        errorMsg.classList.remove('visible');
+
+        const videoId = lofiExtractId(input.value);
+        if (!videoId) {
+            input.classList.add('error');
+            errorMsg.classList.add('visible');
+            return;
+        }
+
+        swapLofiVideo(videoId, 'now playing ♪');
+        input.value = '';
+    }
+
+    function resetLofiDefault() {
+        swapLofiVideo(DEFAULT.id, DEFAULT.title);
+    }
+
+    function toggleLofiPlay() {
+        if (!player) return;
+        isPlaying ? player.pauseVideo() : player.playVideo();
+    }
+
+    function lofiSetVolume(val) {
+        if (player && player.setVolume) player.setVolume(parseInt(val));
+        document.getElementById('lofi-vol-icon').textContent =
+            val == 0 ? '🔇' : val < 50 ? '🔈' : '🔊';
+    }
+
+    function lofiSetPlaying(playing) {
+        isPlaying = playing;
+        document.getElementById('lofi-play-btn').textContent = playing ? '⏸ Pause' : '▶ Play';
+    }
+</script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

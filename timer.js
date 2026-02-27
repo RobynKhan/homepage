@@ -78,12 +78,19 @@ const handleNavClick = (event) => {
 
   // Toggle visibility of the target container
   if (targetElement) {
-    // If the container is already visible, hide it
-    if (targetElement.style.display === "block") {
-      targetElement.style.display = "none";
+    const isHidden =
+      targetElement.style.display === "none" ||
+      window.getComputedStyle(targetElement).display === "none";
+
+    if (isHidden) {
+      // Clear inline style so CSS default takes over (flex, block, etc.)
+      targetElement.style.display = "";
+      // If CSS default is also none, force block
+      if (window.getComputedStyle(targetElement).display === "none") {
+        targetElement.style.display = "block";
+      }
     } else {
-      // Otherwise, show the container
-      targetElement.style.display = "block";
+      targetElement.style.display = "none";
     }
   }
 };
@@ -167,18 +174,22 @@ const updatePomodoroCount = () => {
 
 const applyTheme = (theme) => {
   const themes = {
-    default:
-      "https://i.pinimg.com/originals/41/fd/4b/41fd4b8362d93cb0bdc7117bf92ee8a2.jpg",
-    theme1:
-      "https://i.pinimg.com/originals/3b/73/99/3b7399c74894fb9b1fb27b3e4c8e3b1e.jpg",
-    theme2:
-      "https://i.pinimg.com/originals/51/02/0f/51020f0a2b56b35e10d22d6bc4deab5d.jpg",
-    theme3:
-      "https://i.pinimg.com/originals/08/d2/e9/08d2e9d8b4c7f7c9edbe5d5cd4b37e4a.jpg",
-    theme4:
-      "https://i.pinimg.com/originals/58/2a/d3/582ad3a92c1f4c5d73ade7dd0f5d70e3.jpg",
+    default: "themes/theme 2.gif",
+    theme1: "themes/theme1.jpg",
+    theme2: "themes/default.jpg",
+    theme3: "themes/theme3.jpg",
   };
   document.body.style.backgroundImage = `url('${themes[theme] || themes.default}')`;
+
+  // Swap theme colour class
+  document.body.classList.remove(
+    "theme-default",
+    "theme-theme1",
+    "theme-theme2",
+    "theme-theme3",
+  );
+  document.body.classList.add(`theme-${theme}`);
+
   const bgSelect = document.getElementById("background-select");
   if (bgSelect) bgSelect.value = theme;
 };

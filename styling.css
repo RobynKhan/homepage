@@ -1,19 +1,19 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Share+Tech+Mono&display=swap");
 
 :root {
-  --cream: #e8d5b0;
-  --brown-dark: #20130f;
-  --brown-mid: #81320b;
-  --brown-light: #c47a3a;
-  --sand: #d19d5b;
-  --glass-bg: rgba(30, 18, 10, 0.55);
-  --glass-border: rgba(196, 122, 58, 0.35);
-  --glass-hover: rgba(50, 30, 15, 0.75);
-  --text-primary: #f0dfc0;
-  --text-muted: rgba(240, 223, 192, 0.6);
+  --cream: #ead6f5;
+  --brown-dark: #1a0d2e;
+  --brown-mid: #5b2d8a;
+  --brown-light: #9c5fc0;
+  --sand: #c48de0;
+  --glass-bg: rgba(28, 12, 50, 0.6);
+  --glass-border: rgba(156, 95, 192, 0.35);
+  --glass-hover: rgba(55, 20, 90, 0.78);
+  --text-primary: #e8d0f8;
+  --text-muted: rgba(232, 208, 248, 0.55);
   --radius-lg: 18px;
   --radius-pill: 999px;
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   --transition: 0.22s ease;
 }
 
@@ -34,8 +34,43 @@ body {
   height: 100vh;
   margin: 0;
   font-family: "Inter", "Courier New", sans-serif;
-  background-image: url("https://i.pinimg.com/originals/41/fd/4b/41fd4b8362d93cb0bdc7117bf92ee8a2.jpg");
+  background-image: url("themes/theme 2.gif");
   overflow: hidden;
+}
+
+/* ── Admin corner button ───────────────────────────── */
+.admin-corner {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 500;
+}
+
+.admin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 16px;
+  box-shadow: var(--shadow);
+  transition:
+    background var(--transition),
+    color var(--transition),
+    transform var(--transition);
+}
+
+.admin-btn:hover {
+  background: var(--glass-hover);
+  color: var(--cream);
+  transform: scale(1.1);
 }
 
 /* ── Navbar ─────────────────────────────────────────── */
@@ -1255,4 +1290,278 @@ body {
     width: 110px;
     height: 110px;
   }
+}
+
+/* ── Lofi Study Widget ──────────────────────────────────────────────────── */
+.lofi-widget {
+  position: fixed;
+  bottom: 20px;
+  left: 130px;
+  z-index: 1000;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  width: 300px;
+  box-shadow: var(--shadow);
+  font-family: "Inter", sans-serif;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Search row */
+.lofi-search-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.lofi-url-input {
+  flex: 1;
+  background: rgba(30, 18, 10, 0.45);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+  padding: 6px 12px;
+  color: var(--text-primary);
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.lofi-url-input::placeholder {
+  color: var(--text-muted);
+}
+
+.lofi-url-input:focus {
+  border-color: var(--sand);
+}
+
+.lofi-url-input.error {
+  border-color: #f87171;
+  animation: lofi-shake 0.3s ease;
+}
+
+@keyframes lofi-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+.lofi-url-btn,
+.lofi-reset-btn {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+  color: var(--sand);
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  transition:
+    background var(--transition),
+    color var(--transition);
+  white-space: nowrap;
+}
+
+.lofi-url-btn:hover,
+.lofi-reset-btn:hover {
+  background: var(--glass-hover);
+  color: var(--cream);
+}
+
+.lofi-reset-btn {
+  padding: 6px 9px;
+}
+
+.lofi-error-msg {
+  font-size: 10px;
+  color: #f87171;
+  display: none;
+  padding: 0 2px;
+}
+
+.lofi-error-msg.visible {
+  display: block;
+}
+
+/* YouTube embed */
+.lofi-player-wrap {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  position: relative;
+}
+
+.lofi-player-wrap iframe {
+  display: block;
+  width: 100%;
+  height: 160px;
+}
+
+/* Loading overlay */
+.lofi-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 12, 8, 0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.lofi-loading-overlay.visible {
+  display: flex;
+}
+
+.lofi-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(196, 122, 58, 0.2);
+  border-top-color: var(--brown-light);
+  border-radius: 50%;
+  animation: lofi-rotate 0.8s linear infinite;
+}
+
+@keyframes lofi-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Controls */
+.lofi-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lofi-btn-main {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+  color: var(--sand);
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 16px;
+  white-space: nowrap;
+  transition:
+    background var(--transition),
+    color var(--transition);
+}
+
+.lofi-btn-main:hover {
+  background: var(--glass-hover);
+  color: var(--cream);
+}
+
+.lofi-volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.lofi-vol-icon {
+  font-size: 12px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.lofi-widget input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 2px;
+  background: var(--glass-border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.lofi-widget input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--sand);
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(209, 157, 91, 0.5);
+}
+
+.lofi-widget input[type="range"]::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--sand);
+  cursor: pointer;
+  border: none;
+}
+
+/* ════════════════════════════════════════════════════════
+   THEME COLOUR PALETTES
+   Override CSS variables per body class applied by applyTheme()
+   ════════════════════════════════════════════════════════ */
+
+/* Theme 1 — cool slate / midnight blue */
+body.theme-theme1 {
+  --cream: #d6e4f0;
+  --brown-dark: #0d1b2a;
+  --brown-mid: #1e3a5f;
+  --brown-light: #3b7abf;
+  --sand: #7ab3d9;
+  --glass-bg: rgba(10, 25, 47, 0.6);
+  --glass-border: rgba(59, 122, 191, 0.35);
+  --glass-hover: rgba(20, 50, 90, 0.78);
+  --text-primary: #c8dff0;
+  --text-muted: rgba(200, 223, 240, 0.55);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Theme 2 — warm brown (original default) */
+body.theme-theme2 {
+  --cream: #e8d5b0;
+  --brown-dark: #20130f;
+  --brown-mid: #81320b;
+  --brown-light: #c47a3a;
+  --sand: #d19d5b;
+  --glass-bg: rgba(30, 18, 10, 0.55);
+  --glass-border: rgba(196, 122, 58, 0.35);
+  --glass-hover: rgba(50, 30, 15, 0.75);
+  --text-primary: #f0dfc0;
+  --text-muted: rgba(240, 223, 192, 0.6);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+/* Theme 3 — sage / forest green */
+body.theme-theme3 {
+  --cream: #d8eed8;
+  --brown-dark: #0d1f0d;
+  --brown-mid: #2a5c2a;
+  --brown-light: #4e9e4e;
+  --sand: #82c882;
+  --glass-bg: rgba(10, 28, 10, 0.6);
+  --glass-border: rgba(78, 158, 78, 0.35);
+  --glass-hover: rgba(20, 55, 20, 0.78);
+  --text-primary: #c8e8c8;
+  --text-muted: rgba(200, 232, 200, 0.55);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }

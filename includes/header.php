@@ -30,8 +30,13 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#item3" class="nav-link" aria-label="Music" data-target="container-3">
-                    <i class="bi bi-music-note-beamed"></i>
+                <a href="#lofi" class="nav-link" aria-label="Lofi Radio" data-target="lofi-widget">
+                    <i class="bi bi-youtube"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#spotify" class="nav-link" aria-label="Spotify" data-target="container-3">
+                    <i class="bi bi-spotify"></i>
                 </a>
             </li>
             <li class="nav-item">
@@ -41,3 +46,16 @@
             </li>
         </ul>
     </nav>
+
+    <!-- Admin login/logout button — top right -->
+    <div class="admin-corner">
+        <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
+            <a href="logout_admin.php" class="admin-btn" title="Logout">
+                <i class="bi bi-person-check-fill"></i>
+            </a>
+        <?php else: ?>
+            <a href="login_admin.php" class="admin-btn" title="Admin Login">
+                <i class="bi bi-person-lock"></i>
+            </a>
+        <?php endif; ?>
+    </div>
