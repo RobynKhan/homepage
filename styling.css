@@ -1,3 +1,28 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Share+Tech+Mono&display=swap");
+
+:root {
+  --cream: #e8d5b0;
+  --brown-dark: #20130f;
+  --brown-mid: #81320b;
+  --brown-light: #c47a3a;
+  --sand: #d19d5b;
+  --glass-bg: rgba(30, 18, 10, 0.55);
+  --glass-border: rgba(196, 122, 58, 0.35);
+  --glass-hover: rgba(50, 30, 15, 0.75);
+  --text-primary: #f0dfc0;
+  --text-muted: rgba(240, 223, 192, 0.6);
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --transition: 0.22s ease;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   position: relative;
   background-size: cover;
@@ -8,141 +33,236 @@ body {
   align-items: center;
   height: 100vh;
   margin: 0;
-  font-family: "Courier New", monospace;
+  font-family: "Inter", "Courier New", sans-serif;
   background-image: url("https://i.pinimg.com/originals/41/fd/4b/41fd4b8362d93cb0bdc7117bf92ee8a2.jpg");
+  overflow: hidden;
 }
 
+/* ── Navbar ─────────────────────────────────────────── */
 .navbar {
   position: absolute;
-  top: 10%;
+  top: 50%;
   left: 3%;
-  border-radius: 50px;
-  background-color: rgba(98, 94, 51, 0.7);
-  height: 75%;
-  width: 60px;
-  text-align: center;
+  transform: translateY(-50%);
+  border-radius: var(--radius-pill);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  width: 58px;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  padding: 10px;
+  align-items: center;
+  padding: 14px 0;
+  gap: 0;
 }
 
 .nav-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
 }
 
 .nav-item {
-  margin: 20px 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .nav-link {
-  color: rgba(229, 196, 165, 1);
+  color: var(--sand);
   text-decoration: none;
-  display: block;
-  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   transition:
-    background-color 0.3s,
-    color 0.3s;
+    background var(--transition),
+    color var(--transition),
+    transform var(--transition);
 }
 
 .nav-link:hover {
-  background-color: rgba(32, 19, 15, 1);
-  color: #ddd;
-  border-radius: 5px;
+  background: var(--glass-hover);
+  color: var(--cream);
+  transform: scale(1.15);
 }
 
-.bi {
-  font-size: 24px;
+.nav-link .bi {
+  font-size: 20px;
+  line-height: 1;
 }
 
-.settings {
-  position: absolute;
-  background-color: transparent;
-  border: none;
-  padding: 5px;
-  border-radius: 50%;
-  cursor: pointer;
-  top: 3%;
-  left: 6px;
-  text-align: center;
-}
-
+/* ── Timer Container ────────────────────────────────── */
 .timer-container {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  padding: 20px;
+  padding: 32px 28px 24px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  border-radius: 10px;
-  background-color: rgba(222, 199, 157, 0.8);
+  gap: 18px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
   text-align: center;
-  width: 400px;
+  width: 420px;
 }
 
-.runner,
-.config {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  width: 100%;
-}
-
+/* ── Mode Buttons (Pomodoro / Short / Long) ─────────── */
 .timers {
-  text-align: center;
-  font-size: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
 }
 
-.timers button,
-.runner button,
-.config button {
-  margin: 5px;
+.timers button {
+  padding: 7px 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  font-family: "Press Start 2P", cursive;
-  border-radius: 10px;
-  background-color: transparent;
-  border: 1px solid #ddd;
-  padding: 10px;
   transition:
-    background-color 0.3s,
-    color 0.3s;
+    background var(--transition),
+    color var(--transition),
+    border-color var(--transition);
+  white-space: nowrap;
 }
 
-.timers button:hover,
-.runner button:hover,
-.config button:hover {
-  background-color: rgba(32, 19, 15, 1);
-  color: #ddd;
+.timers button:hover {
+  background: var(--glass-hover);
+  color: var(--cream);
+  border-color: var(--brown-light);
 }
 
-.time-button {
-  border: none;
-  padding: 10px;
-  border-radius: 50%;
-  cursor: pointer;
+.timers button.active {
+  background: var(--brown-mid);
+  color: var(--cream);
+  border-color: var(--brown-light);
+  font-weight: 600;
+}
+
+/* ── Timer Display ──────────────────────────────────── */
+.runner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .timer-display {
-  font-size: 50px;
-  font-weight: bold;
-  text-align: center;
+  font-family: "Share Tech Mono", "Courier New", monospace;
+  font-size: 72px;
+  font-weight: 400;
+  color: var(--cream);
+  letter-spacing: 4px;
+  text-shadow: 0 0 24px rgba(196, 122, 58, 0.5);
+  line-height: 1;
+}
+
+/* ── Control Buttons Row ────────────────────────────── */
+.config {
+  display: flex;
+  justify-content: center;
   align-items: center;
-  margin-bottom: 20px;
 }
 
-.pomodoro-count button {
+.pomodoro-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Shared icon-button base */
+.pause-button,
+.restart-button,
+.timer-settings {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--text-primary);
   font-size: 18px;
-  color: rgba(32, 19, 15, 1);
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    color var(--transition),
+    transform var(--transition),
+    border-color var(--transition);
+  padding: 0;
 }
 
+.pause-button:hover,
+.restart-button:hover {
+  background: var(--glass-hover);
+  color: var(--cream);
+  border-color: var(--brown-light);
+  transform: scale(1.1);
+}
+
+/* Start button — primary CTA */
 .start-button {
-  margin-left: 20px;
+  padding: 10px 28px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--brown-light);
+  background: var(--brown-mid);
+  color: var(--cream);
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    transform var(--transition),
+    box-shadow var(--transition);
+  box-shadow: 0 4px 14px rgba(129, 50, 11, 0.4);
+  margin: 0;
 }
 
+.start-button:hover {
+  background: var(--brown-light);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(196, 122, 58, 0.45);
+}
+
+/* Gear button — distinct highlight */
+.timer-settings {
+  background: rgba(129, 50, 11, 0.5) !important;
+  border-color: var(--brown-light) !important;
+  color: var(--sand) !important;
+}
+
+.timer-settings:hover {
+  background: var(--brown-mid) !important;
+  color: var(--cream) !important;
+  border-color: var(--cream) !important;
+  transform: rotate(45deg) scale(1.1) !important;
+}
+
+/* ── Containers (Clock / Music / Games) ─────────────── */
+.container-2,
 .container-3,
 .container-4 {
   display: none;
@@ -150,286 +270,152 @@ body {
   padding: 20px;
 }
 
-#container-3 {
-  display: none;
-  position: fixed;
-  bottom: 20px;
-  left: 90px;
-  z-index: 900;
-  width: 340px;
-  max-width: calc(100vw - 110px);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
-  background: #000;
-}
-
-.settings-container {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
-  background-color: rgba(222, 199, 157, 0.97);
-  border: 2px solid rgba(98, 94, 51, 0.8);
-  border-radius: 14px;
-  padding: 30px 28px 24px;
-  width: 340px;
-  max-width: 90vw;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
-  text-align: left;
-}
-
-.settings-container h2 {
-  margin: 0 0 18px;
-  font-size: 1.1rem;
-  color: rgba(32, 19, 15, 1);
-  text-align: center;
-}
-
-.setting-option {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-bottom: 14px;
-}
-
-.setting-option label {
-  font-size: 0.85rem;
-  color: rgba(32, 19, 15, 0.85);
-  font-weight: bold;
-}
-
-.setting-option input,
-.setting-option select {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(98, 94, 51, 0.6);
-  background: rgba(255, 255, 255, 0.7);
-  font-family: "Courier New", monospace;
-  font-size: 0.9rem;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-#save-settings-btn {
-  display: block;
-  width: 100%;
-  margin-top: 6px;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(98, 94, 51, 0.7);
-  background-color: rgba(98, 94, 51, 0.85);
-  color: rgba(229, 196, 165, 1);
-  font-family: "Courier New", monospace;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-#save-settings-btn:hover {
-  background-color: rgba(32, 19, 15, 1);
-}
-
-.bi-x-circle {
-  cursor: pointer;
-  float: right;
-  font-size: 20px;
-  color: rgba(32, 19, 15, 0.7);
-  transition: color 0.2s;
-}
-
-.bi-x-circle:hover {
-  color: rgba(32, 19, 15, 1);
-}
-
-.clock {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  margin-top: 20px;
-}
-
-.outer-clock-face {
-  position: relative;
-  width: 200px;
-  height: 200px;
-  border: 5px solid #333;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.number {
-  position: absolute;
-  font-size: 18px;
-  color: #333;
-}
-
-.hand {
-  position: absolute;
-  width: 50%;
-  height: 4px;
-  background-color: #333;
-  transform-origin: 100%;
-  transform: rotate(90deg);
-  transition: all 0.5s;
-}
-
-.hour-hand {
-  width: 40%;
-}
-
+/* ── Clock Widget ───────────────────────────────────── */
 #container-2 {
   position: absolute;
-  bottom: 20px; /* Adjust as needed */
-  right: 20px; /* Changed from right to left */
-  background-color: rgba(32, 19, 15, 1); /* Black background */
-  border: 3px solid rgba(129, 50, 11, 1);
-  padding-top: 1%;
-  padding-left: 1%;
-  padding-right: 1%;
-  padding-bottom: 1%;
+  bottom: 28px;
+  right: 28px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  border-radius: 20px;
-  width: 320px; /* Maintain size */
-  height: auto; /* Allow height to adjust */
+  gap: 4px;
+  border-radius: var(--radius-lg);
+  padding: 18px 24px;
+  width: 280px;
+  height: auto;
 }
 
-#date {
-  position: relative;
-  margin-top: 5px;
-  font-family: Courier, monospace;
-  width: 100%;
-  letter-spacing: 0.05rem;
-  text-align: center;
-  font-size: 1.2rem;
-  padding: 0.5rem;
-  border-radius: 10px;
-  border: none;
-  box-shadow: none;
-  background: transparent;
-  color: #d19d5b;
-  text-shadow: none;
-}
-
-#time {
-  position: relative;
-  font-family: Courier, monospace;
-  width: 100%;
-  letter-spacing: 0.05rem;
-  text-align: center;
-  font-size: 2.4rem;
-  padding: 0.5rem;
-  border-radius: 10px;
-  border: none;
-  box-shadow: none;
-  background: transparent;
-  color: #d19d5b;
-  text-shadow: none;
-}
-
-/* Additional styling for the container to enhance the modern look */
 #digital-clock {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  background-color: #1f1914; /* Dark background for contrast */
-  border-radius: 15px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); /* Subtle shadow */
-}
-.spotify-login-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background: #1db954;
-  color: white;
-  border-radius: 50px;
-  text-decoration: none;
-  font-weight: bold;
+  gap: 4px;
 }
 
-#spotify-player {
+#time {
+  font-family: "Share Tech Mono", "Courier New", monospace;
+  font-size: 2.2rem;
+  color: var(--sand);
+  letter-spacing: 2px;
+  line-height: 1;
+}
+
+#date {
+  font-family: "Inter", sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ── Settings Panel ─────────────────────────────────── */
+.settings-container {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(20, 12, 6, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  width: 340px;
+  color: var(--text-primary);
+  z-index: 100;
+}
+
+.settings-container h2 {
+  margin: 0 0 20px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--sand);
+}
+
+.bi-x-circle {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  font-size: 20px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color var(--transition),
+    transform var(--transition);
+}
+
+.bi-x-circle:hover {
+  color: var(--cream);
+  transform: scale(1.2);
+}
+
+.setting-option {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.setting-option label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.setting-option select,
+.setting-option input[type="number"] {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: var(--cream);
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  padding: 8px 12px;
   width: 100%;
+  outline: none;
+  transition: border-color var(--transition);
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-#album-art {
-  width: 180px;
-  height: 180px;
-  border-radius: 12px;
-  object-fit: cover;
+.setting-option select:focus,
+.setting-option input[type="number"]:focus {
+  border-color: var(--brown-light);
 }
 
-#track-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  text-align: center;
-}
-
-#track-name {
-  font-size: 1.1rem;
-  font-weight: bold;
-}
-
-#artist-name {
-  font-size: 0.9rem;
-  opacity: 0.7;
-}
-
-#player-controls {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-}
-
-#player-controls button {
-  background: none;
-  border: none;
-  font-size: 1.8rem;
-  cursor: pointer;
-}
-
-#progress-bar-container,
-#volume-control {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+#save-settings-btn {
   width: 100%;
-}
-
-#progress-bar,
-#volume-bar {
-  flex: 1;
+  margin-top: 8px;
+  padding: 10px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--brown-light);
+  background: var(--brown-mid);
+  color: var(--cream);
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   cursor: pointer;
+  transition:
+    background var(--transition),
+    transform var(--transition);
 }
 
-#logout-btn {
-  display: block;
-  margin-top: 12px;
-  text-align: center;
-  color: rgba(229, 196, 165, 0.75);
-  text-decoration: none;
-  font-size: 0.8rem;
-  transition: color 0.2s;
-}
-
-#logout-btn:hover {
-  color: rgba(229, 196, 165, 1);
+#save-settings-btn:hover {
+  background: var(--brown-light);
+  transform: translateY(-1px);
 }

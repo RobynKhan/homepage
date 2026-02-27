@@ -1,19 +1,4 @@
-// POMODORO TIMER — PHP-backed functionality
-// PHP_TIMERS and PHP_CONFIG are injected by index.php;
-// fall back to defaults when running without PHP (e.g. local file preview).
-const _PHP_TIMERS =
-  typeof PHP_TIMERS !== "undefined"
-    ? PHP_TIMERS
-    : { POMODORO: 1500, SHORTBREAK: 300, LONGBREAK: 900 };
-const _PHP_CONFIG =
-  typeof PHP_CONFIG !== "undefined"
-    ? PHP_CONFIG
-    : {
-        pomodorosUntilLongBreak: 4,
-        initialCount: 0,
-        backgroundTheme: "default",
-      };
-
+// POMODORO TIMER JAVA FUNCTIONALITY
 const elements = {
   startBtn: document.querySelector("#start-button"),
   pauseBtn: document.querySelector("#pause-button"),
@@ -23,23 +8,19 @@ const elements = {
   longbrkBtn: document.getElementById("longbrkbtn"),
   pomCount: document.querySelector(".pomodoro-count"),
   timerDisplay: document.querySelector(".timer-display"),
-  saveSettingsBtn: document.getElementById("save-settings-btn"),
-  bgSelect: document.getElementById("background-select"),
-  closeSettings: document.getElementById("close-settings"),
 };
 
-// Durations (seconds) — sourced from PHP server settings
 const timers = {
-  POMODORO: _PHP_TIMERS.POMODORO,
-  SHORTBREAK: _PHP_TIMERS.SHORTBREAK,
-  LONGBREAK: _PHP_TIMERS.LONGBREAK,
+  POMODORO: 1500, // 25 minutes
+  SHORTBREAK: 300, // 5 minutes
+  LONGBREAK: 900, // 15 minutes
 };
 
 const state = {
-  pomodoroCount: _PHP_CONFIG.initialCount, // seeded from DB
-  pomodorosUntilLongBreak: _PHP_CONFIG.pomodorosUntilLongBreak,
+  pomodoroCount: 0,
+  pomodorosUntilLongBreak: 4,
   timerValue: timers.POMODORO,
-  initialTime: timers.POMODORO,
+  initialTime: timers.POMODORO, // New property to store initial time
   timerInterval: null,
   isPaused: false,
   pomodoroType: "POMODORO",
@@ -55,19 +36,35 @@ const addEventListeners = () => {
   elements.longbrkBtn.addEventListener("click", () => setTimeType("LONGBREAK"));
   elements.resetBtn.addEventListener("click", resetTimer);
 
-  if (elements.saveSettingsBtn) {
-    elements.saveSettingsBtn.addEventListener("click", handleSaveSettings);
+  document.querySelectorAll(".nav-link").forEach((link) => {
+    link.addEventListener("click", handleNavClick);
+  });
+
+  // Gear button opens settings panel
+  const timerSettingsBtn = document.getElementById("timer-settings");
+  if (timerSettingsBtn) {
+    timerSettingsBtn.addEventListener("click", () => {
+      const panel = document.getElementById("settings-container");
+      if (panel)
+        panel.style.display =
+          panel.style.display === "block" ? "none" : "block";
+    });
   }
-  if (elements.closeSettings) {
-    elements.closeSettings.addEventListener("click", () => {
+
+  // X button closes settings panel
+  const closeSettingsBtn = document.getElementById("close-settings");
+  if (closeSettingsBtn) {
+    closeSettingsBtn.addEventListener("click", () => {
       const panel = document.getElementById("settings-container");
       if (panel) panel.style.display = "none";
     });
   }
 
-  document.querySelectorAll(".nav-link").forEach((link) => {
-    link.addEventListener("click", handleNavClick);
-  });
+  // Background theme live preview
+  const bgSelect = document.getElementById("background-select");
+  if (bgSelect) {
+    bgSelect.addEventListener("change", () => applyTheme(bgSelect.value));
+  }
 };
 
 const handleNavClick = (event) => {
@@ -91,7 +88,6 @@ const handleNavClick = (event) => {
   }
 };
 
-// Add event listeners to all navigation links
 const handleStart = () => {
   state.isPaused ? resumeTimer() : startTimer();
 };
@@ -108,12 +104,8 @@ const startTimer = () => {
       updateTimerDisplay();
     } else {
       clearInterval(state.timerInterval);
-      // Save completed session to the PHP backend
-      saveSession(state.pomodoroType, state.initialTime);
-      if (state.pomodoroType === "POMODORO") {
-        state.pomodoroCount++;
-        updatePomodoroCount();
-      }
+      state.pomodoroCount++;
+      updatePomodoroCount();
       if (state.pomodoroCount % state.pomodorosUntilLongBreak === 0) {
         setTimeType("LONGBREAK");
       } else {
@@ -171,55 +163,8 @@ const updatePomodoroCount = () => {
   elements.pomCount.style.color = "white";
   elements.pomCount.style.fontSize = "30px";
   elements.pomCount.textContent = `Pomodoro Count: ${state.pomodoroCount}`;
-
-  // Also update the lifetime counter rendered by PHP
-  const lifetimeEl = document.getElementById("lifetime-count");
-  if (lifetimeEl) {
-    lifetimeEl.innerHTML = `Lifetime Pomodoros: <strong>${state.pomodoroCount}</strong>`;
-  }
 };
 
-// ─── PHP API helpers ───────────────────────────────────────────────────────
-
-/**
- * POST a completed session to api/save_session.php
- * @param {string} type     - 'POMODORO' | 'SHORTBREAK' | 'LONGBREAK'
- * @param {number} duration - duration in seconds
- */
-// saveSession is a no-op without a database — counts are tracked in JS state
-const saveSession = (_type, _duration) => {};
-
-/**
- * Reads current settings inputs and POSTs them to api/save_settings.php.
- * Also refreshes the active timer durations so changes take effect immediately.
- */
-const handleSaveSettings = () => {
-  const pomodoro =
-    parseInt(document.getElementById("pomodoro-duration")?.value) || 25;
-  const shortBreak =
-    parseInt(document.getElementById("short-break-duration")?.value) || 5;
-  const longBreak =
-    parseInt(document.getElementById("long-break-duration")?.value) || 15;
-  const untilLong =
-    parseInt(document.getElementById("until-long-break")?.value) || 4;
-  const theme = elements.bgSelect?.value || "default";
-
-  // Update in-memory timers
-  timers.POMODORO = pomodoro * 60;
-  timers.SHORTBREAK = shortBreak * 60;
-  timers.LONGBREAK = longBreak * 60;
-  state.pomodorosUntilLongBreak = untilLong;
-
-  // Re-apply the current timer type so the display reflects new duration
-  setTimeType(state.pomodoroType);
-  applyTheme(theme);
-
-  // Close settings panel
-  const panel = document.getElementById("settings-container");
-  if (panel) panel.style.display = "none";
-};
-
-// ─── Apply background theme on load ───────────────────────────────────────
 const applyTheme = (theme) => {
   const themes = {
     default:
@@ -234,17 +179,9 @@ const applyTheme = (theme) => {
       "https://i.pinimg.com/originals/58/2a/d3/582ad3a92c1f4c5d73ade7dd0f5d70e3.jpg",
   };
   document.body.style.backgroundImage = `url('${themes[theme] || themes.default}')`;
-  if (elements.bgSelect) elements.bgSelect.value = theme;
+  const bgSelect = document.getElementById("background-select");
+  if (bgSelect) bgSelect.value = theme;
 };
-
-applyTheme(_PHP_CONFIG.backgroundTheme);
-
-// Sync theme preview when dropdown changes (before Save is clicked)
-if (elements.bgSelect) {
-  elements.bgSelect.addEventListener("change", () =>
-    applyTheme(elements.bgSelect.value),
-  );
-}
 
 const setCustomTime = (minutes) => {
   clearInterval(state.timerInterval);
@@ -254,6 +191,9 @@ const setCustomTime = (minutes) => {
 };
 
 addEventListeners();
+
+// Apply default theme on load
+applyTheme("default");
 
 // THE START OF THE CLOCK  FUNCTIONALITY
 

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <title>Document</title>
+    <link rel="stylesheet" href="styling.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a
+            href="#settings"
+            class="nav-link"
+            aria-label="Settings"
+            data-target="settings-container"
+          >
+            <i class="bi bi-sliders2"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            href="#timer"
+            class="nav-link"
+            aria-label="Timer"
+            data-target="timer-container"
+          >
+            <i class="bi bi-hourglass-split"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            href="#item2"
+            class="nav-link"
+            aria-label="Clock"
+            data-target="container-2"
+          >
+            <i class="bi bi-clock"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            href="#item3"
+            class="nav-link"
+            aria-label="Music"
+            data-target="container-3"
+          >
+            <i class="bi bi-music-note-beamed"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            href="#item4"
+            class="nav-link"
+            aria-label="Games"
+            data-target="container-4"
+          >
+            <i class="bi bi-controller"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <section>
+      <div id="timer-container" class="timer-container">
+        <!-- Timer Mode Buttons -->
+        <div class="timers" role="group" aria-label="Timer Modes">
+          <button
+            id="pomodorobtn"
+            class="active"
+            type="button"
+            aria-label="Pomodoro Mode"
+          >
+            Pomodoro
+          </button>
+          <button id="shortbrkbtn" type="button" aria-label="Short Break Mode">
+            Short Break
+          </button>
+          <button id="longbrkbtn" type="button" aria-label="Long Break Mode">
+            Long Break
+          </button>
+        </div>
+        <!-- Timer Display -->
+        <div class="runner">
+          <span class="timer-display" role="timer" aria-live="polite"
+            >00:00</span
+          >
+        </div>
+        <!-- Timer Controls -->
+        <div class="config">
+          <div class="pomodoro-count" role="group" aria-label="Timer Controls">
+            <button
+              class="start-button"
+              id="start-button"
+              type="button"
+              aria-label="Start Timer"
+            >
+              Start
+            </button>
+            <button
+              class="pause-button"
+              id="pause-button"
+              type="button"
+              aria-label="Pause Timer"
+            >
+              <i class="bi bi-pause-circle" aria-hidden="true"></i>
+            </button>
+            <button
+              class="restart-button"
+              id="restart-button"
+              type="button"
+              aria-label="Restart Timer"
+            >
+              <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+            </button>
+            <button
+              class="timer-settings"
+              id="timer-settings"
+              type="button"
+              aria-label="Open Timer Settings"
+            >
+              <i class="bi bi-gear" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="container-2" class="container-2">
+      <div id="digital-clock">
+        <div id="time"></div>
+        <div id="date"></div>
+      </div>
+    </div>
+    <div id="container-3" class="container-3">
+      <div class="section-1">
+        Section 1
+        <button class="button">Button</button>
+      </div>
+    </div>
+
+    <div id="container-4" class="container-4">
+      <div class="section-1">
+        Section 1
+        <button class="button">Button</button>
+      </div>
+    </div>
+
+    <div id="settings-container" class="settings-container">
+      <i class="bi bi-x-circle" id="close-settings"></i>
+      <h2>Settings</h2>
+      <div class="setting-option">
+        <label for="background-select">Background Theme:</label>
+        <select id="background-select">
+          <option value="default">Default</option>
+          <option value="theme1">Theme 1</option>
+          <option value="theme2">Theme 2</option>
+          <option value="theme3">Theme 3</option>
+          <option value="theme4">Hogwarts</option>
+        </select>
+      </div>
+    </div>
+  </body>
+  <script src="timer.js"></script>
+</html>
