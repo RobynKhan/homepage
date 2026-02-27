@@ -691,6 +691,51 @@ body {
   color: var(--cream);
 }
 
+/* ── Todo locked state (guest) ─────────────────────── */
+.todo-locked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 16px;
+  text-align: center;
+}
+
+.todo-locked .bi-lock {
+  font-size: 28px;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.todo-locked p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.todo-login-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--sand);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  transition:
+    background var(--transition),
+    color var(--transition);
+}
+
+.todo-login-link:hover {
+  background: var(--glass-hover);
+  color: var(--cream);
+}
+
 /* ═══════════════════════════════════════════════════════
    SETTINGS PANEL — modal overlay
    ═══════════════════════════════════════════════════════ */
