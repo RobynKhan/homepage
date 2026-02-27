@@ -14,6 +14,12 @@ function getDB(): PDO
     $pass = getenv('DB_PASSWORD');
     $port = getenv('DB_PORT') ?: '5432';
 
+    if (!$host || !$name || !$user || !$pass) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Missing DB environment variables']);
+        exit;
+    }
+
     try {
         $pdo = new PDO(
             "pgsql:host=$host;port=$port;dbname=$name;sslmode=require",
@@ -26,7 +32,7 @@ function getDB(): PDO
         );
     } catch (PDOException $e) {
         http_response_code(500);
-        echo json_encode(['error' => 'Database connection failed']);
+        echo json_encode(['error' => $e->getMessage()]);
         exit;
     }
 
