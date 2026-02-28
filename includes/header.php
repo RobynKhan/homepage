@@ -10,8 +10,10 @@
     <title><?php echo defined('APP_NAME') ? htmlspecialchars(APP_NAME) : 'Pomodoro Timer'; ?></title>
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="styling.css" />
-    <link rel="icon" href="icon.png" type="image/png">
+    <link rel="icon" href="favicon (1).ico" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -55,12 +57,12 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#lofi" class="nav-link" data-target="lofi-widget">
+                <a href="#lofi" class="nav-link" data-target="container-3" data-tab="youtube">
                     <i class="bi bi-youtube"></i> <span>YouTube</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#spotify" class="nav-link" data-target="container-3">
+                <a href="#spotify" class="nav-link" data-target="container-3" data-tab="spotify">
                     <i class="bi bi-spotify"></i> <span>Spotify</span>
                 </a>
             </li>
@@ -83,11 +85,11 @@
             <i class="bi bi-hourglass-split"></i>
             <span>Timer</span>
         </button>
-        <button class="dock-btn" data-target="lofi-widget" aria-label="Music">
+        <button class="dock-btn" data-target="container-3" data-tab="youtube" aria-label="Music">
             <i class="bi bi-music-note-beamed"></i>
             <span>Music</span>
         </button>
-        <button class="dock-btn" data-target="container-3" aria-label="Spotify">
+        <button class="dock-btn" data-target="container-3" data-tab="spotify" aria-label="Spotify">
             <i class="bi bi-spotify"></i>
             <span>Spotify</span>
         </button>

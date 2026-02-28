@@ -28,47 +28,7 @@ $jsConfig = json_encode([
 ?>
 <?php require_once __DIR__ . '/includes/header.php'; ?>
 
-<!-- Lofi FAB (desktop mini-player toggle) -->
-<button class="lofi-fab active" id="lofi-fab" aria-label="Toggle music player">
-    <i class="bi bi-music-note-beamed"></i>
-</button>
-
-<!-- Lofi Study Widget -->
-<div class="lofi-widget" id="lofi-widget" style="display:flex;">
-
-    <div class="lofi-search-row">
-        <input
-            class="lofi-url-input"
-            id="lofi-url-input"
-            type="text"
-            placeholder="paste youtube url..."
-            onkeydown="if(event.key==='Enter') loadLofiURL()" />
-        <button class="lofi-url-btn" onclick="loadLofiURL()">Go</button>
-        <button class="lofi-reset-btn" onclick="resetLofiDefault()" title="reset to default">↺</button>
-    </div>
-    <div class="lofi-error-msg" id="lofi-error-msg">⚠ invalid youtube url</div>
-
-    <div class="lofi-player-wrap" id="lofi-player-wrap">
-        <iframe
-            id="lofi-yt-player"
-            src="https://www.youtube.com/embed/76GStMlLF_Y?enablejsapi=1&autoplay=0&rel=0&modestbranding=1"
-            frameborder="0"
-            allow="autoplay; encrypted-media; fullscreen"></iframe>
-        <div class="lofi-loading-overlay" id="lofi-loading">
-            <div class="lofi-spinner"></div>
-            loading...
-        </div>
-    </div>
-
-    <div class="lofi-controls">
-        <button class="lofi-btn-main" id="lofi-play-btn" onclick="toggleLofiPlay()">▶ Play</button>
-        <div class="lofi-volume-wrap">
-            <span class="lofi-vol-icon" id="lofi-vol-icon">🔈</span>
-            <input type="range" id="lofi-vol" min="0" max="100" value="70" oninput="lofiSetVolume(this.value)" />
-        </div>
-    </div>
-
-</div>
+<!-- (lofi FAB removed — YouTube is inside the left panel) -->
 
 <section>
     <div id="timer-container" class="timer-container">
@@ -133,71 +93,186 @@ $jsConfig = json_encode([
     </div>
 </section>
 
-<!-- Clock is now in the top bar -->
+<!-- PixelTune Left Panel — Spotify + YouTube switcher -->
 <div id="container-3" class="container-3">
 
-    <!-- Spotify Embed Player (always visible) -->
-    <div class="spotify-player-section">
+    <!-- Tab switcher bar -->
+    <div class="px-tab-bar">
+        <button class="px-tab active" id="px-tab-spotify" onclick="pxSwitchTab('spotify')">
+            <i class="bi bi-spotify"></i> SPOTIFY
+        </button>
+        <button class="px-tab" id="px-tab-youtube" onclick="pxSwitchTab('youtube')">
+            <i class="bi bi-youtube"></i> YOUTUBE
+        </button>
+    </div>
 
-        <!-- Login/Logout bar -->
-        <div class="spotify-auth-bar">
-            <?php if (!isset($_SESSION['access_token'])): ?>
-                <a href="login.php" class="btn-spotify" target="_blank" rel="noopener">
-                    <i class="bi bi-spotify"></i> Login with Spotify to see your playlists
-                </a>
-            <?php else: ?>
-                <p class="spotify-connected"><i class="bi bi-spotify"></i> Spotify connected</p>
-                <a href="logout.php" class="btn-spotify btn-spotify--disconnect">Disconnect</a>
-            <?php endif; ?>
-        </div>
+    <!-- ════ SPOTIFY PANEL ════ -->
+    <div class="px-tab-panel active" id="px-panel-spotify">
+        <div class="px-player" id="px-app">
+        <!-- Pixel stars decoration -->
+        <div class="px-star" style="top:12px;right:40px;animation-delay:0.3s"></div>
+        <div class="px-star" style="top:30px;right:18px;animation-delay:0.9s;background:#00e5ff;box-shadow:0 0 4px #00e5ff;"></div>
+        <div class="px-star" style="top:6px;right:70px;animation-delay:1.4s;width:2px;height:2px;background:#b06bff;box-shadow:0 0 4px #b06bff;"></div>
 
-        <div class="app-layout">
+        <!-- Scanline overlay -->
+        <div class="px-scanlines"></div>
 
-            <!-- Sidebar: playlists (only when logged in) -->
-            <div class="sidebar">
-                <h3>Your Playlists</h3>
+        <!-- ===== SCREEN 1: HOME (playlists + search) ===== -->
+        <div class="px-screen active" id="px-screen-home">
+            <div class="px-topbar">
+                <div class="px-topbar-title">&#9654; PIXELTUNE</div>
                 <?php if (!isset($_SESSION['access_token'])): ?>
-                    <p class="sidebar-hint">Login to see your playlists</p>
+                    <a href="login.php" class="px-topbar-btn" target="_blank" rel="noopener" title="Login with Spotify">
+                        <i class="bi bi-spotify"></i>
+                    </a>
                 <?php else: ?>
+                    <div class="px-topbar-actions">
+                        <span class="px-connected-dot"></span>
+                        <a href="logout.php" class="px-topbar-btn" title="Disconnect Spotify">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <div class="px-scroll-area">
+                <!-- Search -->
+                <div class="px-section-label">SEARCH</div>
+                <div class="px-search-bar">
+                    <input type="text" id="search-input" placeholder="SEARCH SONGS..."
+                        onkeydown="if(event.key==='Enter') searchSongs()" />
+                    <button onclick="searchSongs()">&#128269;</button>
+                </div>
+
+                <?php if (!isset($_SESSION['access_token'])): ?>
+                    <!-- Login prompt -->
+                    <div class="px-login-prompt">
+                        <i class="bi bi-spotify" style="font-size:18px;color:var(--px-green)"></i>
+                        <span><a href="login.php" target="_blank" rel="noopener" style="color:var(--px-green);text-decoration:underline">Login with Spotify</a> to see your playlists, liked songs &amp; more</span>
+                    </div>
+
+                    <!-- Default: Top Songs -->
+                    <div class="px-section-label" style="margin-top:10px">&#127942; TOP SONGS</div>
+                    <ul id="track-list-home"></ul>
+                <?php else: ?>
+                    <!-- Playlists (logged in) -->
+                    <div class="px-section-label" style="margin-top:14px">YOUR PLAYLISTS</div>
                     <ul id="playlist-list"></ul>
                 <?php endif; ?>
             </div>
 
-            <!-- Main: search + tracklist -->
-            <div class="main-content">
-                <div class="search-bar">
-                    <input type="text" id="search-input" placeholder="Search for songs…"
-                        onkeydown="if(event.key==='Enter') searchSongs()" />
-                    <button onclick="searchSongs()">
-                        <i class="bi bi-search"></i> Search
-                    </button>
+            <!-- Now playing bar at bottom -->
+            <div class="px-np-bar" onclick="pxShowScreen('player')">
+                <div class="px-np-art" id="px-np-emoji">&#127925;</div>
+                <div class="px-np-info">
+                    <div class="px-np-title" id="px-np-title">Select a track</div>
+                    <div class="px-np-artist" id="px-np-artist">—</div>
                 </div>
-                <div class="tracklist-panel">
-                    <h3 id="playlist-title">Search or select a playlist</h3>
-                    <ul id="track-list"></ul>
-                </div>
+                <div class="px-np-wave" id="px-np-wave"></div>
+            </div>
+        </div>
+
+        <!-- ===== SCREEN 2: TRACKS (search results / playlist tracks) ===== -->
+        <div class="px-screen" id="px-screen-tracks">
+            <div class="px-topbar">
+                <button class="px-back-btn" onclick="pxShowScreen('home')">&#9664; BACK</button>
+                <div class="px-topbar-title" id="px-tracks-screen-title">TRACKS</div>
+                <div style="width:18px"></div>
             </div>
 
-            <!-- Right: Spotify iframe embed -->
-            <div class="right-panel">
-                <div class="embed-container">
-                    <h2>Now Playing</h2>
-                    <iframe
-                        id="spotify-embed"
-                        src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M"
-                        width="100%"
-                        height="380"
-                        frameborder="0"
-                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                        loading="lazy"
-                        style="border-radius: 12px;">
-                    </iframe>
-                </div>
+            <div class="px-scroll-area">
+                <div class="px-section-label"><span id="playlist-title">TRACKS</span></div>
+                <ul id="track-list"></ul>
             </div>
 
+            <!-- Now playing bar -->
+            <div class="px-np-bar" onclick="pxShowScreen('player')">
+                <div class="px-np-art" id="px-np-emoji2">&#127925;</div>
+                <div class="px-np-info">
+                    <div class="px-np-title" id="px-np-title2">Select a track</div>
+                    <div class="px-np-artist" id="px-np-artist2">—</div>
+                </div>
+                <div class="px-np-wave" id="px-np-wave2"></div>
+            </div>
+        </div>
+
+        <!-- ===== SCREEN 3: NOW PLAYING (Spotify embed) ===== -->
+        <div class="px-screen" id="px-screen-player">
+            <div class="px-topbar">
+                <button class="px-back-btn" onclick="pxGoBack()">&#9664; BACK</button>
+                <div class="px-topbar-title">&#9654; NOW PLAYING</div>
+                <div class="px-waveform" id="px-waveform"></div>
+            </div>
+
+            <div class="px-embed-body">
+                <iframe
+                    id="spotify-embed"
+                    src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M"
+                    width="100%"
+                    height="100%"
+                    frameborder="0"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy">
+                </iframe>
+            </div>
         </div>
     </div>
-</div>
+    </div><!-- /px-panel-spotify -->
+
+    <!-- ════ YOUTUBE PANEL ════ -->
+    <div class="px-tab-panel" id="px-panel-youtube">
+        <div class="px-player px-yt-player" id="px-yt-app">
+            <!-- Scanline overlay -->
+            <div class="px-scanlines"></div>
+
+            <!-- Pixel stars -->
+            <div class="px-star" style="top:10px;right:30px;animation-delay:0.2s;background:#ff0000;box-shadow:0 0 4px #ff0000;"></div>
+            <div class="px-star" style="top:25px;right:55px;animation-delay:1.1s;"></div>
+
+            <!-- Single screen for YouTube -->
+            <div class="px-screen active">
+                <div class="px-topbar">
+                    <div class="px-topbar-title" style="color:var(--px-accent)">&#9654; YOUTUBE</div>
+                </div>
+
+                <div class="px-scroll-area">
+                    <!-- URL input -->
+                    <div class="px-section-label">PASTE URL</div>
+                    <div class="px-search-bar">
+                        <input type="text" id="lofi-url-input" placeholder="YOUTUBE URL..."
+                            onkeydown="if(event.key==='Enter') loadLofiURL()" />
+                        <button onclick="loadLofiURL()">GO</button>
+                        <button onclick="resetLofiDefault()" title="Reset" style="border-left:2px solid #000">&#8634;</button>
+                    </div>
+                    <div class="lofi-error-msg" id="lofi-error-msg">&#9888; INVALID URL</div>
+
+                    <!-- YouTube embed -->
+                    <div class="px-yt-embed-wrap" id="lofi-player-wrap">
+                        <iframe
+                            id="lofi-yt-player"
+                            src="https://www.youtube.com/embed/76GStMlLF_Y?enablejsapi=1&autoplay=0&rel=0&modestbranding=1"
+                            frameborder="0"
+                            allow="autoplay; encrypted-media; fullscreen"></iframe>
+                        <div class="lofi-loading-overlay" id="lofi-loading">
+                            <div class="px-yt-spinner"></div>
+                            LOADING...
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="px-yt-controls">
+                        <button class="px-yt-play-btn" id="lofi-play-btn" onclick="toggleLofiPlay()">&#9654; PLAY</button>
+                        <div class="px-yt-volume">
+                            <span class="px-yt-vol-icon" id="lofi-vol-icon">&#128264;</span>
+                            <input type="range" id="lofi-vol" min="0" max="100" value="70" oninput="lofiSetVolume(this.value)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- /px-panel-youtube -->
+
+</div><!-- /container-3 -->
 
 <div id="container-4" class="container-4" data-show-as="flex">
     <?php require_once __DIR__ . '/todo_widget.php'; ?>
@@ -247,11 +322,10 @@ $jsConfig = json_encode([
             }
 
             // Lofi widget state
-            const lofiWidget = document.getElementById('lofi-widget');
             const lofiVol = document.getElementById('lofi-vol');
             const lofiIframe = document.getElementById('lofi-yt-player');
             snap.lofi = {
-                widgetOpen: lofiWidget ? (window.getComputedStyle(lofiWidget).display !== 'none') : false,
+                activeTab: document.querySelector('.px-tab.active')?.id === 'px-tab-youtube' ? 'youtube' : 'spotify',
                 volume: lofiVol ? parseInt(lofiVol.value) : 70,
                 videoId: null,
                 isPlaying: typeof isPlaying !== 'undefined' ? isPlaying : false
@@ -316,11 +390,9 @@ $jsConfig = json_encode([
 
             // Lofi widget
             if (snap.lofi) {
-                const lofiWidget = document.getElementById('lofi-widget');
-                const lofiFab = document.getElementById('lofi-fab');
-                if (lofiWidget) {
-                    lofiWidget.style.display = snap.lofi.widgetOpen ? 'flex' : 'none';
-                    if (lofiFab) lofiFab.classList.toggle('active', snap.lofi.widgetOpen);
+                // Restore active tab
+                if (snap.lofi.activeTab && typeof pxSwitchTab === 'function') {
+                    pxSwitchTab(snap.lofi.activeTab);
                 }
                 const lofiVol = document.getElementById('lofi-vol');
                 if (lofiVol) lofiVol.value = snap.lofi.volume;
@@ -362,10 +434,11 @@ $jsConfig = json_encode([
     }());
 </script>
 
-<!-- Load player JS only when logged in for playlist fetching -->
-<?php if (isset($_SESSION['access_token'])): ?>
-    <script src="player.js"></script>
-<?php endif; ?>
+<!-- PixelTune player JS (always loaded) -->
+<script>
+    const PX_LOGGED_IN = <?php echo isset($_SESSION['access_token']) ? 'true' : 'false'; ?>;
+</script>
+<script src="player.js"></script>
 
 <!-- Lofi Widget Script -->
 <script>
@@ -425,9 +498,8 @@ $jsConfig = json_encode([
         // Create fresh iframe
         const iframe = document.createElement('iframe');
         iframe.id = 'lofi-yt-player';
-        iframe.style.cssText = 'display:block;width:100%;height:160px;';
+        iframe.style.cssText = 'display:block;width:100%;height:200px;';
         iframe.setAttribute('frameborder', '0');
-        iframe.setAttribute('allow', 'autoplay; encrypted-media');
         iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
         iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&rel=0&modestbranding=1`;
         wrap.insertBefore(iframe, document.getElementById('lofi-loading'));
@@ -442,8 +514,6 @@ $jsConfig = json_encode([
                 onStateChange: lofiStateChange
             }
         });
-
-        document.getElementById('lofi-track-title').textContent = title;
     }
 
     function lofiExtractId(url) {
@@ -498,7 +568,7 @@ $jsConfig = json_encode([
 
     function lofiSetPlaying(playing) {
         isPlaying = playing;
-        document.getElementById('lofi-play-btn').textContent = playing ? '⏸ Pause' : '▶ Play';
+        document.getElementById('lofi-play-btn').textContent = playing ? '\u23F8 PAUSE' : '\u25B6 PLAY';
     }
 </script>
 

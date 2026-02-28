@@ -63,29 +63,18 @@ const addEventListeners = () => {
         const targetEl = document.getElementById(targetId);
         if (targetEl) {
           togglePanel(targetEl);
+          // If link specifies a tab, switch to it
+          const tab = link.dataset.tab;
+          if (tab && typeof pxSwitchTab === 'function') {
+            pxSwitchTab(tab);
+          }
         }
         closeDrawer();
       });
     });
   }
 
-  // ─── Lofi FAB (desktop floating music button) ──────
-  const lofiFab = document.getElementById("lofi-fab");
-  const lofiWidget = document.getElementById("lofi-widget");
-  if (lofiFab && lofiWidget) {
-    lofiFab.addEventListener("click", () => {
-      const isHidden =
-        lofiWidget.style.display === "none" ||
-        window.getComputedStyle(lofiWidget).display === "none";
-      if (isHidden) {
-        lofiWidget.style.display = "flex";
-        lofiFab.classList.add("active");
-      } else {
-        lofiWidget.style.display = "none";
-        lofiFab.classList.remove("active");
-      }
-    });
-  }
+  // (Lofi FAB removed — YouTube is now a tab inside container-3)
 
   // ─── Mobile bottom dock + bottom sheets ────────────
   const sheetBackdrop = document.getElementById("sheet-backdrop");
@@ -115,6 +104,12 @@ const addEventListeners = () => {
         target.classList.add("sheet-open");
         btn.classList.add("active");
         if (sheetBackdrop) sheetBackdrop.classList.add("visible");
+      }
+
+      // Switch tab if specified
+      const tab = btn.dataset.tab;
+      if (tab && typeof pxSwitchTab === 'function') {
+        pxSwitchTab(tab);
       }
     });
   });

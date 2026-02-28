@@ -1,41 +1,53 @@
 <?php
-// ─── To-do Widget ──────────────────────────────────────────────────
+// ─── To-do Widget — PixelTune Style ────────────────────────────────
 $isAdmin = function_exists('is_admin_logged_in') && is_admin_logged_in();
 ?>
-<div class="todo-widget">
-    <div class="todo-header">
-        <h3 class="todo-title"><i class="bi bi-journal-check"></i> To-do</h3>
+<div class="px-todo">
+    <div class="px-todo-scanlines"></div>
+
+    <!-- Title bar -->
+    <div class="px-todo-titlebar">
+        <span class="px-todo-titlebar-dots">
+            <span class="px-dot px-dot--red"></span>
+            <span class="px-dot px-dot--yellow"></span>
+            <span class="px-dot px-dot--green"></span>
+        </span>
+        <h3 class="px-todo-title">QUESTS</h3>
     </div>
 
     <?php if ($isAdmin): ?>
-        <!-- Logged-in admin: full CRUD -->
-        <div class="todo-input-row">
-            <input
-                type="text"
-                id="todo-input"
-                class="todo-input"
-                placeholder="Add a task…"
-                maxlength="120"
-                onkeydown="if(event.key==='Enter') todoAdd()" />
-            <button class="todo-add-btn" onclick="todoAdd()" aria-label="Add task">
-                <i class="bi bi-plus-lg"></i>
-            </button>
-        </div>
-        <ul class="todo-list" id="todo-list"></ul>
-        <div class="todo-error" id="todo-error" style="display:none;">
-            <i class="bi bi-exclamation-triangle"></i>
-            <span id="todo-error-msg">Could not load tasks</span>
-        </div>
-        <div class="todo-footer">
-            <span id="todo-count" class="todo-count">0 tasks</span>
-            <button class="todo-clear-btn" onclick="todoClearDone()" title="Clear completed">Clear done</button>
+        <!-- Admin: full CRUD -->
+        <div class="px-todo-body">
+            <div class="px-todo-input-row">
+                <input
+                    type="text"
+                    id="todo-input"
+                    class="px-todo-input"
+                    placeholder="+ new quest..."
+                    maxlength="120"
+                    onkeydown="if(event.key==='Enter') todoAdd()" />
+                <button class="px-todo-add-btn" onclick="todoAdd()" aria-label="Add task">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            </div>
+            <ul class="px-todo-list" id="todo-list"></ul>
+            <div class="px-todo-error" id="todo-error" style="display:none;">
+                <i class="bi bi-exclamation-triangle"></i>
+                <span id="todo-error-msg">SYSTEM ERROR</span>
+            </div>
+            <div class="px-todo-footer">
+                <span id="todo-count" class="px-todo-count">0 / 0</span>
+                <button class="px-todo-clear-btn" onclick="todoClearDone()" title="Clear completed">
+                    <i class="bi bi-trash3"></i> CLR
+                </button>
+            </div>
         </div>
     <?php else: ?>
         <!-- Guest: locked state -->
-        <div class="todo-locked">
-            <i class="bi bi-lock"></i>
-            <p>Login as admin to use tasks</p>
-            <a href="login_admin.php" class="todo-login-link">Login</a>
+        <div class="px-todo-locked">
+            <i class="bi bi-lock-fill"></i>
+            <p>ADMIN ACCESS REQUIRED</p>
+            <a href="login_admin.php" class="px-todo-login-btn">LOGIN</a>
         </div>
     <?php endif; ?>
 </div>
@@ -71,7 +83,7 @@ $isAdmin = function_exists('is_admin_logged_in') && is_admin_logged_in();
                 const msgEl = document.getElementById('todo-error-msg');
                 if (el) {
                     el.style.display = 'flex';
-                    if (msgEl) msgEl.textContent = msg || 'Could not load tasks';
+                    if (msgEl) msgEl.textContent = msg || 'SYSTEM ERROR';
                 }
             }
 
@@ -86,7 +98,7 @@ $isAdmin = function_exists('is_admin_logged_in') && is_admin_logged_in();
                     hideError();
                 } catch (err) {
                     todos = [];
-                    showError('Could not load tasks — check connection');
+                    showError('CONNECTION LOST');
                     console.error('Todo list load error:', err);
                 }
                 render();
@@ -100,24 +112,24 @@ $isAdmin = function_exists('is_admin_logged_in') && is_admin_logged_in();
                 list.innerHTML = '';
                 todos.forEach((todo) => {
                     const li = document.createElement('li');
-                    li.className = 'todo-item' + (todo.done ? ' todo-done' : '');
+                    li.className = 'px-todo-item' + (todo.done ? ' px-todo-done' : '');
 
                     const checkbox = document.createElement('button');
-                    checkbox.className = 'todo-check';
+                    checkbox.className = 'px-todo-check';
                     checkbox.setAttribute('aria-label', todo.done ? 'Mark incomplete' : 'Mark complete');
                     checkbox.innerHTML = todo.done ?
-                        '<i class="bi bi-check-circle-fill"></i>' :
-                        '<i class="bi bi-circle"></i>';
+                        '<span class="px-todo-box">&#x2713;</span>' :
+                        '<span class="px-todo-box"></span>';
                     checkbox.onclick = () => todoToggle(todo.id, !todo.done);
 
                     const text = document.createElement('span');
-                    text.className = 'todo-text';
+                    text.className = 'px-todo-text';
                     text.textContent = todo.text;
 
                     const del = document.createElement('button');
-                    del.className = 'todo-del-btn';
+                    del.className = 'px-todo-del';
                     del.setAttribute('aria-label', 'Delete task');
-                    del.innerHTML = '<i class="bi bi-x"></i>';
+                    del.innerHTML = '&#x2715;';
                     del.onclick = () => todoDelete(todo.id);
 
                     li.appendChild(checkbox);
@@ -128,7 +140,7 @@ $isAdmin = function_exists('is_admin_logged_in') && is_admin_logged_in();
 
                 const total = todos.length;
                 const done = todos.filter(t => t.done).length;
-                count.textContent = total === 0 ? 'No tasks' : `${done}/${total} done`;
+                count.textContent = total === 0 ? 'NO QUESTS' : `${done} / ${total} DONE`;
             }
 
             window.todoAdd = async function() {
