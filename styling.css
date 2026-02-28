@@ -544,9 +544,15 @@ body {
   display: block;
 }
 
-.px-dot--red    { background: #ff2d6b; }
-.px-dot--yellow { background: #ffe600; }
-.px-dot--green  { background: #00ff99; }
+.px-dot--red {
+  background: #ff2d6b;
+}
+.px-dot--yellow {
+  background: #ffe600;
+}
+.px-dot--green {
+  background: #00ff99;
+}
 
 .px-todo-title {
   margin: 0;
@@ -608,7 +614,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, transform 0.1s;
+  transition:
+    background 0.15s,
+    transform 0.1s;
 }
 
 .px-todo-add-btn:hover {
@@ -685,7 +693,10 @@ body {
   font-family: "Press Start 2P", monospace;
   font-size: 7px;
   color: transparent;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s,
+    background 0.15s;
 }
 
 .px-todo-done .px-todo-box {
@@ -728,7 +739,9 @@ body {
   align-items: center;
   flex-shrink: 0;
   opacity: 0;
-  transition: opacity 0.15s, color 0.15s;
+  transition:
+    opacity 0.15s,
+    color 0.15s;
 }
 
 .px-todo-item:hover .px-todo-del,
@@ -775,7 +788,9 @@ body {
   display: flex;
   align-items: center;
   gap: 4px;
-  transition: color 0.15s, border-color 0.15s;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
 }
 
 .px-todo-clear-btn:hover {
@@ -824,7 +839,9 @@ body {
   box-shadow: 0 3px 0 #000;
   text-decoration: none;
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
+  transition:
+    background 0.15s,
+    transform 0.1s;
 }
 
 .px-todo-login-btn:hover {
@@ -1252,7 +1269,9 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
   background: #1a1a35;
   color: #8888bb;
   box-shadow: 0 3px 0 #000;
@@ -1966,7 +1985,9 @@ body {
   box-shadow: 2px 2px 0 #000;
   cursor: pointer;
   letter-spacing: 1px;
-  transition: background 0.1s, transform 0.1s;
+  transition:
+    background 0.1s,
+    transform 0.1s;
   white-space: nowrap;
   flex-shrink: 0;
 }

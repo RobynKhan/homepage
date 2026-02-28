@@ -109,114 +109,114 @@ $jsConfig = json_encode([
     <!-- ════ SPOTIFY PANEL ════ -->
     <div class="px-tab-panel active" id="px-panel-spotify">
         <div class="px-player" id="px-app">
-        <!-- Pixel stars decoration -->
-        <div class="px-star" style="top:12px;right:40px;animation-delay:0.3s"></div>
-        <div class="px-star" style="top:30px;right:18px;animation-delay:0.9s;background:#00e5ff;box-shadow:0 0 4px #00e5ff;"></div>
-        <div class="px-star" style="top:6px;right:70px;animation-delay:1.4s;width:2px;height:2px;background:#b06bff;box-shadow:0 0 4px #b06bff;"></div>
+            <!-- Pixel stars decoration -->
+            <div class="px-star" style="top:12px;right:40px;animation-delay:0.3s"></div>
+            <div class="px-star" style="top:30px;right:18px;animation-delay:0.9s;background:#00e5ff;box-shadow:0 0 4px #00e5ff;"></div>
+            <div class="px-star" style="top:6px;right:70px;animation-delay:1.4s;width:2px;height:2px;background:#b06bff;box-shadow:0 0 4px #b06bff;"></div>
 
-        <!-- Scanline overlay -->
-        <div class="px-scanlines"></div>
+            <!-- Scanline overlay -->
+            <div class="px-scanlines"></div>
 
-        <!-- ===== SCREEN 1: HOME (playlists + search) ===== -->
-        <div class="px-screen active" id="px-screen-home">
-            <div class="px-topbar">
-                <div class="px-topbar-title">&#9654; PIXELTUNE</div>
-                <?php if (!isset($_SESSION['access_token'])): ?>
-                    <a href="login.php" class="px-topbar-btn" target="_blank" rel="noopener" title="Login with Spotify">
-                        <i class="bi bi-spotify"></i>
-                    </a>
-                <?php else: ?>
-                    <div class="px-topbar-actions">
-                        <span class="px-connected-dot"></span>
-                        <a href="logout.php" class="px-topbar-btn" title="Disconnect Spotify">
-                            <i class="bi bi-box-arrow-right"></i>
+            <!-- ===== SCREEN 1: HOME (playlists + search) ===== -->
+            <div class="px-screen active" id="px-screen-home">
+                <div class="px-topbar">
+                    <div class="px-topbar-title">&#9654; PIXELTUNE</div>
+                    <?php if (!isset($_SESSION['access_token'])): ?>
+                        <a href="login.php" class="px-topbar-btn" target="_blank" rel="noopener" title="Login with Spotify">
+                            <i class="bi bi-spotify"></i>
                         </a>
+                    <?php else: ?>
+                        <div class="px-topbar-actions">
+                            <span class="px-connected-dot"></span>
+                            <a href="logout.php" class="px-topbar-btn" title="Disconnect Spotify">
+                                <i class="bi bi-box-arrow-right"></i>
+                            </a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="px-scroll-area">
+                    <!-- Search -->
+                    <div class="px-section-label">SEARCH</div>
+                    <div class="px-search-bar">
+                        <input type="text" id="search-input" placeholder="SEARCH SONGS..."
+                            onkeydown="if(event.key==='Enter') searchSongs()" />
+                        <button onclick="searchSongs()">&#128269;</button>
                     </div>
-                <?php endif; ?>
-            </div>
 
-            <div class="px-scroll-area">
-                <!-- Search -->
-                <div class="px-section-label">SEARCH</div>
-                <div class="px-search-bar">
-                    <input type="text" id="search-input" placeholder="SEARCH SONGS..."
-                        onkeydown="if(event.key==='Enter') searchSongs()" />
-                    <button onclick="searchSongs()">&#128269;</button>
+                    <?php if (!isset($_SESSION['access_token'])): ?>
+                        <!-- Login prompt -->
+                        <div class="px-login-prompt">
+                            <i class="bi bi-spotify" style="font-size:18px;color:var(--px-green)"></i>
+                            <span><a href="login.php" target="_blank" rel="noopener" style="color:var(--px-green);text-decoration:underline">Login with Spotify</a> to see your playlists, liked songs &amp; more</span>
+                        </div>
+
+                        <!-- Default: Top Songs -->
+                        <div class="px-section-label" style="margin-top:10px">&#127942; TOP SONGS</div>
+                        <ul id="track-list-home"></ul>
+                    <?php else: ?>
+                        <!-- Playlists (logged in) -->
+                        <div class="px-section-label" style="margin-top:14px">YOUR PLAYLISTS</div>
+                        <ul id="playlist-list"></ul>
+                    <?php endif; ?>
                 </div>
 
-                <?php if (!isset($_SESSION['access_token'])): ?>
-                    <!-- Login prompt -->
-                    <div class="px-login-prompt">
-                        <i class="bi bi-spotify" style="font-size:18px;color:var(--px-green)"></i>
-                        <span><a href="login.php" target="_blank" rel="noopener" style="color:var(--px-green);text-decoration:underline">Login with Spotify</a> to see your playlists, liked songs &amp; more</span>
+                <!-- Now playing bar at bottom -->
+                <div class="px-np-bar" onclick="pxShowScreen('player')">
+                    <div class="px-np-art" id="px-np-emoji">&#127925;</div>
+                    <div class="px-np-info">
+                        <div class="px-np-title" id="px-np-title">Select a track</div>
+                        <div class="px-np-artist" id="px-np-artist">—</div>
                     </div>
-
-                    <!-- Default: Top Songs -->
-                    <div class="px-section-label" style="margin-top:10px">&#127942; TOP SONGS</div>
-                    <ul id="track-list-home"></ul>
-                <?php else: ?>
-                    <!-- Playlists (logged in) -->
-                    <div class="px-section-label" style="margin-top:14px">YOUR PLAYLISTS</div>
-                    <ul id="playlist-list"></ul>
-                <?php endif; ?>
-            </div>
-
-            <!-- Now playing bar at bottom -->
-            <div class="px-np-bar" onclick="pxShowScreen('player')">
-                <div class="px-np-art" id="px-np-emoji">&#127925;</div>
-                <div class="px-np-info">
-                    <div class="px-np-title" id="px-np-title">Select a track</div>
-                    <div class="px-np-artist" id="px-np-artist">—</div>
+                    <div class="px-np-wave" id="px-np-wave"></div>
                 </div>
-                <div class="px-np-wave" id="px-np-wave"></div>
-            </div>
-        </div>
-
-        <!-- ===== SCREEN 2: TRACKS (search results / playlist tracks) ===== -->
-        <div class="px-screen" id="px-screen-tracks">
-            <div class="px-topbar">
-                <button class="px-back-btn" onclick="pxShowScreen('home')">&#9664; BACK</button>
-                <div class="px-topbar-title" id="px-tracks-screen-title">TRACKS</div>
-                <div style="width:18px"></div>
             </div>
 
-            <div class="px-scroll-area">
-                <div class="px-section-label"><span id="playlist-title">TRACKS</span></div>
-                <ul id="track-list"></ul>
-            </div>
-
-            <!-- Now playing bar -->
-            <div class="px-np-bar" onclick="pxShowScreen('player')">
-                <div class="px-np-art" id="px-np-emoji2">&#127925;</div>
-                <div class="px-np-info">
-                    <div class="px-np-title" id="px-np-title2">Select a track</div>
-                    <div class="px-np-artist" id="px-np-artist2">—</div>
+            <!-- ===== SCREEN 2: TRACKS (search results / playlist tracks) ===== -->
+            <div class="px-screen" id="px-screen-tracks">
+                <div class="px-topbar">
+                    <button class="px-back-btn" onclick="pxShowScreen('home')">&#9664; BACK</button>
+                    <div class="px-topbar-title" id="px-tracks-screen-title">TRACKS</div>
+                    <div style="width:18px"></div>
                 </div>
-                <div class="px-np-wave" id="px-np-wave2"></div>
+
+                <div class="px-scroll-area">
+                    <div class="px-section-label"><span id="playlist-title">TRACKS</span></div>
+                    <ul id="track-list"></ul>
+                </div>
+
+                <!-- Now playing bar -->
+                <div class="px-np-bar" onclick="pxShowScreen('player')">
+                    <div class="px-np-art" id="px-np-emoji2">&#127925;</div>
+                    <div class="px-np-info">
+                        <div class="px-np-title" id="px-np-title2">Select a track</div>
+                        <div class="px-np-artist" id="px-np-artist2">—</div>
+                    </div>
+                    <div class="px-np-wave" id="px-np-wave2"></div>
+                </div>
+            </div>
+
+            <!-- ===== SCREEN 3: NOW PLAYING (Spotify embed) ===== -->
+            <div class="px-screen" id="px-screen-player">
+                <div class="px-topbar">
+                    <button class="px-back-btn" onclick="pxGoBack()">&#9664; BACK</button>
+                    <div class="px-topbar-title">&#9654; NOW PLAYING</div>
+                    <div class="px-waveform" id="px-waveform"></div>
+                </div>
+
+                <div class="px-embed-body">
+                    <iframe
+                        id="spotify-embed"
+                        src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M"
+                        width="100%"
+                        height="100%"
+                        frameborder="0"
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        loading="lazy">
+                    </iframe>
+                </div>
             </div>
         </div>
-
-        <!-- ===== SCREEN 3: NOW PLAYING (Spotify embed) ===== -->
-        <div class="px-screen" id="px-screen-player">
-            <div class="px-topbar">
-                <button class="px-back-btn" onclick="pxGoBack()">&#9664; BACK</button>
-                <div class="px-topbar-title">&#9654; NOW PLAYING</div>
-                <div class="px-waveform" id="px-waveform"></div>
-            </div>
-
-            <div class="px-embed-body">
-                <iframe
-                    id="spotify-embed"
-                    src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M"
-                    width="100%"
-                    height="100%"
-                    frameborder="0"
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                    loading="lazy">
-                </iframe>
-            </div>
-        </div>
-    </div>
     </div><!-- /px-panel-spotify -->
 
     <!-- ════ YOUTUBE PANEL ════ -->

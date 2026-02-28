@@ -2,12 +2,16 @@
 
 function pxSwitchTab(tabName) {
   // Update tab buttons
-  document.querySelectorAll(".px-tab").forEach((t) => t.classList.remove("active"));
+  document
+    .querySelectorAll(".px-tab")
+    .forEach((t) => t.classList.remove("active"));
   const tabBtn = document.getElementById("px-tab-" + tabName);
   if (tabBtn) tabBtn.classList.add("active");
 
   // Update panels
-  document.querySelectorAll(".px-tab-panel").forEach((p) => p.classList.remove("active"));
+  document
+    .querySelectorAll(".px-tab-panel")
+    .forEach((p) => p.classList.remove("active"));
   const panel = document.getElementById("px-panel-" + tabName);
   if (panel) panel.classList.add("active");
 }

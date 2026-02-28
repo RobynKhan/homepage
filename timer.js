@@ -65,7 +65,7 @@ const addEventListeners = () => {
           togglePanel(targetEl);
           // If link specifies a tab, switch to it
           const tab = link.dataset.tab;
-          if (tab && typeof pxSwitchTab === 'function') {
+          if (tab && typeof pxSwitchTab === "function") {
             pxSwitchTab(tab);
           }
         }
@@ -108,7 +108,7 @@ const addEventListeners = () => {
 
       // Switch tab if specified
       const tab = btn.dataset.tab;
-      if (tab && typeof pxSwitchTab === 'function') {
+      if (tab && typeof pxSwitchTab === "function") {
         pxSwitchTab(tab);
       }
     });
