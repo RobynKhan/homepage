@@ -51,7 +51,7 @@ $jsConfig = json_encode([
     <div class="lofi-player-wrap" id="lofi-player-wrap">
         <iframe
             id="lofi-yt-player"
-            src="https://www.youtube.com/embed/76GStMlLF_Y?enablejsapi=1&autoplay=1&rel=0&modestbranding=1"
+            src="https://www.youtube.com/embed/76GStMlLF_Y?enablejsapi=1&autoplay=0&rel=0&modestbranding=1"
             frameborder="0"
             allow="autoplay; encrypted-media; fullscreen"></iframe>
         <div class="lofi-loading-overlay" id="lofi-loading">
