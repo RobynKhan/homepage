@@ -212,8 +212,7 @@ async function loadPlaylists() {
     grid.innerHTML = "";
 
     data.items.forEach((pl) => {
-      const art =
-        (pl.images && pl.images[0]?.url) || "";
+      const art = (pl.images && pl.images[0]?.url) || "";
       const card = document.createElement("div");
       card.className = "px-pl-card";
       card.title = pl.name;

@@ -1648,7 +1648,9 @@ body {
   border: 2px solid #000;
   box-shadow: 2px 2px 0 #000;
   cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
   overflow: hidden;
 }
 
@@ -1699,7 +1701,9 @@ body {
   font-size: 14px;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.15s, transform 0.1s;
+  transition:
+    opacity 0.15s,
+    transform 0.1s;
 }
 
 .px-pl-card:hover .px-pl-play-btn {
@@ -1753,7 +1757,9 @@ body {
   box-shadow: 2px 2px 0 #000;
   background: var(--px-panel);
   cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
 }
 
 .px-recent-list li:hover {
@@ -1817,7 +1823,9 @@ body {
   justify-content: center;
   cursor: pointer;
   font-size: 12px;
-  transition: background 0.1s, transform 0.1s;
+  transition:
+    background 0.1s,
+    transform 0.1s;
 }
 
 .px-recent-list .add-queue-btn:hover {
