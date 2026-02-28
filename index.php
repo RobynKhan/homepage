@@ -223,6 +223,135 @@ $jsConfig = json_encode([
     const PHP_CONFIG = <?php echo $jsConfig; ?>;
 </script>
 
+<!-- State save/restore for Spotify login flow -->
+<script>
+(function() {
+    const STATE_KEY = 'spotifyLoginState';
+
+    // ── Save state when clicking Spotify login ──
+    document.addEventListener('click', function(e) {
+        const link = e.target.closest('a.btn-spotify[target="_blank"]');
+        if (!link) return;
+
+        const snap = {};
+
+        // Timer state
+        if (typeof state !== 'undefined') {
+            snap.timer = {
+                pomodoroType: state.pomodoroType,
+                timerValue: state.timerValue,
+                isPaused: state.isPaused,
+                pomodoroCount: state.pomodoroCount,
+                wasRunning: !!state.timerInterval
+            };
+        }
+
+        // Lofi widget state
+        const lofiWidget = document.getElementById('lofi-widget');
+        const lofiVol = document.getElementById('lofi-vol');
+        const lofiIframe = document.getElementById('lofi-yt-player');
+        snap.lofi = {
+            widgetOpen: lofiWidget ? (window.getComputedStyle(lofiWidget).display !== 'none') : false,
+            volume: lofiVol ? parseInt(lofiVol.value) : 70,
+            videoId: null,
+            isPlaying: typeof isPlaying !== 'undefined' ? isPlaying : false
+        };
+        if (lofiIframe && lofiIframe.src) {
+            const m = lofiIframe.src.match(/embed\/([a-zA-Z0-9_-]{11})/);
+            if (m) snap.lofi.videoId = m[1];
+        }
+
+        // Background theme
+        const bgSelect = document.getElementById('background-select');
+        if (bgSelect) snap.theme = bgSelect.value;
+
+        // Guest todos (non-admin in-memory list)
+        if (typeof todos !== 'undefined' && Array.isArray(todos)) {
+            snap.guestTodos = todos;
+        }
+
+        // Panel visibility
+        snap.panels = {};
+        ['container-3', 'container-4', 'settings-container'].forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el) snap.panels[id] = window.getComputedStyle(el).display;
+        });
+
+        try { localStorage.setItem(STATE_KEY, JSON.stringify(snap)); } catch(e) {}
+    });
+
+    // ── Restore state on load ──
+    function restoreState() {
+        let raw;
+        try { raw = localStorage.getItem(STATE_KEY); } catch(e) {}
+        if (!raw) return;
+        localStorage.removeItem(STATE_KEY);
+
+        let snap;
+        try { snap = JSON.parse(raw); } catch(e) { return; }
+
+        // Theme
+        if (snap.theme && typeof applyTheme === 'function') {
+            applyTheme(snap.theme);
+        }
+
+        // Timer
+        if (snap.timer && typeof state !== 'undefined') {
+            if (snap.timer.pomodoroType && typeof setTimeType === 'function') {
+                setTimeType(snap.timer.pomodoroType);
+            }
+            state.timerValue = snap.timer.timerValue;
+            state.pomodoroCount = snap.timer.pomodoroCount || 0;
+            state.isPaused = snap.timer.isPaused || false;
+            if (typeof updateTimerDisplay === 'function') updateTimerDisplay();
+        }
+
+        // Lofi widget
+        if (snap.lofi) {
+            const lofiWidget = document.getElementById('lofi-widget');
+            const lofiFab = document.getElementById('lofi-fab');
+            if (lofiWidget) {
+                lofiWidget.style.display = snap.lofi.widgetOpen ? 'flex' : 'none';
+                if (lofiFab) lofiFab.classList.toggle('active', snap.lofi.widgetOpen);
+            }
+            const lofiVol = document.getElementById('lofi-vol');
+            if (lofiVol) lofiVol.value = snap.lofi.volume;
+            if (snap.lofi.videoId) {
+                const currentIframe = document.getElementById('lofi-yt-player');
+                if (currentIframe && currentIframe.src) {
+                    const cm = currentIframe.src.match(/embed\/([a-zA-Z0-9_-]{11})/);
+                    if (!cm || cm[1] !== snap.lofi.videoId) {
+                        // Different video — swap but don't autoplay
+                        currentIframe.src = 'https://www.youtube.com/embed/' + snap.lofi.videoId + '?enablejsapi=1&autoplay=0&rel=0&modestbranding=1';
+                    }
+                }
+            }
+        }
+
+        // Guest todos
+        if (snap.guestTodos && typeof todos !== 'undefined' && typeof render === 'function') {
+            todos = snap.guestTodos;
+            render();
+        }
+
+        // Panel visibility
+        if (snap.panels) {
+            Object.keys(snap.panels).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.style.display = snap.panels[id];
+            });
+        }
+    }
+
+    // Run restore after everything else has initialized
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() { setTimeout(restoreState, 100); });
+    } else {
+        setTimeout(restoreState, 100);
+    }
+}());
+</script>
+
 <!-- Load player JS only when logged in for playlist fetching -->
 <?php if (isset($_SESSION['access_token'])): ?>
     <script src="player.js"></script>
