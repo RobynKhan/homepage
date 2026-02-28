@@ -274,7 +274,7 @@ $jsConfig = json_encode([
 
 </div><!-- /container-3 -->
 
-<div id="container-4" class="container-4" data-show-as="flex">
+<div id="container-4" class="container-4" data-show-as="flex" style="display:flex;">
     <?php require_once __DIR__ . '/todo_widget.php'; ?>
 </div>
 
