@@ -117,7 +117,7 @@ $jsConfig = json_encode([
             <!-- Scanline overlay -->
             <div class="px-scanlines"></div>
 
-            <!-- ===== SCREEN 1: HOME (playlists + search) ===== -->
+            <!-- ===== SCREEN 1: HOME (playlists + search + recent) ===== -->
             <div class="px-screen active" id="px-screen-home">
                 <div class="px-topbar">
                     <div class="px-topbar-title">&#9654; PIXELTUNE</div>
@@ -155,9 +155,13 @@ $jsConfig = json_encode([
                         <div class="px-section-label" style="margin-top:10px">&#127942; TOP SONGS</div>
                         <ul id="track-list-home"></ul>
                     <?php else: ?>
-                        <!-- Playlists (logged in) -->
-                        <div class="px-section-label" style="margin-top:14px">YOUR PLAYLISTS</div>
-                        <ul id="playlist-list"></ul>
+                        <!-- Recently Played -->
+                        <div class="px-section-label" style="margin-top:10px">&#9655; RECENTLY PLAYED</div>
+                        <ul class="px-recent-list" id="recent-list"></ul>
+
+                        <!-- Your Playlists — grid with covers -->
+                        <div class="px-section-label" style="margin-top:12px">&#127925; YOUR PLAYLISTS</div>
+                        <div class="px-playlist-grid" id="playlist-grid"></div>
                     <?php endif; ?>
                 </div>
 

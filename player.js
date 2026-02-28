@@ -72,8 +72,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   buildNpWaveforms();
 
   if (typeof PX_LOGGED_IN !== "undefined" && PX_LOGGED_IN) {
-    // Logged in: load user playlists
+    // Logged in: load user playlists + recently played
     loadPlaylists();
+    loadRecentlyPlayed();
   } else {
     // Guest: load default Top Songs into home screen
     loadDefaultTopSongs();
@@ -198,34 +199,116 @@ function loadDefaultTopSongs() {
   });
 }
 
-// ─── Playlists ────────────────────────────────────────────────────────────────
+// ─── Playlists (grid with cover art) ──────────────────────────────────────────
 
 async function loadPlaylists() {
-  const res = await fetch("playlists.php");
-  const data = await res.json();
-  const list = document.getElementById("playlist-list");
-  if (!list || !data.items) return;
-  list.innerHTML = "";
+  try {
+    const res = await fetch("playlists.php");
+    const data = await res.json();
+    if (!data.items) return;
 
-  data.items.forEach((pl) => {
-    const li = document.createElement("li");
-    li.textContent = pl.name;
-    li.dataset.id = pl.id;
-    li.title = pl.name;
-    li.addEventListener("click", () => {
-      // Load tracklist and navigate to tracks screen
-      loadTracks(pl.id, pl.name, li);
+    const grid = document.getElementById("playlist-grid");
+    if (!grid) return;
+    grid.innerHTML = "";
+
+    data.items.forEach((pl) => {
+      const art =
+        (pl.images && pl.images[0]?.url) || "";
+      const card = document.createElement("div");
+      card.className = "px-pl-card";
+      card.title = pl.name;
+      card.innerHTML = `
+        <div class="px-pl-cover">
+          ${
+            art
+              ? `<img src="${art}" alt="" loading="lazy">`
+              : `<span class="px-pl-placeholder">&#127925;</span>`
+          }
+          <button class="px-pl-play-btn" aria-label="Play ${pl.name}">
+            <i class="bi bi-play-fill"></i>
+          </button>
+        </div>
+        <div class="px-pl-name">${pl.name}</div>
+        <div class="px-pl-count">${pl.tracks?.total ?? "—"} tracks</div>
+      `;
+
+      // Click cover/name → open tracklist
+      card.addEventListener("click", (e) => {
+        if (e.target.closest(".px-pl-play-btn")) return;
+        loadTracks(pl.id, pl.name);
+      });
+
+      // Play button → play entire playlist in embed
+      card.querySelector(".px-pl-play-btn").addEventListener("click", (e) => {
+        e.stopPropagation();
+        playInEmbed("playlist", pl.id, pl.name, "Playlist");
+      });
+
+      grid.appendChild(card);
     });
-    list.appendChild(li);
-  });
+  } catch (err) {
+    console.error("Failed to load playlists:", err);
+  }
 }
 
-async function loadTracks(playlistId, playlistName, liEl) {
-  document
-    .querySelectorAll("#playlist-list li")
-    .forEach((l) => l.classList.remove("active"));
-  if (liEl) liEl.classList.add("active");
+// ─── Recently Played ──────────────────────────────────────────────────────────
 
+async function loadRecentlyPlayed() {
+  try {
+    const res = await fetch("recent.php");
+    const data = await res.json();
+    const items = data.items;
+    if (!items || items.length === 0) return;
+
+    const list = document.getElementById("recent-list");
+    if (!list) return;
+    list.innerHTML = "";
+
+    // Deduplicate by track id, keep most recent
+    const seen = new Set();
+    const unique = [];
+    for (const item of items) {
+      const track = item.track;
+      if (!track || seen.has(track.id)) continue;
+      seen.add(track.id);
+      unique.push(track);
+    }
+
+    unique.forEach((track) => {
+      const art =
+        track.album.images[2]?.url || track.album.images[0]?.url || "";
+      const trackId = track.uri.split(":")[2];
+      const trackName = track.name;
+      const artistName = track.artists.map((a) => a.name).join(", ");
+      const li = document.createElement("li");
+
+      li.innerHTML = `
+        ${
+          art
+            ? `<img src="${art}" alt="" class="px-recent-art">`
+            : `<div class="px-recent-art px-recent-placeholder">&#127911;</div>`
+        }
+        <div class="track-meta">
+          <span class="track-title">${trackName}</span>
+          <span class="track-artist">${artistName}</span>
+        </div>
+        <button class="add-queue-btn" title="Play" aria-label="Play">
+          <i class="bi bi-play-fill"></i>
+        </button>
+      `;
+
+      const playAction = () =>
+        playInEmbed("track", trackId, trackName, artistName);
+      li.querySelector(".add-queue-btn").addEventListener("click", playAction);
+      li.querySelector(".track-meta").addEventListener("click", playAction);
+      list.appendChild(li);
+    });
+  } catch (err) {
+    console.error("Failed to load recently played:", err);
+  }
+}
+
+async function loadTracks(playlistId, playlistName) {
   document.getElementById("playlist-title").textContent = playlistName;
   const titleEl = document.getElementById("px-tracks-screen-title");
   if (titleEl) titleEl.textContent = playlistName;
@@ -251,10 +334,6 @@ async function searchSongs() {
   document.getElementById("playlist-title").textContent = title;
   const titleEl = document.getElementById("px-tracks-screen-title");
   if (titleEl) titleEl.textContent = "SEARCH";
-
-  document
-    .querySelectorAll("#playlist-list li")
-    .forEach((l) => l.classList.remove("active"));
 
   // Navigate to tracks screen
   pxShowScreen("tracks");
