@@ -29,12 +29,12 @@ $jsConfig = json_encode([
 <?php require_once __DIR__ . '/includes/header.php'; ?>
 
 <!-- Lofi FAB (desktop mini-player toggle) -->
-<button class="lofi-fab" id="lofi-fab" aria-label="Toggle music player">
+<button class="lofi-fab active" id="lofi-fab" aria-label="Toggle music player">
     <i class="bi bi-music-note-beamed"></i>
 </button>
 
 <!-- Lofi Study Widget -->
-<div class="lofi-widget" id="lofi-widget">
+<div class="lofi-widget" id="lofi-widget" style="display:flex;">
 
     <div class="lofi-search-row">
         <input
@@ -142,7 +142,7 @@ $jsConfig = json_encode([
         <!-- Login/Logout bar -->
         <div class="spotify-auth-bar">
             <?php if (!isset($_SESSION['access_token'])): ?>
-                <a href="login.php" class="btn-spotify">
+                <a href="login.php" class="btn-spotify" target="_blank" rel="noopener">
                     <i class="bi bi-spotify"></i> Login with Spotify to see your playlists
                 </a>
             <?php else: ?>
