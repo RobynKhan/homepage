@@ -447,6 +447,8 @@ $jsConfig = json_encode([
 
     let isPlaying = false;
     let player = null;
+    let ytApiReady = false;
+    let ytPlayerInitialized = false;
 
     /* ── YouTube IFrame API ── */
     const tag = document.createElement('script');
@@ -454,13 +456,25 @@ $jsConfig = json_encode([
     document.head.appendChild(tag);
 
     window.onYouTubeIframeAPIReady = function() {
+        ytApiReady = true;
+        // Only init if the YouTube tab is already visible
+        if (document.getElementById('px-panel-youtube')?.classList.contains('active')) {
+            initYouTubePlayer();
+        }
+    };
+
+    function initYouTubePlayer() {
+        if (ytPlayerInitialized || !ytApiReady) return;
+        const el = document.getElementById('lofi-yt-player');
+        if (!el) return;
+        ytPlayerInitialized = true;
         player = new YT.Player('lofi-yt-player', {
             events: {
                 onReady: lofiPlayerReady,
                 onStateChange: lofiStateChange
             }
         });
-    };
+    }
 
     function lofiPlayerReady(e) {
         e.target.setVolume(parseInt(document.getElementById('lofi-vol').value));
@@ -484,6 +498,7 @@ $jsConfig = json_encode([
                 player.destroy();
             } catch (err) {}
             player = null;
+            ytPlayerInitialized = false;
         }
 
         // Safely remove old iframe

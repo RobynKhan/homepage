@@ -14,6 +14,11 @@ function pxSwitchTab(tabName) {
     .forEach((p) => p.classList.remove("active"));
   const panel = document.getElementById("px-panel-" + tabName);
   if (panel) panel.classList.add("active");
+
+  // Lazy-init YouTube player when its tab becomes visible for the first time
+  if (tabName === "youtube" && typeof initYouTubePlayer === "function") {
+    initYouTubePlayer();
+  }
 }
 
 // ─── Screen Navigation ────────────────────────────────────────────────────────
