@@ -53,8 +53,7 @@ $jsConfig = json_encode([
             id="lofi-yt-player"
             src="https://www.youtube.com/embed/76GStMlLF_Y?enablejsapi=1&autoplay=1&rel=0&modestbranding=1"
             frameborder="0"
-            allow="autoplay; encrypted-media"
-            allowfullscreen></iframe>
+            allow="autoplay; encrypted-media; fullscreen"></iframe>
         <div class="lofi-loading-overlay" id="lofi-loading">
             <div class="lofi-spinner"></div>
             loading...
@@ -190,7 +189,6 @@ $jsConfig = json_encode([
                         height="380"
                         frameborder="0"
                         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                        allowfullscreen
                         loading="lazy"
                         style="border-radius: 12px;">
                     </iframe>
@@ -291,7 +289,7 @@ $jsConfig = json_encode([
         iframe.style.cssText = 'display:block;width:100%;height:160px;';
         iframe.setAttribute('frameborder', '0');
         iframe.setAttribute('allow', 'autoplay; encrypted-media');
-        iframe.setAttribute('allowfullscreen', '');
+        iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
         iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&rel=0&modestbranding=1`;
         wrap.insertBefore(iframe, document.getElementById('lofi-loading'));
 

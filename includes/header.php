@@ -8,6 +8,7 @@
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <title><?php echo defined('APP_NAME') ? htmlspecialchars(APP_NAME) : 'Pomodoro Timer'; ?></title>
+    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="styling.css" />
 </head>
 

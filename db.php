@@ -20,9 +20,13 @@ function getDB(): PDO
         exit;
     }
 
+    // Resolve hostname to IPv4 to avoid IPv6 connectivity issues on Render
+    $ipv4 = gethostbyname($host);
+    $connectHost = ($ipv4 !== $host) ? $ipv4 : $host;
+
     try {
         $pdo = new PDO(
-            "pgsql:host=$host;port=$port;dbname=$name;sslmode=require",
+            "pgsql:host=$connectHost;port=$port;dbname=$name;sslmode=require",
             $user,
             $pass,
             [
