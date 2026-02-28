@@ -151,20 +151,17 @@ function playInEmbed(type, id, trackName, artistName) {
   if (trackName) updateNowPlayingBar(trackName, artistName);
   pxShowScreen("player");
 
-  // Log track play to Supabase (fire-and-forget)
-  supabase.auth.getUser().then(({ data }) => {
-    if (!data.user) return;
-    supabase.from("spotify_tracks").upsert(
-      {
-        user_id: data.user.id,
-        track_id: id,
-        title: trackName,
-        artist: artistName,
-        last_played_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id,track_id" },
-    );
-  });
+  // Log track play via PHP endpoint (fire-and-forget)
+  fetch("log_spotify.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      track_id: id,
+      title: trackName || "",
+      artist: artistName || "",
+      album_art: "",
+    }),
+  }).catch(() => {});
 }
 
 // ─── Default Top Songs (guest mode) ──────────────────────────────────────────

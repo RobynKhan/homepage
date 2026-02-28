@@ -522,19 +522,18 @@ $jsConfig = json_encode([
         document.getElementById('lofi-loading').classList.add('visible');
         lofiSetPlaying(false);
 
-        // Log YouTube video to Supabase (fire-and-forget)
-        if (typeof PX_LOGGED_IN !== 'undefined' && PX_LOGGED_IN) {
-            fetch('log_youtube.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    url: 'https://www.youtube.com/watch?v=' + videoId,
-                    title: title || '',
-                }),
-            }).catch(() => {});
-        }
+        // Log YouTube video via PHP endpoint (fire-and-forget)
+        fetch('log_youtube.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                url: 'https://www.youtube.com/watch?v=' + videoId,
+                title: title || '',
+                thumbnail: 'https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg'
+            })
+        }).catch(() => {});
 
         if (player) {
             try {
