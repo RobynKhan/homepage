@@ -471,9 +471,31 @@ $jsConfig = json_encode([
     };
 
     function initYouTubePlayer() {
-        if (ytPlayerInitialized || !ytApiReady) return;
+        if (!ytApiReady) return;
         const el = document.getElementById('lofi-yt-player');
         if (!el) return;
+
+        // If already initialized, destroy and re-bind so it works after tab switch
+        if (player) {
+            try {
+                player.destroy();
+            } catch (e) {}
+            player = null;
+        }
+
+        // The iframe may have been replaced by destroy(), recreate it if needed
+        let iframe = document.getElementById('lofi-yt-player');
+        if (!iframe) {
+            const wrap = document.getElementById('lofi-player-wrap');
+            iframe = document.createElement('iframe');
+            iframe.id = 'lofi-yt-player';
+            iframe.style.cssText = 'display:block;width:100%;height:200px;';
+            iframe.setAttribute('frameborder', '0');
+            iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
+            iframe.src = 'https://www.youtube.com/embed/' + DEFAULT.id + '?enablejsapi=1&autoplay=0&rel=0&modestbranding=1';
+            wrap.insertBefore(iframe, document.getElementById('lofi-loading'));
+        }
+
         ytPlayerInitialized = true;
         player = new YT.Player('lofi-yt-player', {
             events: {

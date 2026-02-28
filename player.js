@@ -15,9 +15,10 @@ function pxSwitchTab(tabName) {
   const panel = document.getElementById("px-panel-" + tabName);
   if (panel) panel.classList.add("active");
 
-  // Lazy-init YouTube player when its tab becomes visible for the first time
+  // Lazy-init YouTube player when its tab becomes visible
   if (tabName === "youtube" && typeof initYouTubePlayer === "function") {
-    initYouTubePlayer();
+    // Short delay so the panel is rendered before YT.Player binds to the iframe
+    setTimeout(initYouTubePlayer, 100);
   }
 }
 
