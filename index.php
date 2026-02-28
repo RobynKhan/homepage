@@ -204,16 +204,8 @@ $jsConfig = json_encode([
                     <div class="px-waveform" id="px-waveform"></div>
                 </div>
 
-                <div class="px-embed-body">
-                    <iframe
-                        id="spotify-embed"
-                        src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M"
-                        width="100%"
-                        height="100%"
-                        frameborder="0"
-                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                        loading="lazy">
-                    </iframe>
+                <div class="px-embed-body" id="spotify-embed-container">
+                    <!-- Spotify IFrame Embed API will create the iframe here -->
                 </div>
             </div>
         </div>

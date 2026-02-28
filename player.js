@@ -90,12 +90,57 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-// ─── Iframe Player ────────────────────────────────────────────────────────────
+// ─── Spotify IFrame Embed API ─────────────────────────────────────────────────
+
+let spotifyEmbedController = null;
+let spotifyEmbedReady = false;
+let pendingSpotifyUri = null;
+
+// Load the Spotify IFrame API script
+(function loadSpotifyIFrameAPI() {
+  const script = document.createElement("script");
+  script.src = "https://open.spotify.com/embed/iframe-api/v1";
+  script.async = true;
+  document.head.appendChild(script);
+})();
+
+// Spotify calls this global callback when the API is ready
+window.onSpotifyIframeApiReady = (IFrameAPI) => {
+  const container = document.getElementById("spotify-embed-container");
+  if (!container) return;
+
+  const options = {
+    uri: "spotify:playlist:37i9dQZF1DXcBWIGoYBM5M",
+    width: "100%",
+    height: "100%",
+  };
+
+  const callback = (controller) => {
+    spotifyEmbedController = controller;
+    spotifyEmbedReady = true;
+
+    // If a song was queued before the API was ready, play it now
+    if (pendingSpotifyUri) {
+      controller.loadUri(pendingSpotifyUri);
+      controller.play();
+      pendingSpotifyUri = null;
+    }
+  };
+
+  IFrameAPI.createController(container, options, callback);
+};
 
 function playInEmbed(type, id, trackName, artistName) {
-  const embed = document.getElementById("spotify-embed");
-  if (!embed) return;
-  embed.src = `https://open.spotify.com/embed/${type}/${id}?utm_source=generator&autoplay=1`;
+  const uri = `spotify:${type}:${id}`;
+
+  if (spotifyEmbedReady && spotifyEmbedController) {
+    spotifyEmbedController.loadUri(uri);
+    spotifyEmbedController.play();
+  } else {
+    // API not ready yet — queue it
+    pendingSpotifyUri = uri;
+  }
+
   if (trackName) updateNowPlayingBar(trackName, artistName);
   pxShowScreen("player");
 }
@@ -103,12 +148,8 @@ function playInEmbed(type, id, trackName, artistName) {
 // ─── Default Top Songs (guest mode) ──────────────────────────────────────────
 
 function loadDefaultTopSongs() {
-  // Load the Top 50 Global playlist embed as the default player
-  const embed = document.getElementById("spotify-embed");
-  if (embed) {
-    embed.src =
-      "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator";
-  }
+  // The default playlist is already loaded via the IFrame API init
+  // (spotify:playlist:37i9dQZF1DXcBWIGoYBM5M)
 
   // Populate the home track list with curated top songs
   const list = document.getElementById("track-list-home");
