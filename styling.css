@@ -477,10 +477,10 @@ body {
   position: fixed;
   top: clamp(56px, 8vh, 80px);
   right: clamp(16px, 2vw, 32px);
-  background: #0d0d1a;
+  background: var(--px-bg);
   border: 3px solid #000;
   box-shadow:
-    0 0 0 3px #00e5ff,
+    0 0 0 3px var(--px-cyan),
     0 0 0 6px #000,
     0 0 24px rgba(0, 229, 255, 0.2);
   padding: 0;
@@ -503,8 +503,8 @@ body {
   flex-direction: column;
   height: 100%;
   position: relative;
-  background: #0d0d1a;
-  color: #e8e8ff;
+  background: var(--px-bg);
+  color: var(--px-text);
 }
 
 /* ── Scanline overlay ──────────────────────────────── */
@@ -528,7 +528,7 @@ body {
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  background: #1a1a35;
+  background: var(--px-panel);
   border-bottom: 3px solid #000;
 }
 
@@ -545,13 +545,13 @@ body {
 }
 
 .px-dot--red {
-  background: #ff2d6b;
+  background: var(--px-accent);
 }
 .px-dot--yellow {
-  background: #ffe600;
+  background: var(--px-yellow);
 }
 .px-dot--green {
-  background: #00ff99;
+  background: var(--px-green);
 }
 
 .px-todo-title {
@@ -559,8 +559,8 @@ body {
   font-family: "Press Start 2P", monospace;
   font-size: 8px;
   letter-spacing: 2px;
-  color: #00e5ff;
-  text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+  color: var(--px-cyan);
+  text-shadow: 0 0 8px currentColor;
 }
 
 /* ── Body ──────────────────────────────────────────── */
@@ -583,26 +583,26 @@ body {
   flex: 1;
   font-family: "VT323", monospace;
   font-size: 14px;
-  background: #131326;
-  border: 2px solid #20203d;
-  color: #e8e8ff;
+  background: var(--px-bg2);
+  border: 2px solid var(--px-panel2);
+  color: var(--px-text);
   padding: 6px 10px;
   outline: none;
   transition: border-color 0.2s;
 }
 
 .px-todo-input::placeholder {
-  color: #8888bb;
+  color: var(--px-text2);
   font-family: "VT323", monospace;
 }
 
 .px-todo-input:focus {
-  border-color: #7b2fff;
+  border-color: var(--px-purple);
   box-shadow: 0 0 6px rgba(123, 47, 255, 0.3);
 }
 
 .px-todo-add-btn {
-  background: #7b2fff;
+  background: var(--px-purple);
   border: 2px solid #000;
   box-shadow: 0 2px 0 #000;
   color: #fff;
@@ -620,7 +620,7 @@ body {
 }
 
 .px-todo-add-btn:hover {
-  background: #b06bff;
+  background: var(--px-purple2);
 }
 
 .px-todo-add-btn:active {
@@ -637,7 +637,7 @@ body {
   flex: 1;
   max-height: 300px;
   scrollbar-width: thin;
-  scrollbar-color: #20203d transparent;
+  scrollbar-color: var(--px-panel2) transparent;
 }
 
 .px-todo-list::-webkit-scrollbar {
@@ -645,11 +645,11 @@ body {
 }
 
 .px-todo-list::-webkit-scrollbar-track {
-  background: #0d0d1a;
+  background: var(--px-bg);
 }
 
 .px-todo-list::-webkit-scrollbar-thumb {
-  background: #7b2fff;
+  background: var(--px-purple);
   border: 1px solid #000;
 }
 
@@ -659,7 +659,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 6px 4px;
-  border-bottom: 1px solid #1a1a35;
+  border-bottom: 1px solid var(--px-panel);
   transition: background 0.15s;
 }
 
@@ -688,8 +688,8 @@ body {
   justify-content: center;
   width: 14px;
   height: 14px;
-  border: 2px solid #8888bb;
-  background: #131326;
+  border: 2px solid var(--px-text2);
+  background: var(--px-bg2);
   font-family: "Press Start 2P", monospace;
   font-size: 7px;
   color: transparent;
@@ -700,13 +700,13 @@ body {
 }
 
 .px-todo-done .px-todo-box {
-  border-color: #00ff99;
-  color: #00ff99;
+  border-color: var(--px-green);
+  color: var(--px-green);
   background: rgba(0, 255, 153, 0.1);
 }
 
 .px-todo-check:hover .px-todo-box {
-  border-color: #00e5ff;
+  border-color: var(--px-cyan);
 }
 
 /* ── Task text ─────────────────────────────────────── */
@@ -714,16 +714,16 @@ body {
   flex: 1;
   font-family: "VT323", monospace;
   font-size: 14px;
-  color: #e8e8ff;
+  color: var(--px-text);
   text-align: left;
   word-break: break-word;
   transition: color 0.15s;
 }
 
 .px-todo-done .px-todo-text {
-  color: #555577;
+  color: var(--px-text2);
   text-decoration: line-through;
-  text-decoration-color: #555577;
+  text-decoration-color: var(--px-text2);
 }
 
 /* ── Delete button ─────────────────────────────────── */
@@ -733,7 +733,7 @@ body {
   cursor: pointer;
   font-family: "Press Start 2P", monospace;
   font-size: 7px;
-  color: #555577;
+  color: var(--px-text2);
   padding: 2px;
   display: flex;
   align-items: center;
@@ -756,8 +756,8 @@ body {
 }
 
 .px-todo-del:hover {
-  color: #ff2d6b;
-  text-shadow: 0 0 6px rgba(255, 45, 107, 0.5);
+  color: var(--px-accent);
+  text-shadow: 0 0 6px currentColor;
 }
 
 /* ── Footer ────────────────────────────────────────── */
@@ -767,23 +767,23 @@ body {
   justify-content: space-between;
   padding: 8px 0 0;
   margin-top: 8px;
-  border-top: 2px solid #1a1a35;
+  border-top: 2px solid var(--px-panel);
 }
 
 .px-todo-count {
   font-family: "Press Start 2P", monospace;
   font-size: 6px;
-  color: #8888bb;
+  color: var(--px-text2);
   letter-spacing: 1px;
 }
 
 .px-todo-clear-btn {
   background: none;
-  border: 2px solid #1a1a35;
+  border: 2px solid var(--px-panel);
   cursor: pointer;
   font-family: "Press Start 2P", monospace;
   font-size: 6px;
-  color: #8888bb;
+  color: var(--px-text2);
   padding: 4px 8px;
   display: flex;
   align-items: center;
@@ -794,8 +794,8 @@ body {
 }
 
 .px-todo-clear-btn:hover {
-  color: #ff2d6b;
-  border-color: #ff2d6b;
+  color: var(--px-accent);
+  border-color: var(--px-accent);
 }
 
 .px-todo-clear-btn i {
@@ -814,15 +814,15 @@ body {
 
 .px-todo-locked .bi-lock-fill {
   font-size: 24px;
-  color: #ff2d6b;
-  text-shadow: 0 0 8px rgba(255, 45, 107, 0.4);
+  color: var(--px-accent);
+  text-shadow: 0 0 8px currentColor;
 }
 
 .px-todo-locked p {
   margin: 0;
   font-family: "Press Start 2P", monospace;
   font-size: 7px;
-  color: #8888bb;
+  color: var(--px-text2);
   letter-spacing: 1px;
   line-height: 1.8;
 }
@@ -833,8 +833,8 @@ body {
   font-size: 7px;
   letter-spacing: 1.5px;
   padding: 8px 20px;
-  color: #0d0d1a;
-  background: #00e5ff;
+  color: var(--px-bg);
+  background: var(--px-cyan);
   border: 2px solid #000;
   box-shadow: 0 3px 0 #000;
   text-decoration: none;
@@ -864,7 +864,7 @@ body {
   border: 2px solid rgba(255, 45, 107, 0.4);
   font-family: "Press Start 2P", monospace;
   font-size: 6px;
-  color: #ff2d6b;
+  color: var(--px-accent);
 }
 
 .px-todo-error .bi {
@@ -1272,8 +1272,8 @@ body {
   transition:
     background 0.15s,
     color 0.15s;
-  background: #1a1a35;
-  color: #8888bb;
+  background: var(--px-panel);
+  color: var(--px-text2);
   box-shadow: 0 3px 0 #000;
 }
 
@@ -1282,16 +1282,16 @@ body {
 }
 
 .px-tab.active {
-  background: #0d0d1a;
-  color: #00e5ff;
+  background: var(--px-bg);
+  color: var(--px-cyan);
   box-shadow: none;
-  border-bottom-color: #0d0d1a;
-  text-shadow: 0 0 8px #00e5ff;
+  border-bottom-color: var(--px-bg);
+  text-shadow: 0 0 8px currentColor;
 }
 
 .px-tab:not(.active):hover {
-  background: #20203d;
-  color: #e8e8ff;
+  background: var(--px-panel2);
+  color: var(--px-text);
 }
 
 .px-tab i {
@@ -1312,8 +1312,8 @@ body {
    Compact retro pixel player — screen-based navigation
    ═══════════════════════════════════════════════════════ */
 
-/* ── PixelTune CSS variables (scoped to .px-player) ── */
-.px-player {
+/* ── PixelTune CSS variables (global — respond to theme) ── */
+:root {
   --px-bg: #0d0d1a;
   --px-bg2: #131326;
   --px-panel: #1a1a35;
@@ -2139,7 +2139,7 @@ body {
   gap: 8px;
   font-family: "Press Start 2P", monospace;
   font-size: 6px;
-  color: #8888bb;
+  color: var(--px-text2);
   letter-spacing: 1px;
 }
 
@@ -2150,8 +2150,8 @@ body {
 .px-yt-spinner {
   width: 16px;
   height: 16px;
-  border: 3px solid #1a1a35;
-  border-top-color: #ff2d6b;
+  border: 3px solid var(--px-panel);
+  border-top-color: var(--px-accent);
   animation: lofi-rotate 0.8s linear infinite;
 }
 
@@ -2159,7 +2159,7 @@ body {
 .px-yt-player .lofi-error-msg {
   font-family: "Press Start 2P", monospace;
   font-size: 6px;
-  color: #ff2d6b;
+  color: var(--px-accent);
   display: none;
   padding: 4px 4px 0;
   letter-spacing: 1px;
@@ -2181,7 +2181,7 @@ body {
   font-family: "Press Start 2P", monospace;
   font-size: 6px;
   padding: 8px 14px;
-  background: #7b2fff;
+  background: var(--px-purple);
   color: #fff;
   border: 2px solid #000;
   box-shadow: 2px 2px 0 #000;
@@ -2195,7 +2195,7 @@ body {
 }
 
 .px-yt-play-btn:hover {
-  background: #b06bff;
+  background: var(--px-purple2);
 }
 
 .px-yt-play-btn:active {
@@ -2221,7 +2221,7 @@ body {
   appearance: none;
   width: 100%;
   height: 4px;
-  background: #1a1a35;
+  background: var(--px-panel);
   border: 1px solid #000;
   outline: none;
   cursor: pointer;
@@ -2231,7 +2231,7 @@ body {
   -webkit-appearance: none;
   width: 10px;
   height: 10px;
-  background: #ff2d6b;
+  background: var(--px-accent);
   border: 2px solid #000;
   cursor: pointer;
 }
@@ -2239,7 +2239,7 @@ body {
 .px-yt-player input[type="range"]::-moz-range-thumb {
   width: 10px;
   height: 10px;
-  background: #ff2d6b;
+  background: var(--px-accent);
   border: 2px solid #000;
   cursor: pointer;
   border-radius: 0;
@@ -2283,7 +2283,7 @@ body {
     max-height: 70vh;
     margin: 16px auto;
     box-shadow:
-      0 0 0 3px #00e5ff,
+      0 0 0 3px var(--px-cyan),
       0 0 0 6px #000,
       0 0 16px rgba(0, 229, 255, 0.15);
   }
@@ -2413,10 +2413,10 @@ body {
 
   /* Pixel-themed sheet override for todo */
   #container-4 {
-    background: #0d0d1a !important;
+    background: var(--px-bg) !important;
     border: 3px solid #000 !important;
     box-shadow:
-      0 0 0 3px #00e5ff,
+      0 0 0 3px var(--px-cyan),
       0 -8px 30px rgba(0, 229, 255, 0.15) !important;
     border-radius: 0 !important;
   }
@@ -2445,7 +2445,7 @@ body {
   }
 
   #container-4::before {
-    background: #7b2fff;
+    background: var(--px-purple);
     border-radius: 0;
     width: 28px;
     height: 3px;
@@ -2610,6 +2610,20 @@ body.theme-theme1 {
   --text-primary: #c8dff0;
   --text-muted: rgba(200, 223, 240, 0.55);
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  /* PixelTune — midnight blue */
+  --px-bg: #0a1628;
+  --px-bg2: #0f1e35;
+  --px-panel: #152a4a;
+  --px-panel2: #1c3560;
+  --px-accent: #3b9eff;
+  --px-accent2: #74bfff;
+  --px-purple: #1e5faa;
+  --px-purple2: #4a8fd4;
+  --px-cyan: #7ab3d9;
+  --px-yellow: #f0d060;
+  --px-green: #5ec4a0;
+  --px-text: #c8dff0;
+  --px-text2: #6a8fb5;
 }
 
 /* Theme 2 — warm brown (original default) */
@@ -2625,6 +2639,20 @@ body.theme-theme2 {
   --text-primary: #f0dfc0;
   --text-muted: rgba(240, 223, 192, 0.6);
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  /* PixelTune — warm amber */
+  --px-bg: #1a0e08;
+  --px-bg2: #241610;
+  --px-panel: #2e1c12;
+  --px-panel2: #3a2518;
+  --px-accent: #e07830;
+  --px-accent2: #f0a060;
+  --px-purple: #a0500a;
+  --px-purple2: #c47a3a;
+  --px-cyan: #d19d5b;
+  --px-yellow: #ffe070;
+  --px-green: #90c050;
+  --px-text: #f0dfc0;
+  --px-text2: #8a7050;
 }
 
 /* Theme 3 — sage / forest green */
@@ -2640,6 +2668,20 @@ body.theme-theme3 {
   --text-primary: #c8e8c8;
   --text-muted: rgba(200, 232, 200, 0.55);
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  /* PixelTune — forest green */
+  --px-bg: #081408;
+  --px-bg2: #0e200e;
+  --px-panel: #163016;
+  --px-panel2: #1e401e;
+  --px-accent: #50c878;
+  --px-accent2: #80e0a0;
+  --px-purple: #2a7a3a;
+  --px-purple2: #4e9e4e;
+  --px-cyan: #82c882;
+  --px-yellow: #d0e860;
+  --px-green: #40e070;
+  --px-text: #c8e8c8;
+  --px-text2: #608860;
 }
 
 /* end of file */

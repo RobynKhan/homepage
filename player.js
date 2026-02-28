@@ -149,6 +149,21 @@ function playInEmbed(type, id, trackName, artistName) {
 
   if (trackName) updateNowPlayingBar(trackName, artistName);
   pxShowScreen("player");
+
+  // Log track play to Supabase (fire-and-forget)
+  supabase.auth.getUser().then(({ data }) => {
+    if (!data.user) return;
+    supabase.from("spotify_tracks").upsert(
+      {
+        user_id: data.user.id,
+        track_id: id,
+        title: trackName,
+        artist: artistName,
+        last_played_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,track_id" },
+    );
+  });
 }
 
 // ─── Default Top Songs (guest mode) ──────────────────────────────────────────
@@ -302,7 +317,7 @@ async function loadRecentlyPlayed() {
       `;
 
       const playAction = () =>
-        playInEmbed("track", trackId, trackName, artistName);
+        playInEmbed("track", trackId, trackName, artistName, art);
       li.querySelector(".add-queue-btn").addEventListener("click", playAction);
       li.querySelector(".track-meta").addEventListener("click", playAction);
       list.appendChild(li);
@@ -378,11 +393,11 @@ function renderTracks(tracks) {
     `;
 
     li.querySelector(".add-queue-btn").addEventListener("click", () => {
-      playInEmbed("track", trackId, trackName, artistName);
+      playInEmbed("track", trackId, trackName, artistName, art);
     });
 
     li.querySelector(".track-meta").addEventListener("click", () => {
-      playInEmbed("track", trackId, trackName, artistName);
+      playInEmbed("track", trackId, trackName, artistName, art);
     });
 
     list.appendChild(li);

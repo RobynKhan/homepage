@@ -434,6 +434,13 @@ $jsConfig = json_encode([
 <script>
     const PX_LOGGED_IN = <?php echo isset($_SESSION['access_token']) ? 'true' : 'false'; ?>;
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const supabase = window.supabase.createClient(
+        '<?php echo getenv("SUPABASE_URL"); ?>',
+        '<?php echo getenv("SUPABASE_ANON_KEY"); ?>'
+    );
+</script>
 <script src="player.js"></script>
 
 <!-- Lofi Widget Script -->
@@ -492,6 +499,20 @@ $jsConfig = json_encode([
     function swapLofiVideo(videoId, title, sub, label) {
         document.getElementById('lofi-loading').classList.add('visible');
         lofiSetPlaying(false);
+
+        // Log YouTube video to Supabase (fire-and-forget)
+        if (typeof PX_LOGGED_IN !== 'undefined' && PX_LOGGED_IN) {
+            fetch('log_youtube.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    url: 'https://www.youtube.com/watch?v=' + videoId,
+                    title: title || '',
+                }),
+            }).catch(() => {});
+        }
 
         if (player) {
             try {

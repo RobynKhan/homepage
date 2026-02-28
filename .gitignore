@@ -1,0 +1,13 @@
+# Environment variables
+.env
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# IDE
+.vscode/
+*.swp
+
+# PHP
+vendor/
