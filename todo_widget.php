@@ -205,7 +205,10 @@ $isAdmin = function_exists('is_admin_logged_in') && is_admin_logged_in();
                     checkbox.innerHTML = todo.done ?
                         '<i class="bi bi-check-circle-fill"></i>' :
                         '<i class="bi bi-circle"></i>';
-                    checkbox.onclick = () => { todo.done = !todo.done; render(); };
+                    checkbox.onclick = () => {
+                        todo.done = !todo.done;
+                        render();
+                    };
 
                     const text = document.createElement('span');
                     text.className = 'todo-text';
@@ -215,7 +218,10 @@ $isAdmin = function_exists('is_admin_logged_in') && is_admin_logged_in();
                     del.className = 'todo-del-btn';
                     del.setAttribute('aria-label', 'Delete task');
                     del.innerHTML = '<i class="bi bi-x"></i>';
-                    del.onclick = () => { todos = todos.filter(t => t.id !== todo.id); render(); };
+                    del.onclick = () => {
+                        todos = todos.filter(t => t.id !== todo.id);
+                        render();
+                    };
 
                     li.appendChild(checkbox);
                     li.appendChild(text);
@@ -232,7 +238,11 @@ $isAdmin = function_exists('is_admin_logged_in') && is_admin_logged_in();
                 const input = document.getElementById('todo-input');
                 const text = input.value.trim();
                 if (!text) return;
-                todos.push({ id: nextId++, text, done: false });
+                todos.push({
+                    id: nextId++,
+                    text,
+                    done: false
+                });
                 input.value = '';
                 render();
             };

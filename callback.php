@@ -50,5 +50,17 @@ $_SESSION['access_token']  = $data['access_token'];
 $_SESSION['refresh_token'] = $data['refresh_token'] ?? null;
 $_SESSION['expires_at']    = time() + (int)($data['expires_in'] ?? 3600);
 
-header('Location: index.php');
+// If opened in a new tab, close it and refresh the opener; otherwise redirect normally
+echo '<!DOCTYPE html><html><head><title>Spotify Connected</title></head><body>
+<script>
+if (window.opener) {
+    window.opener.location.reload();
+    window.close();
+} else {
+    window.location.href = "index.php";
+}
+</script>
+<noscript><meta http-equiv="refresh" content="0;url=index.php"></noscript>
+<p>Spotify connected! Redirecting...</p>
+</body></html>';
 exit;
