@@ -246,7 +246,7 @@ $jsConfig = json_encode([
                     <div class="px-yt-embed-wrap" id="lofi-player-wrap">
                         <iframe
                             id="lofi-yt-player"
-                            src="https://www.youtube.com/embed/76GStMlLF_Y?autoplay=0&rel=0&modestbranding=1"
+                            src="https://www.youtube.com/embed/76GStMlLF_Y?enablejsapi=1&autoplay=0&rel=0&modestbranding=1"
                             frameborder="0"
                             allow="autoplay; encrypted-media; fullscreen"></iframe>
                         <div class="lofi-loading-overlay" id="lofi-loading">
@@ -398,7 +398,7 @@ $jsConfig = json_encode([
                         const cm = currentIframe.src.match(/embed\/([a-zA-Z0-9_-]{11})/);
                         if (!cm || cm[1] !== snap.lofi.videoId) {
                             // Different video — swap but don't autoplay
-                            currentIframe.src = 'https://www.youtube.com/embed/' + snap.lofi.videoId + '?autoplay=0&rel=0&modestbranding=1';
+                            currentIframe.src = 'https://www.youtube.com/embed/' + snap.lofi.videoId + '?enablejsapi=1&autoplay=0&rel=0&modestbranding=1';
                         }
                     }
                 }
@@ -441,24 +441,100 @@ $jsConfig = json_encode([
         '<?php echo getenv("SUPABASE_ANON_KEY"); ?>'
     );
 </script>
+<!-- YouTube IFrame API — MUST be defined before player.js because
+     the Spotify Embed API internally loads the YT IFrame API and
+     fires onYouTubeIframeAPIReady.  If our callback isn't registered
+     yet, we miss the event and the YT player never initialises. -->
+<script>
+    const DEFAULT = {
+        id: '76GStMlLF_Y',
+        title: 'why the rush?',
+        sub: 'lo-fi beats · cat jazz',
+        label: 'cat jazz · live radio'
+    };
+
+    let isPlaying = false;
+    let player = null;
+    let ytApiReady = false;
+    let ytPlayerInitialized = false;
+
+    window.onYouTubeIframeAPIReady = function() {
+        ytApiReady = true;
+        // Don't re-init if Spotify already owns the player or YT tab isn't active
+        if (window._ytPlayerInstance) return;
+        if (document.getElementById('px-panel-youtube')?.classList.contains('active')) {
+            initYouTubePlayer();
+        }
+    };
+
+    // Load the YT IFrame API script only if not already loaded by Spotify
+    if (typeof YT === 'undefined') {
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(tag);
+    } else {
+        // YT was already loaded (e.g. by Spotify Embed API) — fire manually
+        window.onYouTubeIframeAPIReady();
+    }
+</script>
 
 <script src="player.js"></script>
 
 <!-- Lofi Widget Script -->
 <script>
-    const DEFAULT = {
-        id: '76GStMlLF_Y',
-        title: 'why the rush?'
-    };
+    function initYouTubePlayer() {
+        // Already initialized — bail out
+        if (window._ytPlayerInstance) return;
 
-    // NO YT IFrame API — plain iframe only, fully independent from Spotify
-    function getLofiIframe() {
-        return document.getElementById('lofi-yt-player');
+        // Self-heal: if YT was loaded (by Spotify Embed) but our flag wasn't set
+        if (!ytApiReady && typeof YT !== 'undefined' && YT.Player) {
+            ytApiReady = true;
+        }
+        if (!ytApiReady) return;
+        const el = document.getElementById('lofi-yt-player');
+        if (!el) return;
+
+        // The iframe may have been replaced by destroy(), recreate it if needed
+        let iframe = document.getElementById('lofi-yt-player');
+        if (!iframe) {
+            const wrap = document.getElementById('lofi-player-wrap');
+            iframe = document.createElement('iframe');
+            iframe.id = 'lofi-yt-player';
+            iframe.style.cssText = 'display:block;width:100%;height:200px;';
+            iframe.setAttribute('frameborder', '0');
+            iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
+            iframe.src = 'https://www.youtube.com/embed/' + DEFAULT.id + '?enablejsapi=1&autoplay=0&rel=0&modestbranding=1';
+            wrap.insertBefore(iframe, document.getElementById('lofi-loading'));
+        }
+
+        ytPlayerInitialized = true;
+        window._ytPlayerInstance = new YT.Player('lofi-yt-player', {
+            events: {
+                onReady: lofiPlayerReady,
+                onStateChange: lofiStateChange
+            }
+        });
+        player = window._ytPlayerInstance;
     }
 
-    function swapLofiVideo(videoId, title) {
-        document.getElementById('lofi-loading').classList.add('visible');
+    function lofiPlayerReady(e) {
+        e.target.setVolume(parseInt(document.getElementById('lofi-vol').value));
+    }
 
+    function lofiStateChange(e) {
+        if (e.data === YT.PlayerState.PLAYING) {
+            lofiSetPlaying(true);
+            document.getElementById('lofi-loading').classList.remove('visible');
+        } else if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) {
+            lofiSetPlaying(false);
+        }
+    }
+
+    function swapLofiVideo(videoId, title, sub, label) {
+        document.getElementById('lofi-loading').classList.add('visible');
+        lofiSetPlaying(false);
+
+        // Log YouTube video via PHP endpoint (fire-and-forget)
         fetch('log_youtube.php', {
             method: 'POST',
             headers: {
@@ -471,19 +547,41 @@ $jsConfig = json_encode([
             })
         }).catch(() => {});
 
-        const wrap = document.getElementById('lofi-player-wrap');
-        const old = document.getElementById('lofi-yt-player');
-        if (old) old.remove();
+        if (player) {
+            try {
+                player.destroy();
+            } catch (err) {}
+            player = null;
+            ytPlayerInitialized = false;
+            window._ytPlayerInstance = null;
+            window._ytPlayerInitialized = false;
+        }
 
+        // Safely remove old iframe
+        const wrap = document.getElementById('lofi-player-wrap');
+        const oldIframe = document.getElementById('lofi-yt-player');
+        if (oldIframe) oldIframe.remove();
+
+        // Create fresh iframe
         const iframe = document.createElement('iframe');
         iframe.id = 'lofi-yt-player';
         iframe.style.cssText = 'display:block;width:100%;height:200px;';
         iframe.setAttribute('frameborder', '0');
         iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
-        // autoplay=1 so it starts playing, no JS API needed
-        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
-        iframe.onload = () => document.getElementById('lofi-loading').classList.remove('visible');
+        iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&rel=0&modestbranding=1`;
         wrap.insertBefore(iframe, document.getElementById('lofi-loading'));
+
+        // Bind new player
+        player = new YT.Player('lofi-yt-player', {
+            events: {
+                onReady: function(e) {
+                    e.target.setVolume(parseInt(document.getElementById('lofi-vol').value));
+                    e.target.playVideo();
+                },
+                onStateChange: lofiStateChange
+            }
+        });
+        window._ytPlayerInstance = player;
     }
 
     function lofiExtractId(url) {
@@ -506,14 +604,17 @@ $jsConfig = json_encode([
     function loadLofiURL() {
         const input = document.getElementById('lofi-url-input');
         const errorMsg = document.getElementById('lofi-error-msg');
+
         input.classList.remove('error');
         errorMsg.classList.remove('visible');
+
         const videoId = lofiExtractId(input.value);
         if (!videoId) {
             input.classList.add('error');
             errorMsg.classList.add('visible');
             return;
         }
+
         swapLofiVideo(videoId, 'now playing ♪');
         input.value = '';
     }
@@ -522,24 +623,20 @@ $jsConfig = json_encode([
         swapLofiVideo(DEFAULT.id, DEFAULT.title);
     }
 
-    // Play/pause won't work without the JS API — these buttons become volume-only
     function toggleLofiPlay() {
-        // Can't control iframe playback without enablejsapi — use iframe src swap instead
-        const iframe = getLofiIframe();
-        if (!iframe) return;
-        const src = iframe.src;
-        // Toggle by reloading with autoplay on/off (crude but works)
-        if (src.includes('autoplay=1')) {
-            iframe.src = src.replace('autoplay=1', 'autoplay=0');
-        } else {
-            iframe.src = src.replace('autoplay=0', 'autoplay=1');
-        }
+        if (!player) return;
+        isPlaying ? player.pauseVideo() : player.playVideo();
     }
 
     function lofiSetVolume(val) {
+        if (player && player.setVolume) player.setVolume(parseInt(val));
         document.getElementById('lofi-vol-icon').textContent =
             val == 0 ? '🔇' : val < 50 ? '🔈' : '🔊';
-        // Volume can't be controlled without JS API — iframe handles its own volume
+    }
+
+    function lofiSetPlaying(playing) {
+        isPlaying = playing;
+        document.getElementById('lofi-play-btn').textContent = playing ? '\u23F8 PAUSE' : '\u25B6 PLAY';
     }
 </script>
 
