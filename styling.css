@@ -461,8 +461,6 @@ body {
   padding: 0;
   z-index: 50;
   animation: fadeInUp 0.4s ease both;
-  max-height: calc(100vh - clamp(80px, 12vh, 120px));
-  overflow-y: auto;
 }
 
 .container-4 {
@@ -1300,13 +1298,13 @@ body {
   font-size: 12px;
 }
 
-/* Tab panel visibility — both always visible, stacked */
+/* Tab panel visibility */
 .px-tab-panel {
-  display: block;
-  visibility: visible;
-  height: auto;
-  overflow: visible;
-  pointer-events: auto;
+  display: block; /* keep it in DOM */
+  visibility: hidden; /* but hide it visually */
+  height: 0; /* collapse it so it takes no space */
+  overflow: hidden; /* prevent bleed */
+  pointer-events: none; /* prevent clicks */
 }
 
 .px-tab-panel.active {
