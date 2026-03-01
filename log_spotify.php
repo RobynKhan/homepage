@@ -1,21 +1,37 @@
 <?php
-// log_spotify.php — Log a Spotify track play to Supabase PostgreSQL
-// Uses PHP session auth + PDO (same pattern as todo_api.php)
 
+/**
+ * ============================================================================
+ * log_spotify.php — Spotify Track Play Logger
+ * ============================================================================
+ *
+ * Logs each Spotify track play to the database (spotify_tracks table).
+ * Accepts POST requests with JSON body containing:
+ *   { track_id, title, artist, album_art }
+ *
+ * Uses upsert (INSERT ... ON CONFLICT) to update the last_played_at
+ * timestamp if the same user has already played that track.
+ *
+ * Authorization: Admin users OR Spotify-authenticated users.
+ * Called by: player.js → playInEmbed() (fire-and-forget fetch)
+ * ============================================================================
+ */
+
+// ─── Session Initialization & Dependencies ──────────────────────────────
 session_start();
 require_once __DIR__ . '/auth_config.php';
 require_once __DIR__ . '/db.php';
 
 header('Content-Type: application/json');
 
-// Only accept POST
+// ─── HTTP Method Validation (POST only) ───────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['error' => 'Method not allowed']);
     exit;
 }
 
-// Allow admin OR Spotify-authenticated users
+// ─── User Authentication (admin or Spotify-linked user) ───────────────────
 if (is_admin_logged_in()) {
     $username = current_admin()['username'];
 } elseif (!empty($_SESSION['access_token'])) {
@@ -26,6 +42,7 @@ if (is_admin_logged_in()) {
     echo json_encode(['error' => 'Unauthorized']);
     exit;
 }
+// ─── Parse Request Body & Validate ─────────────────────────────────────────
 $body     = json_decode(file_get_contents('php://input'), true) ?? [];
 
 $track_id  = trim($body['track_id'] ?? '');
@@ -39,9 +56,8 @@ if (empty($track_id)) {
     exit;
 }
 
+// ─── Upsert Track Play Record in Database ─────────────────────────────────
 $db = getDB();
-
-// Upsert: update last_played_at if this user+track already exists
 $stmt = $db->prepare('
     INSERT INTO spotify_tracks (user_id, track_id, title, artist, album_art, last_played_at)
     VALUES (:user_id, :track_id, :title, :artist, :album_art, NOW())

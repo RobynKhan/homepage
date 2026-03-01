@@ -1,26 +1,61 @@
-// ─── Tab Switching (Spotify / YouTube) ────────────────────────────────────────
+/**
+ * ============================================================================
+ * player.js — Spotify Player Controller (Dashboard + Standalone)
+ * ============================================================================
+ *
+ * Unified Spotify controller that works on BOTH pages:
+ *   - index.php (PixelTune retro panel with tabs, screen navigation)
+ *   - player.html (standalone 3-column layout with sidebar + queue)
+ *
+ * Handles:
+ *   - Tab switching between Spotify and YouTube panels (dashboard only)
+ *   - Multi-screen navigation (Home → Tracks → Now Playing) with history
+ *   - Spotify IFrame Embed API initialization and playback control
+ *   - Loading user playlists, recently played tracks, and search results
+ *   - Rendering track lists and handling play actions
+ *   - Now-playing bar updates across screens
+ *   - Decorative waveform/animation generation
+ *
+ * Both Spotify and YouTube run in separate iframes — switching between
+ * tabs does NOT stop either player from continuing.
+ *
+ * Communicates with: playlists.php, recent.php, search.php, tracks.php,
+ *                    log_spotify.php (all via AJAX fetch)
+ *
+ * Loaded by: index.php, player.html
+ * ============================================================================
+ */
+
+// ─── Page Detection ──────────────────────────────────────────────────────
+// Detect which page we're on so functions can adapt their behavior
+const IS_STANDALONE_PLAYER = !!document.querySelector(".app-layout");
+const IS_DASHBOARD = !!document.getElementById("px-app");
+
+// ─── Tab Switching (Spotify / YouTube Panel Toggle) ──────────────────────
 
 function pxSwitchTab(tabName) {
-  // Update tab buttons (highlight active)
+  // Update tab buttons
   document
     .querySelectorAll(".px-tab")
     .forEach((t) => t.classList.remove("active"));
   const tabBtn = document.getElementById("px-tab-" + tabName);
   if (tabBtn) tabBtn.classList.add("active");
 
-  // Both panels stay visible — just scroll to the chosen one
+  // Update panels
+  document
+    .querySelectorAll(".px-tab-panel")
+    .forEach((p) => p.classList.remove("active"));
   const panel = document.getElementById("px-panel-" + tabName);
-  if (panel) {
-    panel.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
+  if (panel) panel.classList.add("active");
 
   // Lazy-init YouTube player when its tab becomes visible
   if (tabName === "youtube" && typeof initYouTubePlayer === "function") {
+    // Short delay so the panel is rendered before YT.Player binds to the iframe
     setTimeout(initYouTubePlayer, 100);
   }
 }
 
-// ─── Screen Navigation ────────────────────────────────────────────────────────
+// ─── Multi-Screen Navigation with History Stack ─────────────────────────
 
 let pxScreenHistory = ["home"];
 
@@ -59,7 +94,7 @@ function pxGoBack() {
   }
 }
 
-// ─── Now-Playing Bar Updates ──────────────────────────────────────────────────
+// ─── Now-Playing Bar Label Updates (Home + Tracks screens) ─────────────────
 function updateNowPlayingBar(trackName, artistName) {
   // Update both home and tracks screen NP bars
   ["", "2"].forEach((suffix) => {
@@ -70,7 +105,7 @@ function updateNowPlayingBar(trackName, artistName) {
   });
 }
 
-// ─── Init ─────────────────────────────────────────────────────────────────────
+// ─── DOM Ready: Initialize Player, Load Data, Bind Events ─────────────────
 document.addEventListener("DOMContentLoaded", async () => {
   buildPxWaveform();
   buildNpWaveforms();
@@ -95,7 +130,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-// ─── Spotify IFrame Embed API ─────────────────────────────────────────────────
+// ─── Spotify IFrame Embed API Setup & Playback Control ───────────────────
 
 let spotifyEmbedController = null;
 let spotifyEmbedReady = false;
@@ -147,7 +182,11 @@ function playInEmbed(type, id, trackName, artistName) {
   }
 
   if (trackName) updateNowPlayingBar(trackName, artistName);
-  pxShowScreen("player");
+
+  // Navigate to player screen only on PixelTune dashboard
+  if (IS_DASHBOARD && typeof pxShowScreen === "function") {
+    pxShowScreen("player");
+  }
 
   // Log track play via PHP endpoint (fire-and-forget)
   fetch("log_spotify.php", {
@@ -162,7 +201,7 @@ function playInEmbed(type, id, trackName, artistName) {
   }).catch(() => {});
 }
 
-// ─── Default Top Songs (guest mode) ──────────────────────────────────────────
+// ─── Guest Mode: Default Popular Playlists Display ──────────────────────
 
 function loadDefaultTopSongs() {
   // The default playlist is already loaded via the IFrame API init
@@ -215,7 +254,7 @@ function loadDefaultTopSongs() {
   });
 }
 
-// ─── Playlists (grid with cover art) ──────────────────────────────────────────
+// ─── User Playlists: Grid with Cover Art from Spotify API ─────────────────
 
 async function loadPlaylists() {
   try {
@@ -229,44 +268,62 @@ async function loadPlaylists() {
 
     data.items.forEach((pl) => {
       const art = (pl.images && pl.images[0]?.url) || "";
-      const card = document.createElement("div");
-      card.className = "px-pl-card";
-      card.title = pl.name;
-      card.innerHTML = `
-        <div class="px-pl-cover">
-          ${
-            art
-              ? `<img src="${art}" alt="" loading="lazy">`
-              : `<span class="px-pl-placeholder">&#127925;</span>`
-          }
-          <button class="px-pl-play-btn" aria-label="Play ${pl.name}">
-            <i class="bi bi-play-fill"></i>
-          </button>
-        </div>
-        <div class="px-pl-name">${pl.name}</div>
-        <div class="px-pl-count">${pl.tracks?.total ?? "—"} tracks</div>
-      `;
 
-      // Click cover/name → open tracklist
-      card.addEventListener("click", (e) => {
-        if (e.target.closest(".px-pl-play-btn")) return;
-        loadTracks(pl.id, pl.name);
-      });
+      // ── Dashboard: PixelTune playlist grid cards ──
+      if (grid) {
+        const card = document.createElement("div");
+        card.className = "px-pl-card";
+        card.title = pl.name;
+        card.innerHTML = `
+          <div class="px-pl-cover">
+            ${
+              art
+                ? `<img src="${art}" alt="" loading="lazy">`
+                : `<span class="px-pl-placeholder">&#127925;</span>`
+            }
+            <button class="px-pl-play-btn" aria-label="Play ${pl.name}">
+              <i class="bi bi-play-fill"></i>
+            </button>
+          </div>
+          <div class="px-pl-name">${pl.name}</div>
+          <div class="px-pl-count">${pl.tracks?.total ?? "—"} tracks</div>
+        `;
 
-      // Play button → play entire playlist in embed
-      card.querySelector(".px-pl-play-btn").addEventListener("click", (e) => {
-        e.stopPropagation();
-        playInEmbed("playlist", pl.id, pl.name, "Playlist");
-      });
+        card.addEventListener("click", (e) => {
+          if (e.target.closest(".px-pl-play-btn")) return;
+          loadTracks(pl.id, pl.name);
+        });
 
-      grid.appendChild(card);
+        card.querySelector(".px-pl-play-btn").addEventListener("click", (e) => {
+          e.stopPropagation();
+          playInEmbed("playlist", pl.id, pl.name, "Playlist");
+        });
+
+        grid.appendChild(card);
+      }
+
+      // ── Standalone Player: sidebar playlist list items ──
+      const sidebar = document.getElementById("playlist-list");
+      if (sidebar) {
+        const li = document.createElement("li");
+        li.textContent = pl.name;
+        li.addEventListener("click", () => {
+          // Highlight active
+          sidebar
+            .querySelectorAll("li")
+            .forEach((l) => l.classList.remove("active"));
+          li.classList.add("active");
+          loadTracks(pl.id, pl.name);
+        });
+        sidebar.appendChild(li);
+      }
     });
   } catch (err) {
     console.error("Failed to load playlists:", err);
   }
 }
 
-// ─── Recently Played ──────────────────────────────────────────────────────────
+// ─── Recently Played Tracks from Spotify API ────────────────────────────
 
 async function loadRecentlyPlayed() {
   try {
@@ -339,7 +396,7 @@ async function loadTracks(playlistId, playlistName) {
   renderTracks((data.items ?? []).map((i) => i.track).filter(Boolean));
 }
 
-// ─── Search ───────────────────────────────────────────────────────────────────
+// ─── Spotify Track Search via Search API ─────────────────────────────────
 
 async function searchSongs() {
   const query = document.getElementById("search-input")?.value.trim();
@@ -358,7 +415,7 @@ async function searchSongs() {
   renderTracks(data.tracks?.items ?? []);
 }
 
-// ─── Render Tracks ────────────────────────────────────────────────────────────
+// ─── Track List Renderer (used by search, playlist, and recent) ───────────
 
 function renderTracks(tracks) {
   const list = document.getElementById("track-list");
@@ -400,7 +457,7 @@ function renderTracks(tracks) {
   });
 }
 
-// ─── PixelTune Waveform Decoration ────────────────────────────────────────────
+// ─── Decorative Waveform Animation (Now Playing Screen) ──────────────────
 function buildPxWaveform() {
   const el = document.getElementById("px-waveform");
   if (!el) return;
@@ -415,7 +472,7 @@ function buildPxWaveform() {
   }
 }
 
-// ─── Mini Waveforms in Now-Playing Bars ──────────────────────────────────────
+// ─── Mini Waveform Bars in Now-Playing Bottom Bars ───────────────────────
 function buildNpWaveforms() {
   ["px-np-wave", "px-np-wave2"].forEach((id) => {
     const el = document.getElementById(id);

@@ -1,5 +1,18 @@
 <?php
-// includes/spotify_helpers.php — Shared Spotify token helpers
+
+/**
+ * ============================================================================
+ * includes/spotify_helpers.php — Spotify API Token & Request Helpers
+ * ============================================================================
+ *
+ * Provides shared utility functions for communicating with the Spotify Web API:
+ *   - refreshSpotifyToken() — Refresh expired access tokens using refresh token
+ *   - requireSpotifyToken() — Get a valid token or exit with 401
+ *   - spotifyGet()          — Make authenticated GET requests with auto-retry
+ *
+ * Used by: playlists.php, recent.php, search.php, tracks.php
+ * ============================================================================
+ */
 require_once __DIR__ . '/../config.php';
 
 /**

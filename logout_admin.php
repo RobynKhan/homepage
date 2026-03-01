@@ -1,4 +1,16 @@
 <?php
+
+/**
+ * ============================================================================
+ * logout_admin.php — Admin Session Logout
+ * ============================================================================
+ *
+ * Removes only the admin authentication key from the session, preserving
+ * other session data (e.g., Spotify tokens). Redirects to the homepage.
+ *
+ * Called from: Admin greeting area in the top bar (header.php)
+ * ============================================================================
+ */
 session_start();
 require_once __DIR__ . '/auth_config.php';
 

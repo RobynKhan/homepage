@@ -1,13 +1,32 @@
 <?php
+
+/**
+ * ============================================================================
+ * login_admin.php — Admin Login Page
+ * ============================================================================
+ *
+ * Renders a styled login form for admin users and processes login attempts.
+ * On successful authentication:
+ *   - Stores admin info in the session
+ *   - Regenerates session ID (prevents session fixation attacks)
+ *   - Redirects to the dashboard (index.php)
+ *
+ * Admin credentials are validated against hashed passwords stored in
+ * environment variables (see auth_config.php).
+ *
+ * Flow: login_admin.php (form) → POST login_admin.php → index.php
+ * ============================================================================
+ */
 session_start();
 require_once __DIR__ . '/auth_config.php';
 
-// Already logged in? Send to dashboard
+// ─── Redirect Already-Authenticated Users to Dashboard ────────────────────
 if (is_admin_logged_in()) {
   header('Location: ' . DASHBOARD_PAGE);
   exit;
 }
 
+// ─── Login Form Submission Handler ────────────────────────────────────────
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -18,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     isset(ADMIN_ACCOUNTS[$username]) &&
     password_verify($password, ADMIN_ACCOUNTS[$username]['password_hash'])
   ) {
-    // ✅ Valid — store minimal info in session
+    // ─── Successful Login — Store Admin Session Data ────────────────────────
     $_SESSION[AUTH_SESSION_KEY] = [
       'username'     => ADMIN_ACCOUNTS[$username]['username'],
       'display_name' => ADMIN_ACCOUNTS[$username]['display_name'],

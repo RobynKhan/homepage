@@ -1,3 +1,20 @@
+<!--
+  ============================================================================
+  frerein.html — Static Prototype / Development Sandbox
+  ============================================================================
+
+  A standalone HTML page used as a static prototype of the dashboard layout.
+  Contains placeholder sections (Section 1 with generic buttons) for layout
+  testing. Includes the timer, digital clock, music panel placeholder,
+  games panel placeholder, and settings panel.
+
+  This file does NOT connect to any backend services. It loads:
+    - styling.css for visual styling
+    - timer.js for timer + clock + navigation functionality
+
+  Note: This is a development/testing file, not the production dashboard.
+  ============================================================================
+-->
 <!doctype html>
 <html lang="en">
   <head>
@@ -7,10 +24,11 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     />
-    <title>Document</title>
+    <title>Pomodoro Dashboard — Prototype</title>
     <link rel="stylesheet" href="styling.css" />
   </head>
   <body>
+    <!-- ====== NAVIGATION BAR ====== -->
     <nav class="navbar">
       <ul class="nav-list">
         <li class="nav-item">
@@ -35,7 +53,7 @@
         </li>
         <li class="nav-item">
           <a
-            href="#item2"
+            href="#clock"
             class="nav-link"
             aria-label="Clock"
             data-target="container-2"
@@ -45,7 +63,7 @@
         </li>
         <li class="nav-item">
           <a
-            href="#item3"
+            href="#music"
             class="nav-link"
             aria-label="Music"
             data-target="container-3"
@@ -55,9 +73,9 @@
         </li>
         <li class="nav-item">
           <a
-            href="#item4"
+            href="#tasks"
             class="nav-link"
-            aria-label="Games"
+            aria-label="Tasks"
             data-target="container-4"
           >
             <i class="bi bi-controller"></i>
@@ -65,6 +83,7 @@
         </li>
       </ul>
     </nav>
+    <!-- ====== POMODORO TIMER SECTION ====== -->
     <section>
       <div id="timer-container" class="timer-container">
         <!-- Timer Mode Buttons -->
@@ -130,12 +149,15 @@
       </div>
     </section>
 
+    <!-- ====== DIGITAL CLOCK DISPLAY ====== -->
     <div id="container-2" class="container-2">
       <div id="digital-clock">
         <div id="time"></div>
         <div id="date"></div>
       </div>
     </div>
+
+    <!-- ====== MUSIC PANEL PLACEHOLDER ====== -->
     <div id="container-3" class="container-3">
       <div class="section-1">
         Section 1
@@ -143,6 +165,7 @@
       </div>
     </div>
 
+    <!-- ====== TASKS PANEL PLACEHOLDER ====== -->
     <div id="container-4" class="container-4">
       <div class="section-1">
         Section 1
@@ -150,6 +173,7 @@
       </div>
     </div>
 
+    <!-- ====== SETTINGS PANEL (Background Theme Selection) ====== -->
     <div id="settings-container" class="settings-container">
       <i class="bi bi-x-circle" id="close-settings"></i>
       <h2>Settings</h2>

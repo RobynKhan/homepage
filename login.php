@@ -1,4 +1,17 @@
 <?php
+
+/**
+ * ============================================================================
+ * login.php — Spotify OAuth Login Initiator
+ * ============================================================================
+ *
+ * Generates a CSRF-safe state token, stores it in the session, and redirects
+ * the user to Spotify's authorization page. After the user grants permission,
+ * Spotify redirects back to callback.php with the authorization code.
+ *
+ * Flow: User clicks "Login with Spotify" → login.php → Spotify → callback.php
+ * ============================================================================
+ */
 session_start();
 require __DIR__ . '/config.php';
 

@@ -1,11 +1,29 @@
 <?php
-// ─── To-do Widget — PixelTune Style ────────────────────────────────
+
+/**
+ * ============================================================================
+ * todo_widget.php — Todo/Quests Widget (PixelTune Styled)
+ * ============================================================================
+ *
+ * Renders the todo list widget embedded in the main dashboard (index.php).
+ * Two modes:
+ *   - Admin (logged in):  Full CRUD interface with input, checkboxes, delete
+ *   - Guest (not logged in): Locked state with login prompt
+ *
+ * The admin mode includes inline JavaScript that communicates with
+ * todo_api.php for persistent storage via Supabase PostgreSQL.
+ *
+ * Included by: index.php (inside container-4)
+ * ============================================================================
+ */
+
+// ─── Determine Admin Status ───────────────────────────────────────────────
 $isAdmin = function_exists('is_admin_logged_in') && is_admin_logged_in();
 ?>
 <div class="px-todo">
     <div class="px-todo-scanlines"></div>
 
-    <!-- Title bar -->
+    <!-- ── Todo Widget: Title Bar with Window Controls ── -->
     <div class="px-todo-titlebar">
         <span class="px-todo-titlebar-dots">
             <span class="px-dot px-dot--red"></span>
@@ -16,7 +34,7 @@ $isAdmin = function_exists('is_admin_logged_in') && is_admin_logged_in();
     </div>
 
     <?php if ($isAdmin): ?>
-        <!-- Admin: full CRUD -->
+        <!-- ── Todo Widget: Admin CRUD Interface ── -->
         <div class="px-todo-body">
             <div class="px-todo-input-row">
                 <input
@@ -43,7 +61,7 @@ $isAdmin = function_exists('is_admin_logged_in') && is_admin_logged_in();
             </div>
         </div>
     <?php else: ?>
-        <!-- Guest: locked state -->
+        <!-- ── Todo Widget: Guest Locked State ── -->
         <div class="px-todo-locked">
             <i class="bi bi-lock-fill"></i>
             <p>ADMIN ACCESS REQUIRED</p>

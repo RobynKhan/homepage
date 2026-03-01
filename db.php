@@ -1,8 +1,29 @@
 <?php
-// db.php — Supabase PostgreSQL connection
-// Credentials are loaded from Render environment variables:
-//   DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, DB_PORT
 
+/**
+ * ============================================================================
+ * db.php — Database Connection (Supabase PostgreSQL)
+ * ============================================================================
+ *
+ * Provides a singleton PDO connection to the Supabase PostgreSQL database.
+ * Credentials are loaded from Render environment variables:
+ *   DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, DB_PORT
+ *
+ * Features:
+ *   - Singleton pattern (one connection per request)
+ *   - IPv4 DNS resolution to avoid IPv6 issues on Render
+ *   - SSL-required connection (sslmode=require)
+ *   - Exception-based error handling
+ *
+ * Used by: todo_api.php, log_spotify.php, log_youtube.php
+ * ============================================================================
+ */
+
+/**
+ * Get or create a singleton PDO connection to the PostgreSQL database.
+ *
+ * @return PDO Active database connection
+ */
 function getDB(): PDO
 {
     static $pdo = null;

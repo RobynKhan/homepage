@@ -1,4 +1,19 @@
 <!DOCTYPE html>
+<!--
+  ============================================================================
+  includes/header.php — Shared Page Header & Navigation
+  ============================================================================
+
+  Renders the top portion of every page served by index.php:
+    - HTML <head> with meta tags, fonts, icons, and stylesheet imports
+    - Top bar with hamburger menu, live clock, and admin login/logout
+    - Side navigation drawer (desktop) with links to all app sections
+    - Bottom dock (mobile) for quick access to Timer, Music, Tasks, etc.
+    - Bottom sheet backdrop for mobile overlay panels
+
+  Included by: index.php (via require_once)
+  ============================================================================
+-->
 <html lang="en">
 
 <head>
@@ -17,7 +32,7 @@
 </head>
 
 <body>
-    <!-- ── Top Bar: hamburger + clock + admin ── -->
+    <!-- ── Top Bar: Hamburger Menu + Live Clock + Admin Actions ── -->
     <header class="top-bar">
         <button class="top-bar__hamburger" id="hamburger-btn" aria-label="Open menu">
             <i class="bi bi-list"></i>
@@ -41,7 +56,7 @@
         </div>
     </header>
 
-    <!-- ── Nav Drawer (desktop, slides from left) ── -->
+    <!-- ── Navigation Drawer (Desktop Slide-Out Panel) ── -->
     <div class="nav-overlay" id="nav-overlay"></div>
     <nav class="nav-drawer" id="nav-drawer">
         <div class="nav-drawer__head">
@@ -79,7 +94,7 @@
         </ul>
     </nav>
 
-    <!-- ── Mobile Bottom Dock ── -->
+    <!-- ── Mobile Bottom Dock Navigation ── -->
     <nav class="bottom-dock" id="bottom-dock">
         <button class="dock-btn" data-target="timer-container" aria-label="Timer">
             <i class="bi bi-hourglass-split"></i>
@@ -103,5 +118,5 @@
         </button>
     </nav>
 
-    <!-- ── Bottom Sheet Backdrop (mobile) ── -->
+    <!-- ── Mobile Bottom Sheet Backdrop Overlay ── -->
     <div class="sheet-backdrop" id="sheet-backdrop"></div>

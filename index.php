@@ -1,9 +1,27 @@
 <?php
+
+/**
+ * ============================================================================
+ * index.php — Main Dashboard / Homepage
+ * ============================================================================
+ *
+ * The primary page of the Pomodoro Timer application. Renders the full
+ * dashboard layout including:
+ *   - Pomodoro timer with work/short-break/long-break modes
+ *   - PixelTune music panel with Spotify and YouTube tabs
+ *   - Todo/Quests widget (admin CRUD or guest locked state)
+ *   - Settings panel for background theme customization
+ *   - Spotify login state save/restore across OAuth redirects
+ *
+ * Dependencies: config.php, auth_config.php, includes/header.php,
+ *               includes/footer.php, todo_widget.php, player.js, timer.js
+ * ============================================================================
+ */
 session_start();
 require_once __DIR__ . '/auth_config.php';
 require 'config.php';
 
-// ─── Default timer settings ────────────────────────────────────────────────
+// ─── Default Timer Settings (from config constants) ──────────────────────
 $settings = [
     'pomodoro_duration'          => DEFAULT_POMODORO,
     'short_break_duration'       => DEFAULT_SHORT_BREAK,
@@ -14,7 +32,7 @@ $settings = [
 
 $pomodoroCount = 0;
 
-// ─── Convert minutes → seconds for the JS state object ───────────────────
+// ─── Convert Timer Durations to Seconds for JavaScript ────────────────────
 $jsTimers = json_encode([
     'POMODORO'   => $settings['pomodoro_duration']          * 60,
     'SHORTBREAK' => $settings['short_break_duration']       * 60,
@@ -30,9 +48,10 @@ $jsConfig = json_encode([
 
 <!-- (lofi FAB removed — YouTube is inside the left panel) -->
 
+<!-- ====== POMODORO TIMER SECTION ====== -->
 <section>
     <div id="timer-container" class="timer-container">
-        <!-- Timer Mode Buttons -->
+        <!-- Timer Mode Selection Buttons (Pomodoro / Short Break / Long Break) -->
         <div class="timers" role="group" aria-label="Timer Modes">
             <button
                 id="pomodorobtn"
@@ -48,7 +67,7 @@ $jsConfig = json_encode([
                 Long Break
             </button>
         </div>
-        <!-- Timer Display -->
+        <!-- Timer Countdown Display -->
         <div class="runner">
             <span class="timer-display" role="timer" aria-live="polite"><?php
                                                                         $initialSeconds = $settings['pomodoro_duration'] * 60;
@@ -57,7 +76,7 @@ $jsConfig = json_encode([
                                                                         echo "{$m}:{$s}";
                                                                         ?></span>
         </div>
-        <!-- Timer Controls -->
+        <!-- Timer Control Buttons (Start / Pause / Restart / Settings) -->
         <div class="config">
             <div class="pomodoro-count" role="group" aria-label="Timer Controls">
                 <button
@@ -93,10 +112,10 @@ $jsConfig = json_encode([
     </div>
 </section>
 
-<!-- PixelTune Left Panel — Spotify + YouTube switcher -->
+<!-- ====== PIXELTUNE MUSIC PANEL (Left Panel — Spotify + YouTube Switcher) ====== -->
 <div id="container-3" class="container-3">
 
-    <!-- Tab switcher bar -->
+    <!-- Music Source Tab Switcher Bar (Spotify / YouTube) -->
     <div class="px-tab-bar">
         <button class="px-tab active" id="px-tab-spotify" onclick="pxSwitchTab('spotify')">
             <i class="bi bi-spotify"></i> SPOTIFY
@@ -106,18 +125,18 @@ $jsConfig = json_encode([
         </button>
     </div>
 
-    <!-- ════ SPOTIFY PANEL ════ -->
+    <!-- ====== SPOTIFY TAB PANEL ====== -->
     <div class="px-tab-panel active" id="px-panel-spotify">
         <div class="px-player" id="px-app">
-            <!-- Pixel stars decoration -->
+            <!-- Pixel Stars Decorative Animation -->
             <div class="px-star" style="top:12px;right:40px;animation-delay:0.3s"></div>
             <div class="px-star" style="top:30px;right:18px;animation-delay:0.9s;background:#00e5ff;box-shadow:0 0 4px #00e5ff;"></div>
             <div class="px-star" style="top:6px;right:70px;animation-delay:1.4s;width:2px;height:2px;background:#b06bff;box-shadow:0 0 4px #b06bff;"></div>
 
-            <!-- Scanline overlay -->
+            <!-- Retro Scanline Visual Overlay -->
             <div class="px-scanlines"></div>
 
-            <!-- ===== SCREEN 1: HOME (playlists + search + recent) ===== -->
+            <!-- ===== SPOTIFY SCREEN 1: Home (Playlists + Search + Recently Played) ===== -->
             <div class="px-screen active" id="px-screen-home">
                 <div class="px-topbar">
                     <div class="px-topbar-title">&#9654; PIXELTUNE</div>
@@ -136,7 +155,7 @@ $jsConfig = json_encode([
                 </div>
 
                 <div class="px-scroll-area">
-                    <!-- Search -->
+                    <!-- Spotify Song Search Input -->
                     <div class="px-section-label">SEARCH</div>
                     <div class="px-search-bar">
                         <input type="text" id="search-input" placeholder="SEARCH SONGS..."
@@ -145,27 +164,27 @@ $jsConfig = json_encode([
                     </div>
 
                     <?php if (!isset($_SESSION['access_token'])): ?>
-                        <!-- Login prompt -->
+                        <!-- Spotify Login Prompt (shown when not connected) -->
                         <div class="px-login-prompt">
                             <i class="bi bi-spotify" style="font-size:18px;color:var(--px-green)"></i>
                             <span><a href="login.php" target="_blank" rel="noopener" style="color:var(--px-green);text-decoration:underline">Login with Spotify</a> to see your playlists, liked songs &amp; more</span>
                         </div>
 
-                        <!-- Default: Top Songs -->
+                        <!-- Default Popular Playlists (guest mode) -->
                         <div class="px-section-label" style="margin-top:10px">&#127942; TOP SONGS</div>
                         <ul id="track-list-home"></ul>
                     <?php else: ?>
-                        <!-- Recently Played -->
+                        <!-- Recently Played Tracks (authenticated users) -->
                         <div class="px-section-label" style="margin-top:10px">&#9655; RECENTLY PLAYED</div>
                         <ul class="px-recent-list" id="recent-list"></ul>
 
-                        <!-- Your Playlists — grid with covers -->
+                        <!-- User's Spotify Playlists Grid with Cover Art -->
                         <div class="px-section-label" style="margin-top:12px">&#127925; YOUR PLAYLISTS</div>
                         <div class="px-playlist-grid" id="playlist-grid"></div>
                     <?php endif; ?>
                 </div>
 
-                <!-- Now playing bar at bottom -->
+                <!-- Now Playing Mini-Bar (navigates to player screen) -->
                 <div class="px-np-bar" onclick="pxShowScreen('player')">
                     <div class="px-np-art" id="px-np-emoji">&#127925;</div>
                     <div class="px-np-info">
@@ -176,7 +195,7 @@ $jsConfig = json_encode([
                 </div>
             </div>
 
-            <!-- ===== SCREEN 2: TRACKS (search results / playlist tracks) ===== -->
+            <!-- ===== SPOTIFY SCREEN 2: Track List (Search Results / Playlist Tracks) ===== -->
             <div class="px-screen" id="px-screen-tracks">
                 <div class="px-topbar">
                     <button class="px-back-btn" onclick="pxShowScreen('home')">&#9664; BACK</button>
@@ -189,7 +208,7 @@ $jsConfig = json_encode([
                     <ul id="track-list"></ul>
                 </div>
 
-                <!-- Now playing bar -->
+                <!-- Now Playing Mini-Bar (tracks screen) -->
                 <div class="px-np-bar" onclick="pxShowScreen('player')">
                     <div class="px-np-art" id="px-np-emoji2">&#127925;</div>
                     <div class="px-np-info">
@@ -200,7 +219,7 @@ $jsConfig = json_encode([
                 </div>
             </div>
 
-            <!-- ===== SCREEN 3: NOW PLAYING (Spotify embed) ===== -->
+            <!-- ===== SPOTIFY SCREEN 3: Now Playing (Spotify Embed Player) ===== -->
             <div class="px-screen" id="px-screen-player">
                 <div class="px-topbar">
                     <button class="px-back-btn" onclick="pxGoBack()">&#9664; BACK</button>
@@ -209,30 +228,30 @@ $jsConfig = json_encode([
                 </div>
 
                 <div class="px-embed-body" id="spotify-embed-container">
-                    <!-- Spotify IFrame Embed API will create the iframe here -->
+                    <!-- Spotify IFrame Embed API Container -->
                 </div>
             </div>
         </div>
     </div><!-- /px-panel-spotify -->
 
-    <!-- ════ YOUTUBE PANEL ════ -->
+    <!-- ====== YOUTUBE TAB PANEL ====== -->
     <div class="px-tab-panel" id="px-panel-youtube">
         <div class="px-player px-yt-player" id="px-yt-app">
-            <!-- Scanline overlay -->
+            <!-- Retro Scanline Visual Overlay -->
             <div class="px-scanlines"></div>
 
-            <!-- Pixel stars -->
+            <!-- Pixel Stars Decorative Animation -->
             <div class="px-star" style="top:10px;right:30px;animation-delay:0.2s;background:#ff0000;box-shadow:0 0 4px #ff0000;"></div>
             <div class="px-star" style="top:25px;right:55px;animation-delay:1.1s;"></div>
 
-            <!-- Single screen for YouTube -->
+            <!-- YouTube Single Screen View -->
             <div class="px-screen active">
                 <div class="px-topbar">
                     <div class="px-topbar-title" style="color:var(--px-accent)">&#9654; YOUTUBE</div>
                 </div>
 
                 <div class="px-scroll-area">
-                    <!-- URL input -->
+                    <!-- YouTube URL Input Field -->
                     <div class="px-section-label">PASTE URL</div>
                     <div class="px-search-bar">
                         <input type="text" id="lofi-url-input" placeholder="YOUTUBE URL..."
@@ -242,7 +261,7 @@ $jsConfig = json_encode([
                     </div>
                     <div class="lofi-error-msg" id="lofi-error-msg">&#9888; INVALID URL</div>
 
-                    <!-- YouTube embed -->
+                    <!-- YouTube Embedded Video Player -->
                     <div class="px-yt-embed-wrap" id="lofi-player-wrap">
                         <iframe
                             id="lofi-yt-player"
@@ -255,7 +274,7 @@ $jsConfig = json_encode([
                         </div>
                     </div>
 
-                    <!-- Controls -->
+                    <!-- YouTube Playback Controls (Play/Pause + Volume) -->
                     <div class="px-yt-controls">
                         <button class="px-yt-play-btn" id="lofi-play-btn" onclick="toggleLofiPlay()">&#9654; PLAY</button>
                         <div class="px-yt-volume">
@@ -268,12 +287,14 @@ $jsConfig = json_encode([
         </div>
     </div><!-- /px-panel-youtube -->
 
-</div><!-- /container-3 -->
+</div><!-- /container-3 (PixelTune Music Panel) -->
 
+<!-- ====== TODO/QUESTS WIDGET SECTION ====== -->
 <div id="container-4" class="container-4" data-show-as="flex" style="display:flex;">
     <?php require_once __DIR__ . '/todo_widget.php'; ?>
 </div>
 
+<!-- ====== SETTINGS PANEL (Background Theme Selection) ====== -->
 <div id="settings-container" class="settings-container">
     <i class="bi bi-x-circle" id="close-settings"></i>
     <h2>Settings</h2>
@@ -288,18 +309,20 @@ $jsConfig = json_encode([
     </div>
 </div>
 
-<!-- PHP-injected timer config passed to JS -->
+<!-- ====== PHP-TO-JS CONFIGURATION BRIDGE ====== -->
+<!-- Timer duration and config values injected from PHP into JavaScript -->
 <script>
     const PHP_TIMERS = <?php echo $jsTimers; ?>;
     const PHP_CONFIG = <?php echo $jsConfig; ?>;
 </script>
 
-<!-- State save/restore for Spotify login flow -->
+<!-- ====== SPOTIFY LOGIN STATE SAVE/RESTORE ====== -->
+<!-- Preserves app state (timer, lofi, todos, panels) across Spotify OAuth redirects -->
 <script>
     (function() {
         const STATE_KEY = 'spotifyLoginState';
 
-        // ── Save state when clicking Spotify login ──
+        // ── Save App State Before Spotify Login Redirect ──
         document.addEventListener('click', function(e) {
             const link = e.target.closest('a.btn-spotify[target="_blank"]');
             if (!link) return;
@@ -352,7 +375,7 @@ $jsConfig = json_encode([
             } catch (e) {}
         });
 
-        // ── Restore state on load ──
+        // ── Restore App State After Spotify Login Redirect ──
         function restoreState() {
             let raw;
             try {
@@ -430,7 +453,8 @@ $jsConfig = json_encode([
     }());
 </script>
 
-<!-- PixelTune player JS (always loaded) -->
+<!-- ====== PIXELTUNE PLAYER INITIALIZATION ====== -->
+<!-- Spotify embed player JS + Supabase client setup -->
 <script>
     const PX_LOGGED_IN = <?php echo isset($_SESSION['access_token']) ? 'true' : 'false'; ?>;
 </script>
@@ -444,103 +468,8 @@ $jsConfig = json_encode([
 
 <script src="player.js"></script>
 
-<!-- Lofi Widget Script -->
-<script>
-    const DEFAULT = {
-        id: '76GStMlLF_Y',
-        title: 'why the rush?'
-    };
-
-    // NO YT IFrame API — plain iframe only, fully independent from Spotify
-    function getLofiIframe() {
-        return document.getElementById('lofi-yt-player');
-    }
-
-    function swapLofiVideo(videoId, title) {
-        document.getElementById('lofi-loading').classList.add('visible');
-
-        fetch('log_youtube.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                url: 'https://www.youtube.com/watch?v=' + videoId,
-                title: title || '',
-                thumbnail: 'https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg'
-            })
-        }).catch(() => {});
-
-        const wrap = document.getElementById('lofi-player-wrap');
-        const old = document.getElementById('lofi-yt-player');
-        if (old) old.remove();
-
-        const iframe = document.createElement('iframe');
-        iframe.id = 'lofi-yt-player';
-        iframe.style.cssText = 'display:block;width:100%;height:200px;';
-        iframe.setAttribute('frameborder', '0');
-        iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
-        // autoplay=1 so it starts playing, no JS API needed
-        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
-        iframe.onload = () => document.getElementById('lofi-loading').classList.remove('visible');
-        wrap.insertBefore(iframe, document.getElementById('lofi-loading'));
-    }
-
-    function lofiExtractId(url) {
-        url = url.trim();
-        const patterns = [
-            /[?&]v=([a-zA-Z0-9_-]{11})/,
-            /youtu\.be\/([a-zA-Z0-9_-]{11})/,
-            /youtube\.com\/live\/([a-zA-Z0-9_-]{11})/,
-            /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
-            /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
-        ];
-        for (const p of patterns) {
-            const m = url.match(p);
-            if (m) return m[1];
-        }
-        if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
-        return null;
-    }
-
-    function loadLofiURL() {
-        const input = document.getElementById('lofi-url-input');
-        const errorMsg = document.getElementById('lofi-error-msg');
-        input.classList.remove('error');
-        errorMsg.classList.remove('visible');
-        const videoId = lofiExtractId(input.value);
-        if (!videoId) {
-            input.classList.add('error');
-            errorMsg.classList.add('visible');
-            return;
-        }
-        swapLofiVideo(videoId, 'now playing ♪');
-        input.value = '';
-    }
-
-    function resetLofiDefault() {
-        swapLofiVideo(DEFAULT.id, DEFAULT.title);
-    }
-
-    // Play/pause won't work without the JS API — these buttons become volume-only
-    function toggleLofiPlay() {
-        // Can't control iframe playback without enablejsapi — use iframe src swap instead
-        const iframe = getLofiIframe();
-        if (!iframe) return;
-        const src = iframe.src;
-        // Toggle by reloading with autoplay on/off (crude but works)
-        if (src.includes('autoplay=1')) {
-            iframe.src = src.replace('autoplay=1', 'autoplay=0');
-        } else {
-            iframe.src = src.replace('autoplay=0', 'autoplay=1');
-        }
-    }
-
-    function lofiSetVolume(val) {
-        document.getElementById('lofi-vol-icon').textContent =
-            val == 0 ? '🔇' : val < 50 ? '🔈' : '🔊';
-        // Volume can't be controlled without JS API — iframe handles its own volume
-    }
-</script>
+<!-- ====== YOUTUBE WIDGET CONTROLLER ====== -->
+<!-- Handles YouTube URL input, video swapping, play/pause, and volume -->
+<script src="youtube.js"></script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

@@ -1,4 +1,22 @@
 <?php
+
+/**
+ * ============================================================================
+ * auth_config.php — Admin Authentication Configuration & Helpers
+ * ============================================================================
+ *
+ * Manages admin user authentication for the Pomodoro Dashboard.
+ * Loads admin credentials from environment variables (ADMIN1_*, ADMIN2_*)
+ * and provides helper functions for session-based auth:
+ *   - is_admin_logged_in()  — Check if an admin session is active
+ *   - require_admin_login() — Redirect unauthenticated users to login page
+ *   - current_admin()       — Retrieve the logged-in admin's data
+ *
+ * Used by: index.php, login_admin.php, logout_admin.php, todo_api.php,
+ *          todo_widget.php, log_spotify.php, log_youtube.php
+ * ============================================================================
+ */
+
 // ─── Admin Accounts — credentials loaded from environment variables ──────
 // Set these on your server / Render dashboard:
 //   ADMIN1_USERNAME, ADMIN1_PASSWORD_HASH

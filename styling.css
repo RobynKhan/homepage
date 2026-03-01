@@ -1,6 +1,29 @@
-* ═══════════════════════════════════════════════════════
-   HOMEPAGE — Redesigned Layout System
-   Top bar + Nav drawer + Centered card + Bottom dock
+/*
+ * ============================================================================
+ * styling.css — Main Application Stylesheet
+ * ============================================================================
+ *
+ * The primary stylesheet for the Pomodoro Timer dashboard application.
+ * Organized into the following major sections:
+ *
+ *   1. CSS Variables & Reset       — Color palette, spacing, shared tokens
+ *   2. Body & Background           — Page layout, theme backgrounds
+ *   3. Top Bar                     — Fixed header with clock and admin controls
+ *   4. Navigation Drawer (Desktop) — Slide-out side menu
+ *   5. Bottom Dock (Mobile)        — Fixed bottom navigation for mobile
+ *   6. Bottom Sheets (Mobile)      — Slide-up panels for mobile
+ *   7. Timer Container             — Pomodoro timer display and controls
+ *   8. Settings Panel              — Theme selection overlay
+ *   9. PixelTune Music Player      — Retro-styled Spotify + YouTube panels
+ *  10. Todo/Quests Widget          — Task management widget
+ *  11. Responsive Overrides        — Mobile-specific layout adjustments
+ *
+ * Used by: index.php, player.html, frerein.html
+ * ============================================================================
+ */
+
+/* ═══════════════════════════════════════════════════════
+   CSS VARIABLES, FONTS, AND GLOBAL RESET
    ═══════════════════════════════════════════════════════ */
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Share+Tech+Mono&display=swap");
@@ -461,8 +484,6 @@ body {
   padding: 0;
   z-index: 50;
   animation: fadeInUp 0.4s ease both;
-  max-height: calc(100vh - clamp(80px, 12vh, 120px));
-  overflow-y: auto;
 }
 
 .container-4 {
@@ -1300,13 +1321,13 @@ body {
   font-size: 12px;
 }
 
-/* Tab panel visibility — both always visible, stacked */
+/* Tab panel visibility */
 .px-tab-panel {
-  display: block;
-  visibility: visible;
-  height: auto;
-  overflow: visible;
-  pointer-events: auto;
+  display: block; /* keep it in DOM */
+  visibility: hidden; /* but hide it visually */
+  height: 0; /* collapse it so it takes no space */
+  overflow: hidden; /* prevent bleed */
+  pointer-events: none; /* prevent clicks */
 }
 
 .px-tab-panel.active {

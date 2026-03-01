@@ -1,14 +1,31 @@
 <?php
-// todo_api.php — Todo CRUD using Supabase PostgreSQL
-// Requires: db.php, auth_config.php
 
+/**
+ * ============================================================================
+ * todo_api.php — Todo/Quests CRUD API
+ * ============================================================================
+ *
+ * RESTful API endpoint for managing admin todo items ("quests").
+ * Supports four actions via the 'action' query parameter:
+ *   - list   — GET  all todos for the logged-in admin (sorted by priority)
+ *   - add    — POST a new todo (text, priority, due_date)
+ *   - update — POST to toggle done/edit text/priority/due_date
+ *   - delete — POST to remove a todo by ID
+ *
+ * Authorization: Admin users only (via auth_config.php helpers).
+ * Database:      Supabase PostgreSQL 'todos' table (via db.php).
+ * Called by:     todo_widget.php inline JavaScript (AJAX fetch)
+ * ============================================================================
+ */
+
+// ─── Session Initialization & Dependencies ──────────────────────────────
 session_start();
 require_once __DIR__ . '/auth_config.php';
 require_once __DIR__ . '/db.php';
 
 header('Content-Type: application/json');
 
-// Must be logged in
+// ─── Admin Authentication Check ────────────────────────────────────────────
 if (!is_admin_logged_in()) {
     http_response_code(401);
     echo json_encode(['error' => 'Unauthorized']);
@@ -21,9 +38,10 @@ $action   = $_GET['action'] ?? '';
 $body     = json_decode(file_get_contents('php://input'), true) ?? [];
 $db       = getDB();
 
+// ─── Route to Action Handler ───────────────────────────────────────────────
 switch ($action) {
 
-    // ── GET all todos for this admin ──────────────────────────────────────
+    // ── LIST: Retrieve all todos for the current admin ────────────────────
     case 'list':
         $stmt = $db->prepare('
             SELECT * FROM todos
@@ -38,7 +56,7 @@ switch ($action) {
         $todos = $stmt->fetchAll();
 
         // Convert done from string to bool for JS
-        $todos = array_map(function($t) {
+        $todos = array_map(function ($t) {
             $t['done'] = (bool)$t['done'];
             return $t;
         }, $todos);
@@ -46,7 +64,7 @@ switch ($action) {
         echo json_encode($todos);
         break;
 
-    // ── POST add new todo ─────────────────────────────────────────────────
+    // ── ADD: Create a new todo item ─────────────────────────────────────────
     case 'add':
         $text     = trim($body['text'] ?? '');
         $priority = $body['priority'] ?? 'medium';
@@ -81,7 +99,7 @@ switch ($action) {
         echo json_encode($todo);
         break;
 
-    // ── POST update todo ──────────────────────────────────────────────────
+    // ── UPDATE: Modify an existing todo (toggle done, edit text/priority/due) ─
     case 'update':
         $id = $body['id'] ?? '';
 
@@ -136,7 +154,7 @@ switch ($action) {
         echo json_encode($todo);
         break;
 
-    // ── POST delete todo ──────────────────────────────────────────────────
+    // ── DELETE: Remove a todo by ID ────────────────────────────────────────
     case 'delete':
         $id = $body['id'] ?? '';
 

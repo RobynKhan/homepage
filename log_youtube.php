@@ -1,26 +1,40 @@
 <?php
-// log_youtube.php — Log a YouTube video watch to Supabase PostgreSQL
-// Uses PHP session auth + PDO (same pattern as todo_api.php)
 
+/**
+ * ============================================================================
+ * log_youtube.php — YouTube Video Watch Logger
+ * ============================================================================
+ *
+ * Logs each YouTube video watch to the database (yt_urls table).
+ * Accepts POST requests with JSON body containing:
+ *   { url, title, thumbnail }
+ *
+ * Authorization: Admin users only.
+ * Called by: youtube.js → swapLofiVideo() (fire-and-forget fetch)
+ * ============================================================================
+ */
+
+// ─── Session Initialization & Dependencies ──────────────────────────────
 session_start();
 require_once __DIR__ . '/auth_config.php';
 require_once __DIR__ . '/db.php';
 
 header('Content-Type: application/json');
 
-// Only accept POST
+// ─── HTTP Method Validation (POST only) ───────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['error' => 'Method not allowed']);
     exit;
 }
 
-// Auth check — admin only
+// ─── Admin Authentication Check ────────────────────────────────────────────
 if (!is_admin_logged_in()) {
     http_response_code(401);
     echo json_encode(['error' => 'Unauthorized']);
     exit;
 }
+// ─── Parse Request Body & Validate URL ────────────────────────────────────
 $username = current_admin()['username'];
 $body     = json_decode(file_get_contents('php://input'), true) ?? [];
 
@@ -34,6 +48,7 @@ if (empty($url)) {
     exit;
 }
 
+// ─── Insert Watch Record into Database ────────────────────────────────────
 $db = getDB();
 
 $stmt = $db->prepare('

@@ -1,4 +1,19 @@
 <?php
+
+/**
+ * ============================================================================
+ * tracks.php — Spotify Playlist Tracks API Endpoint
+ * ============================================================================
+ *
+ * Returns up to 50 tracks from a given Spotify playlist.
+ * Accepts a playlist 'id' query parameter.
+ * Requires an active Spotify session.
+ *
+ * Called by: player.js → loadTracks() (AJAX fetch)
+ * Query:    GET tracks.php?id=<spotify_playlist_id>
+ * Returns:  JSON with playlist track objects from Spotify API
+ * ============================================================================
+ */
 session_start();
 require_once __DIR__ . '/includes/spotify_helpers.php';
 header('Content-Type: application/json');
