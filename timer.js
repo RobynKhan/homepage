@@ -11,16 +11,22 @@ const elements = {
 };
 
 const timers = {
-  POMODORO: 1500, // 25 minutes
-  SHORTBREAK: 300, // 5 minutes
-  LONGBREAK: 900, // 15 minutes
+  POMODORO: (typeof PHP_TIMERS !== "undefined" && PHP_TIMERS.POMODORO) || 1500,
+  SHORTBREAK:
+    (typeof PHP_TIMERS !== "undefined" && PHP_TIMERS.SHORTBREAK) || 300,
+  LONGBREAK: (typeof PHP_TIMERS !== "undefined" && PHP_TIMERS.LONGBREAK) || 900,
 };
 
 const state = {
-  pomodoroCount: 0,
-  pomodorosUntilLongBreak: 4,
-  timerValue: timers.POMODORO,
-  initialTime: timers.POMODORO, // New property to store initial time
+  pomodoroCount:
+    (typeof PHP_CONFIG !== "undefined" && PHP_CONFIG.initialCount) || 0,
+  pomodorosUntilLongBreak:
+    (typeof PHP_CONFIG !== "undefined" && PHP_CONFIG.pomodorosUntilLongBreak) ||
+    4,
+  timerValue:
+    (typeof PHP_TIMERS !== "undefined" && PHP_TIMERS.POMODORO) || 1500,
+  initialTime:
+    (typeof PHP_TIMERS !== "undefined" && PHP_TIMERS.POMODORO) || 1500,
   timerInterval: null,
   isPaused: false,
   pomodoroType: "POMODORO",
@@ -298,8 +304,11 @@ const setCustomTime = (minutes) => {
 
 addEventListeners();
 
-// Apply default theme on load
-applyTheme("default");
+// Apply theme from PHP config or default
+const initialTheme =
+  (typeof PHP_CONFIG !== "undefined" && PHP_CONFIG.backgroundTheme) ||
+  "default";
+applyTheme(initialTheme);
 
 // THE START OF THE CLOCK  FUNCTIONALITY
 

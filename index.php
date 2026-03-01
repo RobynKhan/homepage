@@ -436,7 +436,7 @@ $jsConfig = json_encode([
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    const supabase = window.supabase.createClient(
+    const supabaseClient = window.supabase.createClient(
         '<?php echo getenv("SUPABASE_URL"); ?>',
         '<?php echo getenv("SUPABASE_ANON_KEY"); ?>'
     );
@@ -554,6 +554,7 @@ $jsConfig = json_encode([
             player = null;
             ytPlayerInitialized = false;
             window._ytPlayerInstance = null;
+            window._ytPlayerInitialized = false;
         }
 
         // Safely remove old iframe

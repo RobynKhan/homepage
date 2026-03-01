@@ -12,4 +12,4 @@ define('DEFAULT_POMODOROS_UNTIL_LONG',  4);
 define('SPOTIFY_CLIENT_ID',     getenv('SPOTIFY_CLIENT_ID'));
 define('SPOTIFY_CLIENT_SECRET', getenv('SPOTIFY_CLIENT_SECRET'));
 define('SPOTIFY_REDIRECT_URI',  getenv('SPOTIFY_REDIRECT_URI'));
-define('SPOTIFY_SCOPES',        'streaming user-read-email user-read-private user-modify-playback-state');
+define('SPOTIFY_SCOPES',        'streaming user-read-email user-read-private user-modify-playback-state user-read-recently-played');

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -246,7 +246,9 @@
         color: var(--text-primary);
         font-size: 13px;
         cursor: pointer;
-        transition: background var(--transition), color var(--transition);
+        transition:
+          background var(--transition),
+          color var(--transition);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -302,7 +304,9 @@
         font-size: 13px;
         font-weight: 600;
         cursor: pointer;
-        transition: background var(--transition), transform var(--transition);
+        transition:
+          background var(--transition),
+          transform var(--transition);
         white-space: nowrap;
       }
 
@@ -353,7 +357,9 @@
         color: var(--text-primary);
         font-size: 13px;
         cursor: pointer;
-        transition: background var(--transition), color var(--transition);
+        transition:
+          background var(--transition),
+          color var(--transition);
         gap: 10px;
       }
 
@@ -398,7 +404,10 @@
         font-size: 14px;
         cursor: pointer;
         flex-shrink: 0;
-        transition: background var(--transition), color var(--transition), border-color var(--transition);
+        transition:
+          background var(--transition),
+          color var(--transition),
+          border-color var(--transition);
       }
 
       #track-list li .add-queue-btn:hover {
@@ -506,7 +515,10 @@
         border-radius: 50%;
         cursor: pointer;
         padding: 0;
-        transition: background var(--transition), color var(--transition), transform var(--transition);
+        transition:
+          background var(--transition),
+          color var(--transition),
+          transform var(--transition);
       }
 
       .controls button:hover {
@@ -516,7 +528,11 @@
         transform: scale(1.1);
       }
 
-      .controls .btn-skip { width: 38px; height: 38px; font-size: 17px; }
+      .controls .btn-skip {
+        width: 38px;
+        height: 38px;
+        font-size: 17px;
+      }
 
       #play-btn {
         width: 50px;
@@ -540,7 +556,10 @@
         width: 100%;
       }
 
-      .volume-row .bi { font-size: 14px; color: var(--text-muted); }
+      .volume-row .bi {
+        font-size: 14px;
+        color: var(--text-muted);
+      }
 
       #volume-bar {
         flex: 1;
@@ -570,7 +589,9 @@
       }
 
       .back-link:hover,
-      .logout-link:hover { color: var(--cream); }
+      .logout-link:hover {
+        color: var(--cream);
+      }
 
       /* ── Queue panel ────────────────────────────────────── */
       .queue-panel {
@@ -612,7 +633,10 @@
         font-family: "Inter", sans-serif;
         font-size: 11px;
         cursor: pointer;
-        transition: background var(--transition), color var(--transition), border-color var(--transition);
+        transition:
+          background var(--transition),
+          color var(--transition),
+          border-color var(--transition);
       }
 
       .clear-btn:hover {
@@ -644,7 +668,9 @@
         transition: background var(--transition);
       }
 
-      #queue-list li:hover { background: var(--glass-hover); }
+      #queue-list li:hover {
+        background: var(--glass-hover);
+      }
 
       #queue-list li .q-name {
         flex: 1;
@@ -665,7 +691,9 @@
         flex-shrink: 0;
       }
 
-      #queue-list li .remove-btn:hover { color: var(--cream); }
+      #queue-list li .remove-btn:hover {
+        color: var(--cream);
+      }
 
       /* ── Responsive ─────────────────────────────────────── */
       @media (max-width: 1024px) {
@@ -683,15 +711,21 @@
           padding: 12px;
         }
 
-        .sidebar { max-height: 180px; }
-        .right-panel { flex-direction: column; }
-        #album-art { width: 110px; height: 110px; }
+        .sidebar {
+          max-height: 180px;
+        }
+        .right-panel {
+          flex-direction: column;
+        }
+        #album-art {
+          width: 110px;
+          height: 110px;
+        }
       }
-    </link>
+    </style>
   </head>
   <body>
     <div class="app-layout">
-
       <!-- Sidebar: playlists -->
       <div class="sidebar">
         <h3>Your Playlists</h3>
@@ -701,8 +735,12 @@
       <!-- Main content: search + tracklist -->
       <div class="main-content">
         <div class="search-bar">
-          <input type="text" id="search-input" placeholder="Search for songs…"
-            onkeydown="if(event.key==='Enter') searchSongs()" />
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search for songs…"
+            onkeydown="if (event.key === 'Enter') searchSongs();"
+          />
           <button onclick="searchSongs()">
             <i class="bi bi-search"></i> Search
           </button>
@@ -716,7 +754,6 @@
 
       <!-- Right panel: player + queue -->
       <div class="right-panel">
-
         <!-- Player -->
         <div class="player-container">
           <h2>Now Playing</h2>
@@ -731,10 +768,18 @@
           </div>
 
           <div class="controls">
-            <button class="btn-skip" onclick="previousTrack()" aria-label="Previous">
+            <button
+              class="btn-skip"
+              onclick="previousTrack()"
+              aria-label="Previous"
+            >
               <i class="bi bi-skip-start-fill"></i>
             </button>
-            <button id="play-btn" onclick="togglePlay()" aria-label="Play / Pause">
+            <button
+              id="play-btn"
+              onclick="togglePlay()"
+              aria-label="Play / Pause"
+            >
               <i class="bi bi-play-fill" id="play-icon"></i>
             </button>
             <button class="btn-skip" onclick="nextTrack()" aria-label="Next">
@@ -766,15 +811,8 @@
           </div>
           <ul id="queue-list"></ul>
         </div>
-
       </div>
     </div>
-
-    <!-- Spotify Web Playback SDK -->
-    <script src="https://sdk.scdn.co/spotify-player.js"></script>
-    <script src="player.js"></script>
-  </body>
-</html>
 
     <!-- Spotify Web Playback SDK -->
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
