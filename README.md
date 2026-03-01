@@ -82,27 +82,27 @@ A full-featured Pomodoro productivity dashboard with an integrated YouTube music
 
 ### Configuration & Core
 
-| File              | Purpose                                                                                                              | Connected To                                                                          |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `config.php`      | App name and timer duration defaults                                                                                 | index.php                                                                             |
+| File              | Purpose                                                                                                              | Connected To                                                                                 |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `config.php`      | App name and timer duration defaults                                                                                 | index.php                                                                                    |
 | `auth_config.php` | Admin accounts (from env vars), session helpers (`is_admin_logged_in()`, `require_admin_login()`, `current_admin()`) | index.php, login_admin.php, logout_admin.php, todo_api.php, todo_widget.php, log_youtube.php |
-| `db.php`          | Singleton PDO connection to Supabase PostgreSQL                                                                      | todo_api.php, log_youtube.php                                                         |
-| `Dockerfile`      | PHP 8.2 container with PostgreSQL PDO for Render deployment                                                          | —                                                                                     |
+| `db.php`          | Singleton PDO connection to Supabase PostgreSQL                                                                      | todo_api.php, log_youtube.php                                                                |
+| `Dockerfile`      | PHP 8.2 container with PostgreSQL PDO for Render deployment                                                          | —                                                                                            |
 
 ### Main Pages
 
-| File              | Purpose                                                         | Connected To                                                                       |
-| ----------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| File              | Purpose                                                            | Connected To                                                                                            |
+| ----------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
 | `index.php`       | Main dashboard — timer, YouTube music panel, todo widget, settings | config.php, auth_config.php, header.php, footer.php, todo_widget.php, youtube.js, timer.js, styling.css |
-| `player.html`     | Standalone YouTube player page                                  | youtube.js, styling.css                                                            |
-| `frerein.html`    | Static prototype/sandbox for layout testing                     | timer.js, styling.css                                                              |
-| `login_admin.php` | Admin login form with password verification                     | auth_config.php → redirects to index.php                                           |
+| `player.html`     | Standalone YouTube player page                                     | youtube.js, styling.css                                                                                 |
+| `frerein.html`    | Static prototype/sandbox for layout testing                        | timer.js, styling.css                                                                                   |
+| `login_admin.php` | Admin login form with password verification                        | auth_config.php → redirects to index.php                                                                |
 
 ### Data Logging Endpoints
 
-| File              | Purpose                                | Connected To                            |
-| ----------------- | -------------------------------------- | --------------------------------------- |
-| `log_youtube.php`    | Logs YouTube video watches to database                    | auth_config.php, db.php → `yt_urls` table |
+| File                 | Purpose                                                     | Connected To                              |
+| -------------------- | ----------------------------------------------------------- | ----------------------------------------- |
+| `log_youtube.php`    | Logs YouTube video watches to database                      | auth_config.php, db.php → `yt_urls` table |
 | `search_youtube.php` | Proxies YouTube Data API search (keeps API key server-side) | auth_config.php → YouTube Data API v3     |
 
 ### Todo System
@@ -114,25 +114,25 @@ A full-featured Pomodoro productivity dashboard with an integrated YouTube music
 
 ### Admin Authentication
 
-| File               | Purpose                            | Connected To                             |
-| ------------------ | ---------------------------------- | ---------------------------------------- |
-| `login_admin.php`  | Admin login page with styled form  | auth_config.php → redirects to index.php |
-| `logout_admin.php` | Clears admin session key           | auth_config.php → redirects to index.php |
+| File               | Purpose                           | Connected To                             |
+| ------------------ | --------------------------------- | ---------------------------------------- |
+| `login_admin.php`  | Admin login page with styled form | auth_config.php → redirects to index.php |
+| `logout_admin.php` | Clears admin session key          | auth_config.php → redirects to index.php |
 
 ### Shared Includes
 
-| File                  | Purpose                                               | Connected To         |
-| --------------------- | ----------------------------------------------------- | -------------------- |
+| File                  | Purpose                                               | Connected To          |
+| --------------------- | ----------------------------------------------------- | --------------------- |
 | `includes/header.php` | HTML head, top bar, nav drawer, bottom dock, backdrop | Included by index.php |
 | `includes/footer.php` | Loads timer.js, closes HTML                           | Included by index.php |
 
 ### Client-Side Scripts
 
-| File          | Purpose                                                                                       | Connected To                            |
-| ------------- | --------------------------------------------------------------------------------------------- | --------------------------------------- |
+| File          | Purpose                                                                                            | Connected To                                    |
+| ------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | `youtube.js`  | YouTube embed controller — URL parsing, video swapping, search, queue, play/pause, volume, logging | log_youtube.php, search_youtube.php (via fetch) |
-| `timer.js`    | Pomodoro timer engine, navigation (drawer + dock), theme switcher, live clock                 | DOM elements in index.php / frerein.html |
-| `styling.css` | All visual styles — layout, glass effects, PixelTune retro theme, responsive breakpoints      | Loaded by index.php, player.html, frerein.html |
+| `timer.js`    | Pomodoro timer engine, navigation (drawer + dock), theme switcher, live clock                      | DOM elements in index.php / frerein.html        |
+| `styling.css` | All visual styles — layout, glass effects, PixelTune retro theme, responsive breakpoints           | Loaded by index.php, player.html, frerein.html  |
 
 ### Assets
 

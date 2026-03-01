@@ -117,26 +117,38 @@ body {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  font-family: "Share Tech Mono", monospace;
+  font-family: "Press Start 2P", monospace;
 }
 
 .top-bar__dot {
-  color: var(--text-muted);
-  font-size: 16px;
+  color: var(--px-accent, var(--text-muted));
+  font-size: 10px;
+  animation: px-blink 1s steps(2) infinite;
+}
+
+@keyframes px-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
 }
 
 #time {
-  font-family: "Share Tech Mono", "Courier New", monospace;
-  font-size: 14px;
-  color: var(--sand);
-  letter-spacing: 1px;
+  font-family: "VT323", monospace;
+  font-size: 18px;
+  color: var(--px-cyan, var(--sand));
+  letter-spacing: 2px;
+  text-shadow: 0 0 6px rgba(0, 255, 255, 0.4);
 }
 
 #date {
-  font-family: "Inter", sans-serif;
-  font-size: 12px;
-  color: var(--text-muted);
-  letter-spacing: 0.5px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 6px;
+  color: var(--px-text2, var(--text-muted));
+  letter-spacing: 1px;
   text-transform: uppercase;
 }
 
@@ -1535,6 +1547,146 @@ body {
 
 .px-search-bar button:hover {
   background: var(--px-purple2);
+}
+
+/* ── Lofi Video List (Home Screen) ─────────────────── */
+.px-lofi-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.px-lofi-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 #000;
+  background: var(--px-panel);
+  cursor: pointer;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
+}
+
+.px-lofi-list li:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #000;
+  background: var(--px-panel2);
+}
+
+.px-lofi-list li img {
+  width: 40px;
+  height: 30px;
+  object-fit: cover;
+  border: 2px solid #000;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+}
+
+.px-lofi-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.px-lofi-title {
+  font-family: "VT323", monospace;
+  font-size: 14px;
+  color: var(--px-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.px-lofi-sub {
+  font-family: "Press Start 2P", monospace;
+  font-size: 5px;
+  color: var(--px-text2);
+  letter-spacing: 0.5px;
+}
+
+.px-empty-hint {
+  font-family: "VT323", monospace;
+  font-size: 13px;
+  color: var(--px-text2);
+  padding: 10px 4px;
+  list-style: none;
+}
+
+/* ── Now-Playing Mini Bar (Home Screen bottom) ─────── */
+.px-np-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--px-bg2);
+  border-top: 3px solid #000;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.px-np-bar:hover {
+  background: var(--px-panel);
+}
+
+.px-np-art {
+  font-size: 18px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--px-panel);
+  border: 2px solid #000;
+  flex-shrink: 0;
+  color: var(--px-accent);
+}
+
+.px-np-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.px-np-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 5px;
+  color: var(--px-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.px-np-wave {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.px-np-wave-bar {
+  width: 2px;
+  background: var(--px-accent);
+  animation: px-wave 0.8s ease-in-out infinite;
+  min-height: 2px;
+}
+
+@keyframes px-wave {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
 }
 
 /* ── Pixel stars decoration ────────────────────────── */

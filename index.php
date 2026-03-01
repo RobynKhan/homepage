@@ -144,49 +144,88 @@ $jsConfig = json_encode([
         <div class="px-star" style="top:10px;right:30px;animation-delay:0.2s;background:#ff0000;box-shadow:0 0 4px #ff0000;"></div>
         <div class="px-star" style="top:25px;right:55px;animation-delay:1.1s;"></div>
 
-        <!-- YouTube Single Screen View -->
-        <div class="px-screen active">
+        <!-- ══════ SCREEN 1: HOME — Lofi video list ══════ -->
+        <div class="px-screen active" id="px-screen-home">
             <div class="px-topbar">
                 <div class="px-topbar-title" style="color:var(--px-accent)">&#9654; YOUTUBE</div>
+                <div class="px-topbar-actions">
+                    <button class="px-topbar-btn" onclick="pxGoTo('search')" title="Search"><i class="bi bi-search"></i></button>
+                </div>
+            </div>
+            <div class="px-scroll-area">
+                <div class="px-section-label">PASTE URL</div>
+                <div class="px-search-bar">
+                    <input type="text" id="lofi-url-input" placeholder="YOUTUBE URL..."
+                        onkeydown="if(event.key==='Enter'){loadLofiURL();pxGoTo('player')}" />
+                    <button onclick="loadLofiURL();pxGoTo('player')">GO</button>
+                    <button onclick="resetLofiDefault();pxGoTo('player')" title="Reset" style="border-left:2px solid #000">&#8634;</button>
+                </div>
+                <div class="lofi-error-msg" id="lofi-error-msg">&#9888; INVALID URL</div>
+
+                <div class="px-section-label">LOFI PICKS</div>
+                <ul class="px-lofi-list" id="px-lofi-list">
+                    <!-- Populated by youtube.js → loadLofiHome() -->
+                </ul>
+
+                <div class="px-section-label">RECENTLY PLAYED</div>
+                <ul class="px-lofi-list" id="px-recent-list">
+                    <!-- Populated by youtube.js → loadRecentVideos() -->
+                </ul>
             </div>
 
+            <!-- Now-playing mini bar (click to go to player) -->
+            <div class="px-np-bar" id="px-np-bar" style="display:none" onclick="pxGoTo('player')">
+                <div class="px-np-art"><i class="bi bi-youtube"></i></div>
+                <div class="px-np-info">
+                    <span class="px-np-title" id="px-np-title">—</span>
+                </div>
+                <div class="px-np-wave">
+                    <span class="px-np-wave-bar" style="animation-delay:0s;height:6px"></span>
+                    <span class="px-np-wave-bar" style="animation-delay:0.15s;height:10px"></span>
+                    <span class="px-np-wave-bar" style="animation-delay:0.3s;height:4px"></span>
+                    <span class="px-np-wave-bar" style="animation-delay:0.45s;height:8px"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════ SCREEN 2: SEARCH — Search + results ══════ -->
+        <div class="px-screen" id="px-screen-search">
+            <div class="px-topbar">
+                <button class="px-back-btn" onclick="pxGoTo('home')">&#9664; BACK</button>
+                <div class="px-topbar-title">SEARCH</div>
+            </div>
             <div class="px-scroll-area">
-                <!-- YouTube Search Bar -->
-                <div class="px-section-label">SEARCH</div>
                 <div class="px-search-bar">
                     <input type="text" id="yt-search-input" placeholder="SEARCH YOUTUBE..."
                         onkeydown="if(event.key==='Enter') searchYouTube()" />
                     <button onclick="searchYouTube()"><i class="bi bi-search"></i></button>
                 </div>
                 <div class="px-yt-results" id="yt-search-results"></div>
+            </div>
+        </div>
 
-                <!-- YouTube URL Input Field -->
-                <div class="px-section-label">PASTE URL</div>
-                <div class="px-search-bar">
-                    <input type="text" id="lofi-url-input" placeholder="YOUTUBE URL..."
-                        onkeydown="if(event.key==='Enter') loadLofiURL()" />
-                    <button onclick="loadLofiURL()">GO</button>
-                    <button onclick="resetLofiDefault()" title="Reset" style="border-left:2px solid #000">&#8634;</button>
+        <!-- ══════ SCREEN 3: PLAYER — Video + controls + queue ══════ -->
+        <div class="px-screen" id="px-screen-player">
+            <div class="px-topbar">
+                <button class="px-back-btn" onclick="pxGoTo('home')">&#9664; BACK</button>
+                <div class="px-topbar-title" id="px-player-title">NOW PLAYING</div>
+            </div>
+
+            <!-- Embedded Video -->
+            <div class="px-yt-embed-wrap" id="lofi-player-wrap">
+                <iframe
+                    id="lofi-yt-player"
+                    src="https://www.youtube.com/embed/76GStMlLF_Y?enablejsapi=1&autoplay=0&rel=0&modestbranding=1"
+                    frameborder="0"
+                    allow="autoplay; encrypted-media; fullscreen"></iframe>
+                <div class="lofi-loading-overlay" id="lofi-loading">
+                    <div class="px-yt-spinner"></div>
+                    LOADING...
                 </div>
-                <div class="lofi-error-msg" id="lofi-error-msg">&#9888; INVALID URL</div>
+            </div>
 
-                <!-- Now Playing Indicator -->
-                <div class="px-yt-now-playing" id="yt-now-playing"></div>
-
-                <!-- YouTube Embedded Video Player -->
-                <div class="px-yt-embed-wrap" id="lofi-player-wrap">
-                    <iframe
-                        id="lofi-yt-player"
-                        src="https://www.youtube.com/embed/76GStMlLF_Y?enablejsapi=1&autoplay=0&rel=0&modestbranding=1"
-                        frameborder="0"
-                        allow="autoplay; encrypted-media; fullscreen"></iframe>
-                    <div class="lofi-loading-overlay" id="lofi-loading">
-                        <div class="px-yt-spinner"></div>
-                        LOADING...
-                    </div>
-                </div>
-
-                <!-- YouTube Playback Controls (Play/Pause + Volume) -->
+            <div class="px-scroll-area">
+                <!-- Playback Controls -->
                 <div class="px-yt-controls">
                     <button class="px-yt-play-btn" id="lofi-play-btn" onclick="toggleLofiPlay()">&#9654; PLAY</button>
                     <div class="px-yt-volume">
@@ -194,6 +233,9 @@ $jsConfig = json_encode([
                         <input type="range" id="lofi-vol" min="0" max="100" value="70" oninput="lofiSetVolume(this.value)" />
                     </div>
                 </div>
+
+                <!-- Now Playing Indicator -->
+                <div class="px-yt-now-playing" id="yt-now-playing"></div>
 
                 <!-- Queue -->
                 <div class="px-section-label" id="yt-queue-label" style="display:none;">QUEUE</div>
