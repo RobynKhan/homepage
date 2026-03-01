@@ -441,9 +441,10 @@ $jsConfig = json_encode([
         '<?php echo getenv("SUPABASE_ANON_KEY"); ?>'
     );
 </script>
-<script src="player.js"></script>
-
-<!-- Lofi Widget Script -->
+<!-- YouTube IFrame API — MUST be defined before player.js because
+     the Spotify Embed API internally loads the YT IFrame API and
+     fires onYouTubeIframeAPIReady.  If our callback isn't registered
+     yet, we miss the event and the YT player never initialises. -->
 <script>
     const DEFAULT = {
         id: '76GStMlLF_Y',
@@ -457,11 +458,6 @@ $jsConfig = json_encode([
     let ytApiReady = false;
     let ytPlayerInitialized = false;
 
-    /* ── YouTube IFrame API ── */
-    const tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
-    document.head.appendChild(tag);
-
     window.onYouTubeIframeAPIReady = function() {
         ytApiReady = true;
         // Only init if the YouTube tab is already visible
@@ -470,7 +466,26 @@ $jsConfig = json_encode([
         }
     };
 
+    // Load the YT IFrame API script only if not already loaded by Spotify
+    if (typeof YT === 'undefined') {
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(tag);
+    } else {
+        // YT was already loaded (e.g. by Spotify Embed API) — fire manually
+        window.onYouTubeIframeAPIReady();
+    }
+</script>
+
+<script src="player.js"></script>
+
+<!-- Lofi Widget Script -->
+<script>
     function initYouTubePlayer() {
+        // Self-heal: if YT was loaded (by Spotify Embed) but our flag wasn't set
+        if (!ytApiReady && typeof YT !== 'undefined' && YT.Player) {
+            ytApiReady = true;
+        }
         if (!ytApiReady) return;
         const el = document.getElementById('lofi-yt-player');
         if (!el) return;
