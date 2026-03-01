@@ -83,11 +83,6 @@ const addEventListeners = () => {
         const targetEl = document.getElementById(targetId);
         if (targetEl) {
           togglePanel(targetEl);
-          // If link specifies a tab, switch to it
-          const tab = link.dataset.tab;
-          if (tab && typeof pxSwitchTab === "function") {
-            pxSwitchTab(tab);
-          }
         }
         closeDrawer();
       });
@@ -126,11 +121,6 @@ const addEventListeners = () => {
         if (sheetBackdrop) sheetBackdrop.classList.add("visible");
       }
 
-      // Switch tab if specified
-      const tab = btn.dataset.tab;
-      if (tab && typeof pxSwitchTab === "function") {
-        pxSwitchTab(tab);
-      }
     });
   });
 

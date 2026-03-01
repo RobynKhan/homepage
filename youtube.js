@@ -128,3 +128,59 @@ function lofiSetVolume(val) {
   icon.textContent =
     val == 0 ? "\u{1F507}" : val < 50 ? "\u{1F508}" : "\u{1F50A}";
 }
+async function searchYouTube() {
+  const query = document.getElementById("yt-search-input").value.trim();
+  if (!query) return;
+
+  const res = await fetch(`search_youtube.php?q=${encodeURIComponent(query)}`);
+  const data = await res.json();
+
+  const container = document.getElementById("yt-search-results");
+  container.innerHTML = "";
+
+  data.items.forEach((item) => {
+    const videoId = item.id.videoId;
+    const title = item.snippet.title;
+    const thumb = item.snippet.thumbnails.default.url;
+
+    const div = document.createElement("div");
+    div.className = "yt-result-item";
+    div.innerHTML = `
+      <img src="${thumb}" />
+      <span>${title}</span>
+      <button onclick="swapLofiVideo('${videoId}', '${title.replace(/'/g, "\\'")}')">▶ Play</button>
+      <button onclick="addToQueue('${videoId}', '${title.replace(/'/g, "\\'")}')">+ Queue</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// ─── Queue ────────────────────────────────────────────────────────────
+let queue = [];
+let currentQueueIndex = -1;
+
+function addToQueue(videoId, title) {
+  queue.push({ videoId, title });
+  renderQueue();
+}
+
+function playFromQueue(index) {
+  currentQueueIndex = index;
+  swapLofiVideo(queue[index].videoId, queue[index].title);
+}
+
+function renderQueue() {
+  let container = document.getElementById("yt-queue");
+  if (!container) return;
+  container.innerHTML = "";
+  queue.forEach((item, i) => {
+    const div = document.createElement("div");
+    div.className =
+      "yt-queue-item" + (i === currentQueueIndex ? " active" : "");
+    div.innerHTML = `
+      <span>${item.title}</span>
+      <button onclick="playFromQueue(${i})">▶</button>
+    `;
+    container.appendChild(div);
+  });
+}
