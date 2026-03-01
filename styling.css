@@ -1300,11 +1300,19 @@ body {
 
 /* Tab panel visibility */
 .px-tab-panel {
-  display: none;
+  display: block; /* keep it in DOM */
+  visibility: hidden; /* but hide it visually */
+  height: 0; /* collapse it so it takes no space */
+  overflow: hidden; /* prevent bleed */
+  pointer-events: none; /* prevent clicks */
 }
 
 .px-tab-panel.active {
   display: block;
+  visibility: visible;
+  height: auto;
+  overflow: visible;
+  pointer-events: auto;
 }
 
 /* ═══════════════════════════════════════════════════════
