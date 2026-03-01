@@ -460,7 +460,8 @@ $jsConfig = json_encode([
 
     window.onYouTubeIframeAPIReady = function() {
         ytApiReady = true;
-        // Only init if the YouTube tab is already visible
+        // Don't re-init if Spotify already owns the player or YT tab isn't active
+        if (window._ytPlayerInstance) return;
         if (document.getElementById('px-panel-youtube')?.classList.contains('active')) {
             initYouTubePlayer();
         }
@@ -552,6 +553,7 @@ $jsConfig = json_encode([
             } catch (err) {}
             player = null;
             ytPlayerInitialized = false;
+            window._ytPlayerInstance = null;
         }
 
         // Safely remove old iframe
@@ -578,6 +580,7 @@ $jsConfig = json_encode([
                 onStateChange: lofiStateChange
             }
         });
+        window._ytPlayerInstance = player;
     }
 
     function lofiExtractId(url) {
