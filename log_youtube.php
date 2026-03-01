@@ -15,16 +15,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Allow admin OR Spotify-authenticated users
-if (is_admin_logged_in()) {
-    $username = current_admin()['username'];
-} elseif (!empty($_SESSION['access_token'])) {
-    $username = 'spotify_' . substr(md5($_SESSION['access_token']), 0, 12);
-} else {
+// Auth check — admin only
+if (!is_admin_logged_in()) {
     http_response_code(401);
     echo json_encode(['error' => 'Unauthorized']);
     exit;
 }
+$username = current_admin()['username'];
 $body     = json_decode(file_get_contents('php://input'), true) ?? [];
 
 $url       = trim($body['url'] ?? '');

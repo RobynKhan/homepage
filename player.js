@@ -1,23 +1,21 @@
 // ─── Tab Switching (Spotify / YouTube) ────────────────────────────────────────
 
 function pxSwitchTab(tabName) {
-  // Update tab buttons
+  // Update tab buttons (highlight active)
   document
     .querySelectorAll(".px-tab")
     .forEach((t) => t.classList.remove("active"));
   const tabBtn = document.getElementById("px-tab-" + tabName);
   if (tabBtn) tabBtn.classList.add("active");
 
-  // Update panels
-  document
-    .querySelectorAll(".px-tab-panel")
-    .forEach((p) => p.classList.remove("active"));
+  // Both panels stay visible — just scroll to the chosen one
   const panel = document.getElementById("px-panel-" + tabName);
-  if (panel) panel.classList.add("active");
+  if (panel) {
+    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   // Lazy-init YouTube player when its tab becomes visible
   if (tabName === "youtube" && typeof initYouTubePlayer === "function") {
-    // Short delay so the panel is rendered before YT.Player binds to the iframe
     setTimeout(initYouTubePlayer, 100);
   }
 }
