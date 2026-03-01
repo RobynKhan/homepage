@@ -15,24 +15,10 @@ function pxSwitchTab(tabName) {
   const panel = document.getElementById("px-panel-" + tabName);
   if (panel) panel.classList.add("active");
 
-  // Recreate the YouTube iframe fresh every time you switch to it
-  if (tabName === "youtube") {
-    const wrap = document.getElementById("lofi-player-wrap");
-    const old = document.getElementById("lofi-yt-player");
-    const currentSrc = old ? old.src : null;
-    if (old) old.remove();
-
-    const iframe = document.createElement("iframe");
-    iframe.id = "lofi-yt-player";
-    iframe.style.cssText = "display:block;width:100%;height:200px;";
-    iframe.setAttribute("frameborder", "0");
-    iframe.setAttribute("allow", "autoplay; encrypted-media; fullscreen");
-    const videoId = currentSrc
-      ? (currentSrc.match(/embed\/([a-zA-Z0-9_-]{11})/) || [])[1] ||
-        "76GStMlLF_Y"
-      : "76GStMlLF_Y";
-    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&modestbranding=1`;
-    wrap.insertBefore(iframe, document.getElementById("lofi-loading"));
+  // Lazy-init YouTube player when its tab becomes visible
+  if (tabName === "youtube" && typeof initYouTubePlayer === "function") {
+    // Short delay so the panel is rendered before YT.Player binds to the iframe
+    setTimeout(initYouTubePlayer, 100);
   }
 }
 
