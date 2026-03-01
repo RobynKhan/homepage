@@ -52,7 +52,7 @@ $jsConfig = json_encode([
     <div class="timers" role="group" aria-label="Timer Modes">
         <button id="pomodorobtn" class="active" type="button">25 min</button>
         <button id="shortbrkbtn" type="button">50 min</button>
-        <button id="longbrkbtn" type="button">Custom</button>
+        <button id="custombrkbtn" type="button">Custom</button>
     </div>
 
     <!-- Custom time input — only shows when Custom is selected -->

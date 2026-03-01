@@ -37,14 +37,24 @@ const addEventListeners = () => {
   elements.startBtn.addEventListener("click", handleStart);
   elements.pauseBtn.addEventListener("click", handlePause);
   elements.resetBtn.addEventListener("click", resetTimer);
-  elements.pomodoroBtn.addEventListener("click", () => setTimeType("POMODORO"));
-  elements.shortbrkBtn.addEventListener("click", () =>
-    setTimeType("SHORTBREAK"),
-  );
+  elements.pomodoroBtn.addEventListener("click", () => {
+    setTimeType("POMODORO");
+    hideCustomWrap();
+  });
+  elements.shortbrkBtn.addEventListener("click", () => {
+    setTimeType("SHORTBREAK");
+    hideCustomWrap();
+  });
 
   // ─── Custom Timer Button ──────────────────────────────────────────────
   const customBtn = document.getElementById("custombrkbtn");
-  if (customBtn) customBtn.addEventListener("click", applyCustomTime);
+  if (customBtn) {
+    customBtn.addEventListener("click", () => {
+      const wrap = document.getElementById("custom-time-wrap");
+      if (wrap)
+        wrap.style.display = wrap.style.display === "none" ? "block" : "none";
+    });
+  }
 
   // ─── Desktop Navigation Drawer (Hamburger Menu) ───────────────────────
   const hamburgerBtn = document.getElementById("hamburger-btn");
@@ -226,6 +236,12 @@ const updateActiveButton = (type) => {
   document.getElementById("custombrkbtn")?.classList.remove("active");
 };
 
+// ─── Hide Custom Time Input Wrapper ───────────────────────────────────────
+const hideCustomWrap = () => {
+  const wrap = document.getElementById("custom-time-wrap");
+  if (wrap) wrap.style.display = "none";
+};
+
 // ─── Custom Timer ─────────────────────────────────────────────────────────
 const applyCustomTime = () => {
   const input = document.getElementById("custom-time-input");
@@ -237,6 +253,7 @@ const applyCustomTime = () => {
   }
   input.style.borderColor = "";
   clearInterval(state.timerInterval);
+  state.timerInterval = null;
   state.isPaused = false;
   state.timerValue = minutes * 60;
   state.initialTime = minutes * 60;
@@ -247,6 +264,9 @@ const applyCustomTime = () => {
   elements.pomodoroBtn.classList.remove("active");
   elements.shortbrkBtn.classList.remove("active");
   document.getElementById("custombrkbtn")?.classList.add("active");
+
+  // Hide the input after applying
+  hideCustomWrap();
 };
 
 // ─── Timer Reset ──────────────────────────────────────────────────────────
