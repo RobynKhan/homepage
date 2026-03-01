@@ -7,22 +7,15 @@
  * Proxies search requests to the YouTube Data API v3.
  * Keeps the API key server-side so it's never exposed to the browser.
  *
- * Env: YOUTUBE_API_KEY — Your YouTube Data API v3 key
+ * Authorization: None — available to all visitors.
+ * Env: YOUTUBE_API_KEY — Your YouTube Data API v3 key (set in Render)
  * Called by: youtube.js → searchYouTube()
  * ============================================================================
  */
 
 session_start();
-require_once __DIR__ . '/auth_config.php';
 
 header('Content-Type: application/json');
-
-// ─── Auth Check ───────────────────────────────────────────────────────────
-if (!is_admin_logged_in()) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
 
 // ─── Validate Query ───────────────────────────────────────────────────────
 $query = trim($_GET['q'] ?? '');
@@ -33,7 +26,12 @@ if (empty($query)) {
 }
 
 // ─── YouTube API Request ──────────────────────────────────────────────────
-$apiKey = getenv('YOUTUBE_API_KEY'); // Replace with your actual API key
+$apiKey = getenv('YOUTUBE_API_KEY');
+if (!$apiKey) {
+    http_response_code(500);
+    echo json_encode(['error' => 'YouTube API key not configured']);
+    exit;
+}
 $url = "https://www.googleapis.com/youtube/v3/search?"
     . http_build_query([
         'part'        => 'snippet',

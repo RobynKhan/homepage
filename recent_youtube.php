@@ -10,7 +10,7 @@
  *
  * Response: { items: [ { url, title, thumbnail, watched_at }, ... ] }
  *
- * Authorization: Admin users only.
+ * Authorization: None — available to all visitors (uses session ID for guests).
  * Called by: youtube.js → loadRecentVideos()
  * ============================================================================
  */
@@ -21,14 +21,14 @@ require_once __DIR__ . '/db.php';
 
 header('Content-Type: application/json');
 
-// ─── Auth Check ───────────────────────────────────────────────────────────
-if (!is_admin_logged_in()) {
-    echo json_encode(['items' => []]);
-    exit;
+// ─── User Identification (admin username or guest session ID) ─────────────
+if (is_admin_logged_in()) {
+    $username = current_admin()['username'];
+} else {
+    $username = 'guest_' . session_id();
 }
 
 // ─── Query Recent Videos ──────────────────────────────────────────────────
-$username = current_admin()['username'];
 $db = getDB();
 
 $stmt = $db->prepare('

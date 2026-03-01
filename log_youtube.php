@@ -9,7 +9,7 @@
  * Accepts POST requests with JSON body containing:
  *   { url, title, thumbnail }
  *
- * Authorization: Admin users only.
+ * Authorization: None — available to all visitors (uses session ID for guests).
  * Called by: youtube.js → swapLofiVideo() (fire-and-forget fetch)
  * ============================================================================
  */
@@ -28,14 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// ─── Admin Authentication Check ────────────────────────────────────────────
-if (!is_admin_logged_in()) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
+// ─── User Identification (admin username or guest session ID) ─────────────
+if (is_admin_logged_in()) {
+    $username = current_admin()['username'];
+} else {
+    $username = 'guest_' . session_id();
 }
 // ─── Parse Request Body & Validate URL ────────────────────────────────────
-$username = current_admin()['username'];
 $body     = json_decode(file_get_contents('php://input'), true) ?? [];
 
 $url       = trim($body['url'] ?? '');

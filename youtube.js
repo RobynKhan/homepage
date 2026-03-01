@@ -32,14 +32,14 @@ const YT_DEFAULT = {
 
 // ─── Curated Lofi Picks ──────────────────────────────────────────────────
 const LOFI_PICKS = [
-  { id: "jfKfPfyJRdk", title: "lofi hip hop radio ���" },
+  { id: "jfKfPfyJRdk", title: "lofi hip hop radio" },
   { id: "76GStMlLF_Y", title: "why the rush?" },
-  { id: "rUxyKA_-grg", title: "2am study session ���" },
+  { id: "rUxyKA_-grg", title: "2am study session" },
   { id: "5qap5aO4i9A", title: "chill beats to relax" },
-  { id: "DWcJFNfaw9c", title: "midnight coding ���" },
-  { id: "lTRiuFIWV54", title: "coffee shop vibes ☕" },
-  { id: "kgx4WGK0oNU", title: "jazz & rain ������" },
-  { id: "7NOSDKb0HlU", title: "synthwave radio ���" },
+  { id: "DWcJFNfaw9c", title: "midnight coding" },
+  { id: "lTRiuFIWV54", title: "coffee shop vibes" },
+  { id: "kgx4WGK0oNU", title: "jazz & rain" },
+  { id: "7NOSDKb0HlU", title: "synthwave radio" },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
