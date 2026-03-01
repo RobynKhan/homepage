@@ -297,7 +297,7 @@ const setCustomTime = (minutes) => {
 };
 
 addEventListeners();
-applyTheme('default');
+applyTheme("default");
 
 // THE START OF THE CLOCK  FUNCTIONALITY
 
