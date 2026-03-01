@@ -13,7 +13,7 @@
  *   - current_admin()       — Retrieve the logged-in admin's data
  *
  * Used by: index.php, login_admin.php, logout_admin.php, todo_api.php,
- *          todo_widget.php, log_spotify.php, log_youtube.php
+ *          todo_widget.php, log_youtube.php
  * ============================================================================
  */
 

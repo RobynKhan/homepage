@@ -11,7 +11,6 @@
 #
 # Required environment variables (set via --env-file or -e flags):
 #   DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, DB_PORT
-#   SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REDIRECT_URI
 #   ADMIN1_USERNAME, ADMIN1_PASSWORD_HASH
 #   SUPABASE_URL, SUPABASE_ANON_KEY
 # ============================================================================

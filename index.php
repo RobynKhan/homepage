@@ -8,13 +8,12 @@
  * The primary page of the Pomodoro Timer application. Renders the full
  * dashboard layout including:
  *   - Pomodoro timer with work/short-break/long-break modes
- *   - PixelTune music panel with Spotify and YouTube tabs
+ *   - YouTube music panel for playing videos alongside work sessions
  *   - Todo/Quests widget (admin CRUD or guest locked state)
  *   - Settings panel for background theme customization
- *   - Spotify login state save/restore across OAuth redirects
  *
  * Dependencies: config.php, auth_config.php, includes/header.php,
- *               includes/footer.php, todo_widget.php, player.js, timer.js
+ *               includes/footer.php, todo_widget.php, youtube.js, timer.js
  * ============================================================================
  */
 session_start();
@@ -112,182 +111,58 @@ $jsConfig = json_encode([
     </div>
 </section>
 
-<!-- ====== PIXELTUNE MUSIC PANEL (Left Panel — Spotify + YouTube Switcher) ====== -->
+<!-- ====== YOUTUBE MUSIC PANEL ====== -->
 <div id="container-3" class="container-3">
+    <div class="px-player px-yt-player" id="px-yt-app">
+        <!-- Retro Scanline Visual Overlay -->
+        <div class="px-scanlines"></div>
 
-    <!-- Music Source Tab Switcher Bar (Spotify / YouTube) -->
-    <div class="px-tab-bar">
-        <button class="px-tab active" id="px-tab-spotify" onclick="pxSwitchTab('spotify')">
-            <i class="bi bi-spotify"></i> SPOTIFY
-        </button>
-        <button class="px-tab" id="px-tab-youtube" onclick="pxSwitchTab('youtube')">
-            <i class="bi bi-youtube"></i> YOUTUBE
-        </button>
+        <!-- Pixel Stars Decorative Animation -->
+        <div class="px-star" style="top:10px;right:30px;animation-delay:0.2s;background:#ff0000;box-shadow:0 0 4px #ff0000;"></div>
+        <div class="px-star" style="top:25px;right:55px;animation-delay:1.1s;"></div>
+
+        <!-- YouTube Single Screen View -->
+        <div class="px-screen active">
+            <div class="px-topbar">
+                <div class="px-topbar-title" style="color:var(--px-accent)">&#9654; YOUTUBE</div>
+            </div>
+
+            <div class="px-scroll-area">
+                <!-- YouTube URL Input Field -->
+                <div class="px-section-label">PASTE URL</div>
+                <div class="px-search-bar">
+                    <input type="text" id="lofi-url-input" placeholder="YOUTUBE URL..."
+                        onkeydown="if(event.key==='Enter') loadLofiURL()" />
+                    <button onclick="loadLofiURL()">GO</button>
+                    <button onclick="resetLofiDefault()" title="Reset" style="border-left:2px solid #000">&#8634;</button>
+                </div>
+                <div class="lofi-error-msg" id="lofi-error-msg">&#9888; INVALID URL</div>
+
+                <!-- YouTube Embedded Video Player -->
+                <div class="px-yt-embed-wrap" id="lofi-player-wrap">
+                    <iframe
+                        id="lofi-yt-player"
+                        src="https://www.youtube.com/embed/76GStMlLF_Y?enablejsapi=1&autoplay=0&rel=0&modestbranding=1"
+                        frameborder="0"
+                        allow="autoplay; encrypted-media; fullscreen"></iframe>
+                    <div class="lofi-loading-overlay" id="lofi-loading">
+                        <div class="px-yt-spinner"></div>
+                        LOADING...
+                    </div>
+                </div>
+
+                <!-- YouTube Playback Controls (Play/Pause + Volume) -->
+                <div class="px-yt-controls">
+                    <button class="px-yt-play-btn" id="lofi-play-btn" onclick="toggleLofiPlay()">&#9654; PLAY</button>
+                    <div class="px-yt-volume">
+                        <span class="px-yt-vol-icon" id="lofi-vol-icon">&#128264;</span>
+                        <input type="range" id="lofi-vol" min="0" max="100" value="70" oninput="lofiSetVolume(this.value)" />
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <!-- ====== SPOTIFY TAB PANEL ====== -->
-    <div class="px-tab-panel active" id="px-panel-spotify">
-        <div class="px-player" id="px-app">
-            <!-- Pixel Stars Decorative Animation -->
-            <div class="px-star" style="top:12px;right:40px;animation-delay:0.3s"></div>
-            <div class="px-star" style="top:30px;right:18px;animation-delay:0.9s;background:#00e5ff;box-shadow:0 0 4px #00e5ff;"></div>
-            <div class="px-star" style="top:6px;right:70px;animation-delay:1.4s;width:2px;height:2px;background:#b06bff;box-shadow:0 0 4px #b06bff;"></div>
-
-            <!-- Retro Scanline Visual Overlay -->
-            <div class="px-scanlines"></div>
-
-            <!-- ===== SPOTIFY SCREEN 1: Home (Playlists + Search + Recently Played) ===== -->
-            <div class="px-screen active" id="px-screen-home">
-                <div class="px-topbar">
-                    <div class="px-topbar-title">&#9654; PIXELTUNE</div>
-                    <?php if (!isset($_SESSION['access_token'])): ?>
-                        <a href="login.php" class="px-topbar-btn" target="_blank" rel="noopener" title="Login with Spotify">
-                            <i class="bi bi-spotify"></i>
-                        </a>
-                    <?php else: ?>
-                        <div class="px-topbar-actions">
-                            <span class="px-connected-dot"></span>
-                            <a href="logout.php" class="px-topbar-btn" title="Disconnect Spotify">
-                                <i class="bi bi-box-arrow-right"></i>
-                            </a>
-                        </div>
-                    <?php endif; ?>
-                </div>
-
-                <div class="px-scroll-area">
-                    <!-- Spotify Song Search Input -->
-                    <div class="px-section-label">SEARCH</div>
-                    <div class="px-search-bar">
-                        <input type="text" id="search-input" placeholder="SEARCH SONGS..."
-                            onkeydown="if(event.key==='Enter') searchSongs()" />
-                        <button onclick="searchSongs()">&#128269;</button>
-                    </div>
-
-                    <?php if (!isset($_SESSION['access_token'])): ?>
-                        <!-- Spotify Login Prompt (shown when not connected) -->
-                        <div class="px-login-prompt">
-                            <i class="bi bi-spotify" style="font-size:18px;color:var(--px-green)"></i>
-                            <span><a href="login.php" target="_blank" rel="noopener" style="color:var(--px-green);text-decoration:underline">Login with Spotify</a> to see your playlists, liked songs &amp; more</span>
-                        </div>
-
-                        <!-- Default Popular Playlists (guest mode) -->
-                        <div class="px-section-label" style="margin-top:10px">&#127942; TOP SONGS</div>
-                        <ul id="track-list-home"></ul>
-                    <?php else: ?>
-                        <!-- Recently Played Tracks (authenticated users) -->
-                        <div class="px-section-label" style="margin-top:10px">&#9655; RECENTLY PLAYED</div>
-                        <ul class="px-recent-list" id="recent-list"></ul>
-
-                        <!-- User's Spotify Playlists Grid with Cover Art -->
-                        <div class="px-section-label" style="margin-top:12px">&#127925; YOUR PLAYLISTS</div>
-                        <div class="px-playlist-grid" id="playlist-grid"></div>
-                    <?php endif; ?>
-                </div>
-
-                <!-- Now Playing Mini-Bar (navigates to player screen) -->
-                <div class="px-np-bar" onclick="pxShowScreen('player')">
-                    <div class="px-np-art" id="px-np-emoji">&#127925;</div>
-                    <div class="px-np-info">
-                        <div class="px-np-title" id="px-np-title">Select a track</div>
-                        <div class="px-np-artist" id="px-np-artist">—</div>
-                    </div>
-                    <div class="px-np-wave" id="px-np-wave"></div>
-                </div>
-            </div>
-
-            <!-- ===== SPOTIFY SCREEN 2: Track List (Search Results / Playlist Tracks) ===== -->
-            <div class="px-screen" id="px-screen-tracks">
-                <div class="px-topbar">
-                    <button class="px-back-btn" onclick="pxShowScreen('home')">&#9664; BACK</button>
-                    <div class="px-topbar-title" id="px-tracks-screen-title">TRACKS</div>
-                    <div style="width:18px"></div>
-                </div>
-
-                <div class="px-scroll-area">
-                    <div class="px-section-label"><span id="playlist-title">TRACKS</span></div>
-                    <ul id="track-list"></ul>
-                </div>
-
-                <!-- Now Playing Mini-Bar (tracks screen) -->
-                <div class="px-np-bar" onclick="pxShowScreen('player')">
-                    <div class="px-np-art" id="px-np-emoji2">&#127925;</div>
-                    <div class="px-np-info">
-                        <div class="px-np-title" id="px-np-title2">Select a track</div>
-                        <div class="px-np-artist" id="px-np-artist2">—</div>
-                    </div>
-                    <div class="px-np-wave" id="px-np-wave2"></div>
-                </div>
-            </div>
-
-            <!-- ===== SPOTIFY SCREEN 3: Now Playing (Spotify Embed Player) ===== -->
-            <div class="px-screen" id="px-screen-player">
-                <div class="px-topbar">
-                    <button class="px-back-btn" onclick="pxGoBack()">&#9664; BACK</button>
-                    <div class="px-topbar-title">&#9654; NOW PLAYING</div>
-                    <div class="px-waveform" id="px-waveform"></div>
-                </div>
-
-                <div class="px-embed-body" id="spotify-embed-container">
-                    <!-- Spotify IFrame Embed API Container -->
-                </div>
-            </div>
-        </div>
-    </div><!-- /px-panel-spotify -->
-
-    <!-- ====== YOUTUBE TAB PANEL ====== -->
-    <div class="px-tab-panel" id="px-panel-youtube">
-        <div class="px-player px-yt-player" id="px-yt-app">
-            <!-- Retro Scanline Visual Overlay -->
-            <div class="px-scanlines"></div>
-
-            <!-- Pixel Stars Decorative Animation -->
-            <div class="px-star" style="top:10px;right:30px;animation-delay:0.2s;background:#ff0000;box-shadow:0 0 4px #ff0000;"></div>
-            <div class="px-star" style="top:25px;right:55px;animation-delay:1.1s;"></div>
-
-            <!-- YouTube Single Screen View -->
-            <div class="px-screen active">
-                <div class="px-topbar">
-                    <div class="px-topbar-title" style="color:var(--px-accent)">&#9654; YOUTUBE</div>
-                </div>
-
-                <div class="px-scroll-area">
-                    <!-- YouTube URL Input Field -->
-                    <div class="px-section-label">PASTE URL</div>
-                    <div class="px-search-bar">
-                        <input type="text" id="lofi-url-input" placeholder="YOUTUBE URL..."
-                            onkeydown="if(event.key==='Enter') loadLofiURL()" />
-                        <button onclick="loadLofiURL()">GO</button>
-                        <button onclick="resetLofiDefault()" title="Reset" style="border-left:2px solid #000">&#8634;</button>
-                    </div>
-                    <div class="lofi-error-msg" id="lofi-error-msg">&#9888; INVALID URL</div>
-
-                    <!-- YouTube Embedded Video Player -->
-                    <div class="px-yt-embed-wrap" id="lofi-player-wrap">
-                        <iframe
-                            id="lofi-yt-player"
-                            src="https://www.youtube.com/embed/76GStMlLF_Y?enablejsapi=1&autoplay=0&rel=0&modestbranding=1"
-                            frameborder="0"
-                            allow="autoplay; encrypted-media; fullscreen"></iframe>
-                        <div class="lofi-loading-overlay" id="lofi-loading">
-                            <div class="px-yt-spinner"></div>
-                            LOADING...
-                        </div>
-                    </div>
-
-                    <!-- YouTube Playback Controls (Play/Pause + Volume) -->
-                    <div class="px-yt-controls">
-                        <button class="px-yt-play-btn" id="lofi-play-btn" onclick="toggleLofiPlay()">&#9654; PLAY</button>
-                        <div class="px-yt-volume">
-                            <span class="px-yt-vol-icon" id="lofi-vol-icon">&#128264;</span>
-                            <input type="range" id="lofi-vol" min="0" max="100" value="70" oninput="lofiSetVolume(this.value)" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div><!-- /px-panel-youtube -->
-
-</div><!-- /container-3 (PixelTune Music Panel) -->
+</div><!-- /container-3 (YouTube Music Panel) -->
 
 <!-- ====== TODO/QUESTS WIDGET SECTION ====== -->
 <div id="container-4" class="container-4" data-show-as="flex" style="display:flex;">
@@ -316,17 +191,14 @@ $jsConfig = json_encode([
     const PHP_CONFIG = <?php echo $jsConfig; ?>;
 </script>
 
-<!-- ====== SPOTIFY LOGIN STATE SAVE/RESTORE ====== -->
-<!-- Preserves app state (timer, lofi, todos, panels) across Spotify OAuth redirects -->
+<!-- ====== APP STATE SAVE/RESTORE ====== -->
+<!-- Preserves app state (timer, YouTube video, todos, panels) across page reloads -->
 <script>
     (function() {
-        const STATE_KEY = 'spotifyLoginState';
+        const STATE_KEY = 'appState';
 
-        // ── Save App State Before Spotify Login Redirect ──
-        document.addEventListener('click', function(e) {
-            const link = e.target.closest('a.btn-spotify[target="_blank"]');
-            if (!link) return;
-
+        // ── Save App State Before Navigation ──
+        window.addEventListener('beforeunload', function() {
             const snap = {};
 
             // Timer state
@@ -340,18 +212,16 @@ $jsConfig = json_encode([
                 };
             }
 
-            // Lofi widget state
+            // YouTube widget state
             const lofiVol = document.getElementById('lofi-vol');
             const lofiIframe = document.getElementById('lofi-yt-player');
-            snap.lofi = {
-                activeTab: document.querySelector('.px-tab.active')?.id === 'px-tab-youtube' ? 'youtube' : 'spotify',
+            snap.youtube = {
                 volume: lofiVol ? parseInt(lofiVol.value) : 70,
                 videoId: null,
-                isPlaying: typeof isPlaying !== 'undefined' ? isPlaying : false
             };
             if (lofiIframe && lofiIframe.src) {
                 const m = lofiIframe.src.match(/embed\/([a-zA-Z0-9_-]{11})/);
-                if (m) snap.lofi.videoId = m[1];
+                if (m) snap.youtube.videoId = m[1];
             }
 
             // Background theme
@@ -375,7 +245,7 @@ $jsConfig = json_encode([
             } catch (e) {}
         });
 
-        // ── Restore App State After Spotify Login Redirect ──
+        // ── Restore App State After Page Load ──
         function restoreState() {
             let raw;
             try {
@@ -407,21 +277,16 @@ $jsConfig = json_encode([
                 if (typeof updateTimerDisplay === 'function') updateTimerDisplay();
             }
 
-            // Lofi widget
-            if (snap.lofi) {
-                // Restore active tab
-                if (snap.lofi.activeTab && typeof pxSwitchTab === 'function') {
-                    pxSwitchTab(snap.lofi.activeTab);
-                }
+            // YouTube widget
+            if (snap.youtube) {
                 const lofiVol = document.getElementById('lofi-vol');
-                if (lofiVol) lofiVol.value = snap.lofi.volume;
-                if (snap.lofi.videoId) {
+                if (lofiVol) lofiVol.value = snap.youtube.volume;
+                if (snap.youtube.videoId) {
                     const currentIframe = document.getElementById('lofi-yt-player');
                     if (currentIframe && currentIframe.src) {
                         const cm = currentIframe.src.match(/embed\/([a-zA-Z0-9_-]{11})/);
-                        if (!cm || cm[1] !== snap.lofi.videoId) {
-                            // Different video — swap but don't autoplay
-                            currentIframe.src = 'https://www.youtube.com/embed/' + snap.lofi.videoId + '?autoplay=0&rel=0&modestbranding=1';
+                        if (!cm || cm[1] !== snap.youtube.videoId) {
+                            currentIframe.src = 'https://www.youtube.com/embed/' + snap.youtube.videoId + '?autoplay=0&rel=0&modestbranding=1';
                         }
                     }
                 }
@@ -453,11 +318,7 @@ $jsConfig = json_encode([
     }());
 </script>
 
-<!-- ====== PIXELTUNE PLAYER INITIALIZATION ====== -->
-<!-- Spotify embed player JS + Supabase client setup -->
-<script>
-    const PX_LOGGED_IN = <?php echo isset($_SESSION['access_token']) ? 'true' : 'false'; ?>;
-</script>
+<!-- ====== SUPABASE CLIENT SETUP ====== -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     const supabaseClient = window.supabase.createClient(
@@ -465,8 +326,6 @@ $jsConfig = json_encode([
         '<?php echo getenv("SUPABASE_ANON_KEY"); ?>'
     );
 </script>
-
-<script src="player.js"></script>
 
 <!-- ====== YOUTUBE WIDGET CONTROLLER ====== -->
 <!-- Handles YouTube URL input, video swapping, play/pause, and volume -->

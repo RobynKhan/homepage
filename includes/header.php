@@ -72,13 +72,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#lofi" class="nav-link" data-target="container-3" data-tab="youtube">
+                <a href="#lofi" class="nav-link" data-target="container-3">
                     <i class="bi bi-youtube"></i> <span>YouTube</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#spotify" class="nav-link" data-target="container-3" data-tab="spotify">
-                    <i class="bi bi-spotify"></i> <span>Spotify</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -100,13 +95,9 @@
             <i class="bi bi-hourglass-split"></i>
             <span>Timer</span>
         </button>
-        <button class="dock-btn" data-target="container-3" data-tab="youtube" aria-label="Music">
+        <button class="dock-btn" data-target="container-3" aria-label="Music">
             <i class="bi bi-music-note-beamed"></i>
             <span>Music</span>
-        </button>
-        <button class="dock-btn" data-target="container-3" data-tab="spotify" aria-label="Spotify">
-            <i class="bi bi-spotify"></i>
-            <span>Spotify</span>
         </button>
         <button class="dock-btn" data-target="container-4" aria-label="Tasks">
             <i class="bi bi-journal-check"></i>

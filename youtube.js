@@ -12,9 +12,6 @@
  *   - Loading overlay management
  *   - Play logging to log_youtube.php (fire-and-forget)
  *
- * Both iframes (Spotify + YouTube) run independently — switching tabs
- * does NOT interrupt either player. Each manages its own iframe.
- *
  * Loaded by: index.php, player.html
  * ============================================================================
  */
