@@ -11,6 +11,10 @@
  *   - Volume icon display updates
  *   - Loading overlay management
  *   - Play logging to log_youtube.php (fire-and-forget)
+ *   - YouTube search via search_youtube.php proxy
+ *   - Queue system (add, play-from-queue, render)
+ *   - Now-playing indicator updates
+ *   - Page-aware rendering (PixelTune retro vs glass styles)
  *
  * Loaded by: index.php, player.html
  * ============================================================================
@@ -31,6 +35,9 @@ function getLofiIframe() {
 function swapLofiVideo(videoId, title) {
   const loadingEl = document.getElementById("lofi-loading");
   if (loadingEl) loadingEl.classList.add("visible");
+
+  // Update now-playing display
+  updateNowPlaying(title);
 
   // Log the watch (fire-and-forget, won't block or error visibly)
   fetch("log_youtube.php", {
@@ -128,34 +135,70 @@ function lofiSetVolume(val) {
   icon.textContent =
     val == 0 ? "\u{1F507}" : val < 50 ? "\u{1F508}" : "\u{1F50A}";
 }
+
+// ─── Detect Page Context ─────────────────────────────────────────────────
+// Returns true when running inside the PixelTune retro panel (index.php)
+function isPixelTune() {
+  return !!document.querySelector(".px-yt-player");
+}
+
+// ─── YouTube Search (proxied via search_youtube.php) ─────────────────────
 async function searchYouTube() {
-  const query = document.getElementById("yt-search-input").value.trim();
+  const input = document.getElementById("yt-search-input");
+  const query = input ? input.value.trim() : "";
   if (!query) return;
 
-  const res = await fetch(`search_youtube.php?q=${encodeURIComponent(query)}`);
-  const data = await res.json();
+  let data;
+  try {
+    const res = await fetch(
+      `search_youtube.php?q=${encodeURIComponent(query)}`,
+    );
+    data = await res.json();
+  } catch {
+    return;
+  }
+  if (!data.items) return;
 
   const container = document.getElementById("yt-search-results");
+  if (!container) return;
   container.innerHTML = "";
+
+  const px = isPixelTune();
 
   data.items.forEach((item) => {
     const videoId = item.id.videoId;
     const title = item.snippet.title;
     const thumb = item.snippet.thumbnails.default.url;
+    const safeTitle = title.replace(/'/g, "\\'").replace(/"/g, "&quot;");
 
     const div = document.createElement("div");
-    div.className = "yt-result-item";
-    div.innerHTML = `
-      <img src="${thumb}" />
-      <span>${title}</span>
-      <button onclick="swapLofiVideo('${videoId}', '${title.replace(/'/g, "\\'")}')">▶ Play</button>
-      <button onclick="addToQueue('${videoId}', '${title.replace(/'/g, "\\'")}')">+ Queue</button>
-    `;
+
+    if (px) {
+      // PixelTune retro style (index.php dashboard)
+      div.className = "px-yt-result-item";
+      div.innerHTML =
+        `<img src="${thumb}" alt="" />` +
+        `<span class="result-title">${title}</span>` +
+        `<span class="result-actions">` +
+        `<button onclick="swapLofiVideo('${videoId}','${safeTitle}')">&#9654;</button>` +
+        `<button onclick="addToQueue('${videoId}','${safeTitle}')">+Q</button>` +
+        `</span>`;
+    } else {
+      // Glass style (player.html standalone)
+      div.className = "yt-result-item";
+      div.innerHTML =
+        `<img src="${thumb}" />` +
+        `<span class="yt-result-title">${title}</span>` +
+        `<span class="yt-result-actions">` +
+        `<button onclick="swapLofiVideo('${videoId}','${safeTitle}')">&#9654; Play</button>` +
+        `<button onclick="addToQueue('${videoId}','${safeTitle}')">+ Queue</button>` +
+        `</span>`;
+    }
     container.appendChild(div);
   });
 }
 
-// ─── Queue ────────────────────────────────────────────────────────────
+// ─── Queue System ─────────────────────────────────────────────────────────
 let queue = [];
 let currentQueueIndex = -1;
 
@@ -167,20 +210,47 @@ function addToQueue(videoId, title) {
 function playFromQueue(index) {
   currentQueueIndex = index;
   swapLofiVideo(queue[index].videoId, queue[index].title);
+  renderQueue();
 }
 
+function removeFromQueue(index) {
+  queue.splice(index, 1);
+  if (currentQueueIndex >= index) currentQueueIndex--;
+  renderQueue();
+}
 function renderQueue() {
-  let container = document.getElementById("yt-queue");
+  const container = document.getElementById("yt-queue");
   if (!container) return;
   container.innerHTML = "";
+
+  // Show/hide queue label (PixelTune dashboard)
+  const label = document.getElementById("yt-queue-label");
+  if (label) label.style.display = queue.length ? "" : "none";
+
+  const px = isPixelTune();
+
   queue.forEach((item, i) => {
     const div = document.createElement("div");
-    div.className =
-      "yt-queue-item" + (i === currentQueueIndex ? " active" : "");
-    div.innerHTML = `
-      <span>${item.title}</span>
-      <button onclick="playFromQueue(${i})">▶</button>
-    `;
+    const isActive = i === currentQueueIndex;
+
+    if (px) {
+      div.className = "px-yt-queue-item" + (isActive ? " active" : "");
+      div.innerHTML =
+        `<span class="queue-title">${item.title}</span>` +
+        `<button onclick="playFromQueue(${i})">&#9654;</button>`;
+    } else {
+      div.className = "yt-queue-item" + (isActive ? " active" : "");
+      div.innerHTML =
+        `<span class="yt-queue-title">${item.title}</span>` +
+        `<button onclick="playFromQueue(${i})">&#9654;</button>`;
+    }
     container.appendChild(div);
   });
+}
+
+// ─── Now Playing Display Update ──────────────────────────────────────────
+function updateNowPlaying(title) {
+  const el = document.getElementById("yt-now-playing");
+  if (!el || !title) return;
+  el.textContent = "\u266A " + title;
 }

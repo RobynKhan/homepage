@@ -2,17 +2,6 @@
  * ============================================================================
  * timer.js — Pomodoro Timer, Navigation & Clock Controller
  * ============================================================================
- *
- * The main client-side controller for the dashboard. Handles:
- *   1. Pomodoro Timer — Start, pause, reset, mode switching (work/short/long)
- *      with automatic progression and pomodoro counting
- *   2. Navigation — Hamburger menu drawer (desktop), bottom dock (mobile),
- *      panel toggling, and bottom sheet interactions
- *   3. Settings — Background theme switching with live preview
- *   4. Live Clock — Real-time digital clock with date display
- *
- * Loaded by: index.php (via includes/footer.php), frerein.html
- * ============================================================================
  */
 
 // ─── DOM Element References ───────────────────────────────────────────────
@@ -22,24 +11,22 @@ const elements = {
   resetBtn: document.querySelector("#restart-button"),
   pomodoroBtn: document.getElementById("pomodorobtn"),
   shortbrkBtn: document.getElementById("shortbrkbtn"),
-  longbrkBtn: document.getElementById("longbrkbtn"),
   pomCount: document.querySelector(".pomodoro-count"),
   timerDisplay: document.querySelector(".timer-display"),
 };
 
 // ─── Timer Duration Defaults (in seconds) ─────────────────────────────────
 const timers = {
-  POMODORO: 1500,
-  SHORTBREAK: 300,
-  LONGBREAK: 900,
+  POMODORO: 25 * 60,
+  SHORTBREAK: 50 * 60,
 };
 
 // ─── Timer State Object ───────────────────────────────────────────────────
 const state = {
   pomodoroCount: 0,
   pomodorosUntilLongBreak: 4,
-  timerValue: 1500,
-  initialTime: 1500,
+  timerValue: 25 * 60,
+  initialTime: 25 * 60,
   timerInterval: null,
   isPaused: false,
   pomodoroType: "POMODORO",
@@ -49,12 +36,15 @@ const state = {
 const addEventListeners = () => {
   elements.startBtn.addEventListener("click", handleStart);
   elements.pauseBtn.addEventListener("click", handlePause);
+  elements.resetBtn.addEventListener("click", resetTimer);
   elements.pomodoroBtn.addEventListener("click", () => setTimeType("POMODORO"));
   elements.shortbrkBtn.addEventListener("click", () =>
     setTimeType("SHORTBREAK"),
   );
-  elements.longbrkBtn.addEventListener("click", () => setTimeType("LONGBREAK"));
-  elements.resetBtn.addEventListener("click", resetTimer);
+
+  // ─── Custom Timer Button ──────────────────────────────────────────────
+  const customBtn = document.getElementById("custombrkbtn");
+  if (customBtn) customBtn.addEventListener("click", applyCustomTime);
 
   // ─── Desktop Navigation Drawer (Hamburger Menu) ───────────────────────
   const hamburgerBtn = document.getElementById("hamburger-btn");
@@ -71,25 +61,20 @@ const addEventListeners = () => {
       navDrawer.classList.remove("open");
       navOverlay.classList.remove("visible");
     };
+
     hamburgerBtn.addEventListener("click", openDrawer);
     navOverlay.addEventListener("click", closeDrawer);
     if (navDrawerClose) navDrawerClose.addEventListener("click", closeDrawer);
 
-    // Nav drawer link clicks toggle panels (desktop)
     navDrawer.querySelectorAll(".nav-link").forEach((link) => {
       link.addEventListener("click", (e) => {
         e.preventDefault();
-        const targetId = link.dataset.target;
-        const targetEl = document.getElementById(targetId);
-        if (targetEl) {
-          togglePanel(targetEl);
-        }
+        const targetEl = document.getElementById(link.dataset.target);
+        if (targetEl) togglePanel(targetEl);
         closeDrawer();
       });
     });
   }
-
-  // (Lofi FAB removed — YouTube is now a tab inside container-3)
 
   // ─── Mobile Bottom Dock & Bottom Sheet Interactions ───────────────────
   const sheetBackdrop = document.getElementById("sheet-backdrop");
@@ -108,27 +93,21 @@ const addEventListeners = () => {
   document.querySelectorAll(".dock-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       if (!isMobile()) return;
-      const targetId = btn.dataset.target;
-      const target = document.getElementById(targetId);
+      const target = document.getElementById(btn.dataset.target);
       if (!target) return;
-
       const wasOpen = target.classList.contains("sheet-open");
       closeAllSheets();
-
       if (!wasOpen) {
         target.classList.add("sheet-open");
         btn.classList.add("active");
         if (sheetBackdrop) sheetBackdrop.classList.add("visible");
       }
-
     });
   });
 
-  if (sheetBackdrop) {
-    sheetBackdrop.addEventListener("click", closeAllSheets);
-  }
+  if (sheetBackdrop) sheetBackdrop.addEventListener("click", closeAllSheets);
 
-  // ─── Settings Panel: Open/Close via Gear Button ───────────────────────
+  // ─── Settings Panel: Open/Close ───────────────────────────────────────
   const timerSettingsBtn = document.getElementById("timer-settings");
   if (timerSettingsBtn) {
     timerSettingsBtn.addEventListener("click", () => {
@@ -148,7 +127,6 @@ const addEventListeners = () => {
     });
   }
 
-  // ─── Settings Panel: Close via X Button ─────────────────────────────────
   const closeSettingsBtn = document.getElementById("close-settings");
   if (closeSettingsBtn) {
     closeSettingsBtn.addEventListener("click", () => {
@@ -162,57 +140,37 @@ const addEventListeners = () => {
     });
   }
 
-  // ─── Background Theme: Live Preview on Change ─────────────────────────
+  // ─── Background Theme ─────────────────────────────────────────────────
   const bgSelect = document.getElementById("background-select");
-  if (bgSelect) {
+  if (bgSelect)
     bgSelect.addEventListener("change", () => applyTheme(bgSelect.value));
-  }
 };
 
 // ─── Panel Visibility Toggle Helper ───────────────────────────────────────
 const togglePanel = (targetElement) => {
-  if (targetElement) {
-    const isHidden =
-      targetElement.style.display === "none" ||
-      window.getComputedStyle(targetElement).display === "none";
-
-    if (isHidden) {
-      targetElement.style.display = "";
-      if (window.getComputedStyle(targetElement).display === "none") {
-        targetElement.style.display = targetElement.dataset.showAs || "block";
-      }
-    } else {
-      targetElement.style.display = "none";
+  if (!targetElement) return;
+  const isHidden =
+    targetElement.style.display === "none" ||
+    window.getComputedStyle(targetElement).display === "none";
+  if (isHidden) {
+    targetElement.style.display = "";
+    if (window.getComputedStyle(targetElement).display === "none") {
+      targetElement.style.display = targetElement.dataset.showAs || "block";
     }
+  } else {
+    targetElement.style.display = "none";
   }
-};
-
-// ─── Navigation Link Click Handler ────────────────────────────────────────
-const handleNavClick = (event) => {
-  event.preventDefault();
-
-  // Get the ID of the target container
-  const link = event.target.closest("a");
-  if (!link) return;
-  const targetId = link.dataset.target;
-
-  // Get the target container
-  const targetElement = document.getElementById(targetId);
-
-  togglePanel(targetElement);
 };
 
 // ─── Timer Start/Resume Handler ───────────────────────────────────────────
 const handleStart = () => {
   state.isPaused ? resumeTimer() : startTimer();
 };
-
-// ─── Timer Pause Handler ──────────────────────────────────────────────────
 const handlePause = () => {
   pauseTimer();
 };
 
-// ─── Timer Countdown Engine (1-second interval) ─────────────────────────
+// ─── Timer Countdown Engine ───────────────────────────────────────────────
 const startTimer = () => {
   clearInterval(state.timerInterval);
   state.timerInterval = setInterval(() => {
@@ -223,11 +181,8 @@ const startTimer = () => {
       clearInterval(state.timerInterval);
       state.pomodoroCount++;
       updatePomodoroCount();
-      if (state.pomodoroCount % state.pomodorosUntilLongBreak === 0) {
-        setTimeType("LONGBREAK");
-      } else {
-        setTimeType("SHORTBREAK");
-      }
+      // Auto-advance to 25 min session after completion
+      setTimeType("POMODORO");
     }
   }, 1000);
 };
@@ -238,49 +193,71 @@ const updateTimerDisplay = () => {
 };
 
 const formatTime = (seconds) => {
-  const minutes = Math.floor(seconds / 60)
+  const m = Math.floor(seconds / 60)
     .toString()
     .padStart(2, "0");
-  const secs = (seconds % 60).toString().padStart(2, "0");
-  return `${minutes}:${secs}`;
+  const s = (seconds % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
 };
 
-// ─── Timer Pause/Resume Functions ─────────────────────────────────────────
+// ─── Timer Pause/Resume ────────────────────────────────────────────────────
 const pauseTimer = () => {
   clearInterval(state.timerInterval);
   state.isPaused = true;
 };
-
 const resumeTimer = () => {
   state.isPaused = false;
   startTimer();
 };
 
-// ─── Timer Mode Switching (Pomodoro / Short Break / Long Break) ──────────
+// ─── Timer Mode Switching ─────────────────────────────────────────────────
 const setTimeType = (type) => {
   state.pomodoroType = type;
   state.timerValue = timers[type];
-  state.initialTime = timers[type]; // Update initial time when time type is set
+  state.initialTime = timers[type];
   updateActiveButton(type);
   updateTimerDisplay();
 };
 
-// ─── Timer Mode Button Active State Manager ───────────────────────────────
+// ─── Timer Mode Button Active State ──────────────────────────────────────
 const updateActiveButton = (type) => {
   elements.pomodoroBtn.classList.toggle("active", type === "POMODORO");
   elements.shortbrkBtn.classList.toggle("active", type === "SHORTBREAK");
-  elements.longbrkBtn.classList.toggle("active", type === "LONGBREAK");
+  document.getElementById("custombrkbtn")?.classList.remove("active");
 };
 
-// ─── Timer Reset to Initial Duration ──────────────────────────────────────
+// ─── Custom Timer ─────────────────────────────────────────────────────────
+const applyCustomTime = () => {
+  const input = document.getElementById("custom-time-input");
+  if (!input) return;
+  const minutes = parseInt(input.value);
+  if (isNaN(minutes) || minutes < 1 || minutes > 999) {
+    input.style.borderColor = "#e74c3c";
+    return;
+  }
+  input.style.borderColor = "";
+  clearInterval(state.timerInterval);
+  state.isPaused = false;
+  state.timerValue = minutes * 60;
+  state.initialTime = minutes * 60;
+  state.pomodoroType = "CUSTOM";
+  updateTimerDisplay();
+
+  // Set custom button as active
+  elements.pomodoroBtn.classList.remove("active");
+  elements.shortbrkBtn.classList.remove("active");
+  document.getElementById("custombrkbtn")?.classList.add("active");
+};
+
+// ─── Timer Reset ──────────────────────────────────────────────────────────
 const resetTimer = () => {
   clearInterval(state.timerInterval);
-  state.timerValue = state.initialTime; // Reset to the initially set time
-  updateTimerDisplay();
+  state.timerValue = state.initialTime;
   state.isPaused = false;
+  updateTimerDisplay();
 };
 
-// ─── Pomodoro Completion Counter Display ──────────────────────────────────
+// ─── Pomodoro Count Display ───────────────────────────────────────────────
 const updatePomodoroCount = () => {
   elements.pomCount.style.display = "block";
   elements.pomCount.style.color = "white";
@@ -288,7 +265,7 @@ const updatePomodoroCount = () => {
   elements.pomCount.textContent = `Pomodoro Count: ${state.pomodoroCount}`;
 };
 
-// ─── Background Theme Applier (swaps body background + CSS class) ──────────
+// ─── Background Theme ─────────────────────────────────────────────────────
 const applyTheme = (theme) => {
   const themes = {
     default: "themes/theme 2.gif",
@@ -297,8 +274,6 @@ const applyTheme = (theme) => {
     theme3: "themes/theme3.jpg",
   };
   document.body.style.backgroundImage = `url('${themes[theme] || themes.default}')`;
-
-  // Swap theme colour class
   document.body.classList.remove(
     "theme-default",
     "theme-theme1",
@@ -306,46 +281,35 @@ const applyTheme = (theme) => {
     "theme-theme3",
   );
   document.body.classList.add(`theme-${theme}`);
-
   const bgSelect = document.getElementById("background-select");
   if (bgSelect) bgSelect.value = theme;
 };
 
-// ─── Custom Timer Duration Setter (minutes input) ───────────────────────
+// ─── setCustomTime (kept for state restore compatibility) ─────────────────
 const setCustomTime = (minutes) => {
   clearInterval(state.timerInterval);
   state.timerValue = minutes * 60;
-  state.initialTime = state.timerValue; // Update initial time when custom time is set
+  state.initialTime = state.timerValue;
   updateTimerDisplay();
 };
 
-// ─── Initialize Timer & Apply Default Theme ──────────────────────────────
+// ─── Initialize ───────────────────────────────────────────────────────────
 addEventListeners();
 applyTheme("default");
 
 // ============================================================================
 // LIVE DIGITAL CLOCK
 // ============================================================================
-// Updates the top-bar clock display every second with 12-hour time and date.
-// ===========================================================================-
-
 function updateDateTime() {
   const now = new Date();
-
   const hours = now.getHours();
   const minutes = now.getMinutes();
   const seconds = now.getSeconds();
-
   const ampm = hours >= 12 ? "PM" : "AM";
-  const hourTime = hours % 12 || 12; // Convert 24hr to 12hr format
-  const minute = minutes < 10 ? `0${minutes}` : minutes;
-  const second = seconds < 10 ? `0${seconds}` : seconds;
-
-  const time = `${hourTime}:${minute}:${second} ${ampm}`;
-
-  const month = now.getMonth();
-  const year = now.getFullYear();
-  const day = now.getDate();
+  const h = hours % 12 || 12;
+  const m = minutes < 10 ? `0${minutes}` : minutes;
+  const s = seconds < 10 ? `0${seconds}` : seconds;
+  const time = `${h}:${m}:${s} ${ampm}`;
 
   const monthList = [
     "January",
@@ -361,10 +325,8 @@ function updateDateTime() {
     "November",
     "December",
   ];
+  const date = `${monthList[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
 
-  const date = `${monthList[month]} ${day}, ${year}`;
-
-  // Update the time and date in the respective elements
   document.getElementById("time").innerHTML = time;
   document.getElementById("date").innerHTML = date;
 }

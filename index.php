@@ -49,65 +49,88 @@ $jsConfig = json_encode([
 
 <!-- ====== POMODORO TIMER SECTION ====== -->
 <section>
-    <div id="timer-container" class="timer-container">
-        <!-- Timer Mode Selection Buttons (Pomodoro / Short Break / Long Break) -->
-        <div class="timers" role="group" aria-label="Timer Modes">
+    <div class="timers" role="group" aria-label="Timer Modes">
+        <button id="pomodorobtn" class="active" type="button">25 min</button>
+        <button id="shortbrkbtn" type="button">50 min</button>
+        <button id="longbrkbtn" type="button">Custom</button>
+    </div>
+
+    <!-- Custom time input — only shows when Custom is selected -->
+    <div id="custom-time-wrap" style="display:none; margin-top: 8px;">
+        <input
+            type="number"
+            id="custom-time-input"
+            min="1"
+            max="999"
+            placeholder="Enter minutes..."
+            style="
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-pill);
+            color: var(--cream);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            padding: 8px 16px;
+            outline: none;
+            width: 140px;
+        "
+            onkeydown="if(event.key==='Enter') applyCustomTime()" />
+        <button
+            onclick="applyCustomTime()"
+            style="
+            margin-left: 6px;
+            padding: 8px 16px;
+            border-radius: var(--radius-pill);
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.08);
+            color: var(--cream);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        ">Set</button>
+    </div>
+    <!-- Timer Countdown Display -->
+    <div class="runner">
+        <span class="timer-display" role="timer" aria-live="polite"><?php
+                                                                    $initialSeconds = $settings['pomodoro_duration'] * 60;
+                                                                    $m = str_pad(intdiv($initialSeconds, 60), 2, '0', STR_PAD_LEFT);
+                                                                    $s = str_pad($initialSeconds % 60, 2, '0', STR_PAD_LEFT);
+                                                                    echo "{$m}:{$s}";
+                                                                    ?></span>
+    </div>
+    <!-- Timer Control Buttons (Start / Pause / Restart / Settings) -->
+    <div class="config">
+        <div class="pomodoro-count" role="group" aria-label="Timer Controls">
             <button
-                id="pomodorobtn"
-                class="active"
+                class="start-button"
+                id="start-button"
                 type="button"
-                aria-label="Pomodoro Mode">
-                Pomodoro
+                aria-label="Start Timer">
+                Start
             </button>
-            <button id="shortbrkbtn" type="button" aria-label="Short Break Mode">
-                Short Break
+            <button
+                class="pause-button"
+                id="pause-button"
+                type="button"
+                aria-label="Pause Timer">
+                <i class="bi bi-pause-circle" aria-hidden="true"></i>
             </button>
-            <button id="longbrkbtn" type="button" aria-label="Long Break Mode">
-                Long Break
+            <button
+                class="restart-button"
+                id="restart-button"
+                type="button"
+                aria-label="Restart Timer">
+                <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+            </button>
+            <button
+                class="timer-settings"
+                id="timer-settings"
+                type="button"
+                aria-label="Open Timer Settings">
+                <i class="bi bi-gear" aria-hidden="true"></i>
             </button>
         </div>
-        <!-- Timer Countdown Display -->
-        <div class="runner">
-            <span class="timer-display" role="timer" aria-live="polite"><?php
-                                                                        $initialSeconds = $settings['pomodoro_duration'] * 60;
-                                                                        $m = str_pad(intdiv($initialSeconds, 60), 2, '0', STR_PAD_LEFT);
-                                                                        $s = str_pad($initialSeconds % 60, 2, '0', STR_PAD_LEFT);
-                                                                        echo "{$m}:{$s}";
-                                                                        ?></span>
-        </div>
-        <!-- Timer Control Buttons (Start / Pause / Restart / Settings) -->
-        <div class="config">
-            <div class="pomodoro-count" role="group" aria-label="Timer Controls">
-                <button
-                    class="start-button"
-                    id="start-button"
-                    type="button"
-                    aria-label="Start Timer">
-                    Start
-                </button>
-                <button
-                    class="pause-button"
-                    id="pause-button"
-                    type="button"
-                    aria-label="Pause Timer">
-                    <i class="bi bi-pause-circle" aria-hidden="true"></i>
-                </button>
-                <button
-                    class="restart-button"
-                    id="restart-button"
-                    type="button"
-                    aria-label="Restart Timer">
-                    <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                </button>
-                <button
-                    class="timer-settings"
-                    id="timer-settings"
-                    type="button"
-                    aria-label="Open Timer Settings">
-                    <i class="bi bi-gear" aria-hidden="true"></i>
-                </button>
-            </div>
-        </div>
+    </div>
     </div>
 </section>
 
@@ -128,6 +151,15 @@ $jsConfig = json_encode([
             </div>
 
             <div class="px-scroll-area">
+                <!-- YouTube Search Bar -->
+                <div class="px-section-label">SEARCH</div>
+                <div class="px-search-bar">
+                    <input type="text" id="yt-search-input" placeholder="SEARCH YOUTUBE..."
+                        onkeydown="if(event.key==='Enter') searchYouTube()" />
+                    <button onclick="searchYouTube()"><i class="bi bi-search"></i></button>
+                </div>
+                <div class="px-yt-results" id="yt-search-results"></div>
+
                 <!-- YouTube URL Input Field -->
                 <div class="px-section-label">PASTE URL</div>
                 <div class="px-search-bar">
@@ -137,6 +169,9 @@ $jsConfig = json_encode([
                     <button onclick="resetLofiDefault()" title="Reset" style="border-left:2px solid #000">&#8634;</button>
                 </div>
                 <div class="lofi-error-msg" id="lofi-error-msg">&#9888; INVALID URL</div>
+
+                <!-- Now Playing Indicator -->
+                <div class="px-yt-now-playing" id="yt-now-playing"></div>
 
                 <!-- YouTube Embedded Video Player -->
                 <div class="px-yt-embed-wrap" id="lofi-player-wrap">
@@ -159,6 +194,10 @@ $jsConfig = json_encode([
                         <input type="range" id="lofi-vol" min="0" max="100" value="70" oninput="lofiSetVolume(this.value)" />
                     </div>
                 </div>
+
+                <!-- Queue -->
+                <div class="px-section-label" id="yt-queue-label" style="display:none;">QUEUE</div>
+                <div class="px-yt-queue" id="yt-queue"></div>
             </div>
         </div>
     </div>

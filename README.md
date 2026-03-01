@@ -21,7 +21,8 @@ A full-featured Pomodoro productivity dashboard with an integrated YouTube music
 ## Features
 
 - **Pomodoro Timer** — Configurable work/short-break/long-break cycles with automatic progression
-- **YouTube Player (PixelTune)** — Paste any YouTube URL to embed and play videos in a retro pixel-art player
+- **YouTube Player (PixelTune)** — Search YouTube, paste URLs, queue videos, and play in a retro pixel-art player
+- **YouTube Search** — Server-side YouTube Data API search with queue management
 - **Todo/Quests Widget** — Admin-only persistent task management with priority levels and due dates
 - **Background Themes** — Switchable animated/static background themes
 - **Responsive Design** — Desktop navigation drawer + mobile bottom dock with slide-up sheets
@@ -38,7 +39,7 @@ A full-featured Pomodoro productivity dashboard with an integrated YouTube music
 │  index.php ──────── Main Dashboard Page                         │
 │    ├── includes/header.php  (top bar, nav, dock)                │
 │    ├── timer.js             (timer + nav + clock + themes)       │
-│    ├── youtube.js           (YouTube embed + URL input + swap)   │
+│    ├── youtube.js           (YouTube embed + search + queue + swap)  │
 │    ├── todo_widget.php      (quest list UI + inline JS)         │
 │    ├── styling.css          (all visual styles)                  │
 │    └── includes/footer.php  (closing tags + timer.js load)      │
@@ -54,6 +55,7 @@ A full-featured Pomodoro productivity dashboard with an integrated YouTube music
 │                           │
 │  todo_api.php             │
 │  log_youtube.php          │
+│  search_youtube.php       │  ← YouTube Data API proxy
 └───────────┬───────────────┘
             │
             ▼
@@ -100,7 +102,8 @@ A full-featured Pomodoro productivity dashboard with an integrated YouTube music
 
 | File              | Purpose                                | Connected To                            |
 | ----------------- | -------------------------------------- | --------------------------------------- |
-| `log_youtube.php` | Logs YouTube video watches to database | auth_config.php, db.php → `yt_urls` table |
+| `log_youtube.php`    | Logs YouTube video watches to database                    | auth_config.php, db.php → `yt_urls` table |
+| `search_youtube.php` | Proxies YouTube Data API search (keeps API key server-side) | auth_config.php → YouTube Data API v3     |
 
 ### Todo System
 
@@ -127,7 +130,7 @@ A full-featured Pomodoro productivity dashboard with an integrated YouTube music
 
 | File          | Purpose                                                                                       | Connected To                            |
 | ------------- | --------------------------------------------------------------------------------------------- | --------------------------------------- |
-| `youtube.js`  | YouTube embed controller — URL parsing, video swapping, play/pause toggle, volume icon, logging | log_youtube.php (via fetch)             |
+| `youtube.js`  | YouTube embed controller — URL parsing, video swapping, search, queue, play/pause, volume, logging | log_youtube.php, search_youtube.php (via fetch) |
 | `timer.js`    | Pomodoro timer engine, navigation (drawer + dock), theme switcher, live clock                 | DOM elements in index.php / frerein.html |
 | `styling.css` | All visual styles — layout, glass effects, PixelTune retro theme, responsive breakpoints      | Loaded by index.php, player.html, frerein.html |
 
@@ -155,10 +158,13 @@ A full-featured Pomodoro productivity dashboard with an integrated YouTube music
 ## YouTube Integration
 
 - YouTube player available on **both** pages: dashboard (index.php) and standalone player (player.html)
-- Self-contained controller in `youtube.js` — paste any YouTube URL → video ID extracted via regex → iframe swapped
+- **Search** — Type a query to search YouTube via `search_youtube.php` proxy (keeps API key server-side)
+- **Queue** — Add search results to a queue, play songs in sequence
+- **URL input** — Paste any YouTube URL directly → video ID extracted via regex → iframe swapped
+- **Page-aware rendering** — `youtube.js` detects PixelTune (index.php) vs glass (player.html) context and renders appropriate styles
 - Default video: `76GStMlLF_Y` (lofi stream)
 - Each video watch logged to `yt_urls` table (admin only)
-- No YouTube API key required — uses plain iframe embeds
+- Search requires `YOUTUBE_API_KEY` environment variable (YouTube Data API v3)
 
 ---
 
@@ -219,6 +225,9 @@ ADMIN1_USERNAME=admin
 ADMIN1_PASSWORD_HASH=$2y$10$...
 ADMIN2_USERNAME=admin2
 ADMIN2_PASSWORD_HASH=$2y$10$...
+
+# YouTube Data API (for search feature)
+YOUTUBE_API_KEY=your-youtube-api-key
 ```
 
 Generate password hashes with:

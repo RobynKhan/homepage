@@ -13,6 +13,7 @@
 #   DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, DB_PORT
 #   ADMIN1_USERNAME, ADMIN1_PASSWORD_HASH
 #   SUPABASE_URL, SUPABASE_ANON_KEY
+#   YOUTUBE_API_KEY
 # ============================================================================
 
 FROM php:8.2-cli

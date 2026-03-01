@@ -7,6 +7,7 @@
  * Proxies search requests to the YouTube Data API v3.
  * Keeps the API key server-side so it's never exposed to the browser.
  *
+ * Env: YOUTUBE_API_KEY — Your YouTube Data API v3 key
  * Called by: youtube.js → searchYouTube()
  * ============================================================================
  */

@@ -1629,6 +1629,172 @@ body {
   margin-top: 8px;
 }
 
+/* ── YouTube Search Results ────────────────────────── */
+.px-yt-results {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 220px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--px-purple) #000;
+  margin-bottom: 6px;
+}
+
+.px-yt-results:empty {
+  display: none;
+}
+
+.px-yt-result-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 #000;
+  background: var(--px-panel);
+  cursor: pointer;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
+}
+
+.px-yt-result-item:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #000;
+  background: var(--px-panel2);
+}
+
+.px-yt-result-item img {
+  width: 48px;
+  height: 36px;
+  object-fit: cover;
+  border: 2px solid #000;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+}
+
+.px-yt-result-item .result-title {
+  flex: 1;
+  font-family: "VT323", monospace;
+  font-size: 14px;
+  color: var(--px-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.px-yt-result-item .result-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.px-yt-result-item .result-actions button {
+  font-family: "Press Start 2P", monospace;
+  font-size: 5px;
+  padding: 4px 6px;
+  background: var(--px-purple);
+  color: #fff;
+  border: 2px solid #000;
+  box-shadow: 1px 1px 0 #000;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition:
+    background 0.1s,
+    transform 0.1s;
+  white-space: nowrap;
+}
+
+.px-yt-result-item .result-actions button:hover {
+  background: var(--px-purple2);
+}
+
+.px-yt-result-item .result-actions button:active {
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
+/* ── Now Playing Indicator ─────────────────────────── */
+.px-yt-now-playing {
+  font-family: "VT323", monospace;
+  font-size: 14px;
+  color: var(--px-cyan);
+  padding: 4px;
+  letter-spacing: 1px;
+  text-shadow: 0 0 6px var(--px-cyan);
+  min-height: 0;
+}
+
+.px-yt-now-playing:empty {
+  display: none;
+}
+
+/* ── YouTube Queue ─────────────────────────────────── */
+.px-yt-queue {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.px-yt-queue:empty {
+  display: none;
+}
+
+.px-yt-queue-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 #000;
+  background: var(--px-panel);
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
+}
+
+.px-yt-queue-item.active {
+  border-color: var(--px-accent);
+  background: rgba(255, 45, 107, 0.15);
+}
+
+.px-yt-queue-item .queue-title {
+  flex: 1;
+  font-family: "VT323", monospace;
+  font-size: 13px;
+  color: var(--px-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.px-yt-queue-item button {
+  font-family: "Press Start 2P", monospace;
+  font-size: 5px;
+  padding: 4px 8px;
+  background: var(--px-purple);
+  color: #fff;
+  border: 2px solid #000;
+  box-shadow: 1px 1px 0 #000;
+  cursor: pointer;
+  transition:
+    background 0.1s,
+    transform 0.1s;
+  flex-shrink: 0;
+}
+
+.px-yt-queue-item button:hover {
+  background: var(--px-purple2);
+}
+
+.px-yt-queue-item button:active {
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
 .px-yt-play-btn {
   font-family: "Press Start 2P", monospace;
   font-size: 6px;
@@ -2136,4 +2302,34 @@ body.theme-theme3 {
   --px-text2: #608860;
 }
 
+.custom-timer-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.custom-timer-wrap input[type="number"] {
+  width: 64px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+  color: var(--cream);
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 10px;
+  outline: none;
+  text-align: center;
+  transition: border-color var(--transition);
+}
+
+.custom-timer-wrap input[type="number"]:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Hide the default spinner arrows and use native ones only */
+.custom-timer-wrap input[type="number"]::-webkit-inner-spin-button {
+  opacity: 1;
+  cursor: pointer;
+}
 /* end of file */
