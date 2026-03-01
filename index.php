@@ -482,6 +482,9 @@ $jsConfig = json_encode([
 <!-- Lofi Widget Script -->
 <script>
     function initYouTubePlayer() {
+        // Already initialized — bail out
+        if (window._ytPlayerInstance) return;
+
         // Self-heal: if YT was loaded (by Spotify Embed) but our flag wasn't set
         if (!ytApiReady && typeof YT !== 'undefined' && YT.Player) {
             ytApiReady = true;
@@ -489,14 +492,6 @@ $jsConfig = json_encode([
         if (!ytApiReady) return;
         const el = document.getElementById('lofi-yt-player');
         if (!el) return;
-
-        // If already initialized, destroy and re-bind so it works after tab switch
-        if (player) {
-            try {
-                player.destroy();
-            } catch (e) {}
-            player = null;
-        }
 
         // The iframe may have been replaced by destroy(), recreate it if needed
         let iframe = document.getElementById('lofi-yt-player');
@@ -512,12 +507,13 @@ $jsConfig = json_encode([
         }
 
         ytPlayerInitialized = true;
-        player = new YT.Player('lofi-yt-player', {
+        window._ytPlayerInstance = new YT.Player('lofi-yt-player', {
             events: {
                 onReady: lofiPlayerReady,
                 onStateChange: lofiStateChange
             }
         });
+        player = window._ytPlayerInstance;
     }
 
     function lofiPlayerReady(e) {

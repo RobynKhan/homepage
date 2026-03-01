@@ -17,13 +17,14 @@ function pxSwitchTab(tabName) {
 
   // Lazy-init YouTube player when its tab becomes visible
   if (tabName === "youtube" && typeof initYouTubePlayer === "function") {
-    // If YT was loaded (e.g. by Spotify Embed) but our flag was never set,
-    // detect it now so initYouTubePlayer can proceed.
     if (!ytApiReady && typeof YT !== "undefined" && YT.Player) {
       ytApiReady = true;
     }
-    // Short delay so the panel is rendered before YT.Player binds to the iframe
-    setTimeout(initYouTubePlayer, 150);
+    // Only initialize once — don't re-init if already done
+    if (!window._ytPlayerInitialized) {
+      window._ytPlayerInitialized = true;
+      setTimeout(initYouTubePlayer, 150);
+    }
   }
 }
 
