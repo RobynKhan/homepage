@@ -10,15 +10,19 @@ const elements = {
   pauseBtn: document.querySelector("#pause-button"),
   resetBtn: document.querySelector("#restart-button"),
   pomodoroBtn: document.getElementById("pomodorobtn"),
+  longpomodoroBtn: document.getElementById("longpomodorobtn"),
   shortbrkBtn: document.getElementById("shortbrkbtn"),
+  longbrkBtn: document.getElementById("longbrkbtn"),
   pomCount: document.querySelector(".pomodoro-count"),
   timerDisplay: document.querySelector(".timer-display"),
 };
 
 // ─── Timer Duration Defaults (in seconds) ─────────────────────────────────
 const timers = {
-  POMODORO: 25 * 60,
-  SHORTBREAK: 50 * 60,
+  POMODORO: 25 * 60, // 25 minutes
+  LONGPOMODORO: 50 * 60, // 50 minutes
+  SHORTBREAK: 5 * 60, // 5 minutes
+  LONGBREAK: 15 * 60, // 15 minutes
 };
 
 // ─── Timer State Object ───────────────────────────────────────────────────
@@ -37,12 +41,21 @@ const addEventListeners = () => {
   elements.startBtn.addEventListener("click", handleStart);
   elements.pauseBtn.addEventListener("click", handlePause);
   elements.resetBtn.addEventListener("click", resetTimer);
+
   elements.pomodoroBtn.addEventListener("click", () => {
     setTimeType("POMODORO");
     hideCustomWrap();
   });
   elements.shortbrkBtn.addEventListener("click", () => {
     setTimeType("SHORTBREAK");
+    hideCustomWrap();
+  });
+  elements.longbrkBtn.addEventListener("click", () => {
+    setTimeType("LONGBREAK");
+    hideCustomWrap();
+  });
+  elements.longpomodoroBtn.addEventListener("click", () => {
+    setTimeType("LONGPOMODORO");
     hideCustomWrap();
   });
 
@@ -232,8 +245,12 @@ const setTimeType = (type) => {
 // ─── Timer Mode Button Active State ──────────────────────────────────────
 const updateActiveButton = (type) => {
   elements.pomodoroBtn.classList.toggle("active", type === "POMODORO");
+  elements.longpomodoroBtn?.classList.toggle("active", type === "LONGPOMODORO");
   elements.shortbrkBtn.classList.toggle("active", type === "SHORTBREAK");
-  document.getElementById("custombrkbtn")?.classList.remove("active");
+  elements.longbrkBtn?.classList.toggle("active", type === "LONGBREAK");
+  document
+    .getElementById("custombrkbtn")
+    ?.classList.toggle("active", type === "CUSTOM");
 };
 
 // ─── Hide Custom Time Input Wrapper ───────────────────────────────────────
@@ -279,38 +296,30 @@ const resetTimer = () => {
 
 // ─── Pomodoro Count Display ───────────────────────────────────────────────
 const updatePomodoroCount = () => {
-  elements.pomCount.style.display = "block";
-  elements.pomCount.style.color = "white";
-  elements.pomCount.style.fontSize = "30px";
-  elements.pomCount.textContent = `Pomodoro Count: ${state.pomodoroCount}`;
+  const display = document.getElementById("pomodoro-counter-display");
+  if (display) display.textContent = state.pomodoroCount;
 };
 
-// ─── Background Theme ─────────────────────────────────────────────────────
+// ─── Background Theme (dynamic — reads file paths from <select> data-file) ──
 const applyTheme = (theme) => {
-  const themes = {
-    default: "themes/theme 2.gif",
-    theme1: "themes/theme1.jpg",
-    theme2: "themes/default.jpg",
-    theme3: "themes/theme3.jpg",
-  };
-  document.body.style.backgroundImage = `url('${themes[theme] || themes.default}')`;
-  document.body.classList.remove(
-    "theme-default",
-    "theme-theme1",
-    "theme-theme2",
-    "theme-theme3",
-  );
-  document.body.classList.add(`theme-${theme}`);
   const bgSelect = document.getElementById("background-select");
-  if (bgSelect) bgSelect.value = theme;
-};
+  if (!bgSelect) return;
 
-// ─── setCustomTime (kept for state restore compatibility) ─────────────────
-const setCustomTime = (minutes) => {
-  clearInterval(state.timerInterval);
-  state.timerValue = minutes * 60;
-  state.initialTime = state.timerValue;
-  updateTimerDisplay();
+  // Find the matching <option> to get the file path
+  const opt = bgSelect.querySelector(`option[value="${theme}"]`);
+  const file = opt ? opt.dataset.file : null;
+  if (file) {
+    document.body.style.backgroundImage = `url('${file}')`;
+  }
+
+  // Remove all existing theme-* classes, then add the active one
+  const themeClasses = [...document.body.classList].filter((c) =>
+    c.startsWith("theme-"),
+  );
+  themeClasses.forEach((c) => document.body.classList.remove(c));
+  document.body.classList.add(`theme-${theme}`);
+
+  bgSelect.value = theme;
 };
 
 // ─── Initialize ───────────────────────────────────────────────────────────

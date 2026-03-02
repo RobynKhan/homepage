@@ -315,25 +315,59 @@ body {
 /* ═══════════════════════════════════════════════════════
    TIMER CARD — compact centered hero
    ═══════════════════════════════════════════════════════ */
+/* Timer Container - Pixel styled */
 .timer-container {
   position: relative;
   margin: clamp(20px, 4vh, 60px) auto clamp(16px, 3vh, 32px);
-  padding: clamp(20px, 3vw, 32px) clamp(16px, 3vw, 28px)
-    clamp(16px, 2.5vw, 24px);
+  padding: clamp(16px, 2.5vw, 20px);
   display: flex;
   flex-direction: column;
-  gap: clamp(12px, 2vh, 18px);
-  border-radius: var(--radius-lg);
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow);
-  text-align: center;
+  gap: clamp(12px, 2vh, 16px);
   width: min(420px, 90vw);
   animation: fadeInUp 0.5s ease both;
-}
+  text-align: center;
 
+  /* Pixel styling */
+  background: var(--px-bg);
+  border: 3px solid #000;
+  box-shadow:
+    0 0 0 3px var(--px-purple),
+    0 0 0 6px #000,
+    0 0 30px rgba(123, 47, 255, 0.3);
+  image-rendering: pixelated;
+  font-family: "Press Start 2P", monospace;
+  overflow: hidden;
+}
+/* Scanline overlay for timer */
+.timer-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.08) 3px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+.timer-container::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  background: var(--px-accent);
+  box-shadow:
+    -10px 10px 0 var(--px-yellow),
+    -20px 20px 0 var(--px-cyan);
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 1;
+}
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -349,37 +383,88 @@ body {
 .timers {
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
+  position: relative;
+  z-index: 3;
 }
 
 .timers button {
-  padding: 7px 16px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--glass-border);
-  background: transparent;
-  color: var(--text-muted);
-  font-family: "Inter", sans-serif;
-  font-size: 13px;
-  font-weight: 500;
+  padding: 8px 12px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  background: var(--px-panel);
+  color: var(--px-text);
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 #000;
   cursor: pointer;
+  letter-spacing: 1px;
   transition:
-    background var(--transition),
-    color var(--transition),
-    border-color var(--transition);
+    transform 0.1s,
+    box-shadow 0.1s,
+    background 0.1s;
   white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+  text-transform: uppercase;
 }
-
 .timers button:hover {
-  background: var(--glass-hover);
-  color: var(--cream);
-  border-color: var(--brown-light);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #000;
+  background: var(--px-panel2);
 }
 
 .timers button.active {
-  background: var(--brown-mid);
-  color: var(--cream);
-  border-color: var(--brown-light);
-  font-weight: 600;
+  background: var(--px-purple);
+  color: #fff;
+  box-shadow: 3px 3px 0 #000;
+  border-color: #000;
+}
+
+/* Custom time input - Pixel style */
+#custom-time-wrap {
+  margin-top: 8px;
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  position: relative;
+  z-index: 3;
+}
+
+#custom-time-input {
+  background: var(--px-bg2);
+  border: 2px solid #000;
+  color: var(--px-text);
+  font-family: "VT323", monospace;
+  font-size: 16px;
+  padding: 8px 12px;
+  outline: none;
+  width: 140px;
+  box-shadow: inset 2px 2px 0 #000;
+}
+
+#custom-time-input:focus {
+  border-color: var(--px-purple);
+}
+
+#custom-time-input + button {
+  padding: 8px 16px;
+  background: var(--px-purple);
+  color: #fff;
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 #000;
+  font-family: "Press Start 2P", monospace;
+  font-size: 6px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
+}
+
+#custom-time-input + button:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #000;
+  background: var(--px-purple2);
 }
 
 /* ── Timer Display ──────────────────────────────────── */
@@ -387,30 +472,42 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  z-index: 3;
+  background: var(--px-bg2);
+  border: 3px solid #000;
+  box-shadow: inset 3px 3px 0 #000;
+  padding: 20px 10px;
+  margin: 8px 0;
 }
 
 .timer-display {
-  font-family: "Share Tech Mono", "Courier New", monospace;
-  font-size: clamp(48px, 10vw, 72px);
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(48px, 8vw, 64px);
   font-weight: 400;
-  color: var(--cream);
+  color: var(--px-cyan);
+  text-shadow: 0 0 8px var(--px-cyan);
   letter-spacing: 4px;
-  text-shadow: 0 0 24px rgba(196, 122, 58, 0.5);
   line-height: 1;
+  background: #000;
+  padding: 8px 16px;
+  border: 2px solid var(--px-purple);
+  box-shadow: 4px 4px 0 #000;
 }
-
 /* ── Control Buttons Row ────────────────────────────── */
 .config {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  z-index: 3;
 }
 
 .pomodoro-count {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 /* Shared icon-button base */
@@ -422,69 +519,79 @@ body {
   justify-content: center;
   width: 42px;
   height: 42px;
-  border-radius: 50%;
-  border: 1px solid var(--glass-border);
-  background: transparent;
-  color: var(--text-primary);
-  font-size: 18px;
+  background: var(--px-panel);
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 #000;
+  color: var(--px-text);
+  font-size: 16px;
   cursor: pointer;
   transition:
-    background var(--transition),
-    color var(--transition),
-    transform var(--transition),
-    border-color var(--transition);
+    transform 0.1s,
+    box-shadow 0.1s,
+    background 0.1s;
   padding: 0;
 }
 
 .pause-button:hover,
 .restart-button:hover {
-  background: var(--glass-hover);
-  color: var(--cream);
-  border-color: var(--brown-light);
-  transform: scale(1.1);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #000;
+  background: var(--px-panel2);
+  color: var(--px-cyan);
 }
 
 /* Start button — primary CTA */
 .start-button {
-  padding: 10px 28px;
-  border-radius: var(--radius-pill);
-  border: 1.5px solid var(--brown-light);
-  background: var(--brown-mid);
-  color: var(--cream);
-  font-family: "Inter", sans-serif;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 10px 24px;
+  background: var(--px-purple);
+  color: #fff;
+  border: 2px solid #000;
+  box-shadow: 3px 3px 0 #000;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  font-weight: normal;
   letter-spacing: 1px;
   text-transform: uppercase;
   cursor: pointer;
   transition:
-    background var(--transition),
-    transform var(--transition),
-    box-shadow var(--transition);
-  box-shadow: 0 4px 14px rgba(129, 50, 11, 0.4);
+    transform 0.1s,
+    box-shadow 0.1s,
+    background 0.1s;
   margin: 0;
 }
 
 .start-button:hover {
-  background: var(--brown-light);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(196, 122, 58, 0.45);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #000;
+  background: var(--px-purple2);
 }
 
+.start-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
+}
 /* Gear button — distinct highlight */
 .timer-settings {
-  background: rgba(129, 50, 11, 0.5) !important;
-  border-color: var(--brown-light) !important;
-  color: var(--sand) !important;
+  background: var(--px-panel);
+  color: var(--px-accent);
+  border-color: #000;
 }
 
 .timer-settings:hover {
-  background: var(--brown-mid) !important;
-  color: var(--cream) !important;
-  border-color: var(--cream) !important;
-  transform: rotate(45deg) scale(1.1) !important;
+  transform: rotate(45deg) translate(-1px, -1px) !important;
+  box-shadow: 3px 3px 0 #000 !important;
+  background: var(--px-panel2) !important;
+  color: var(--px-accent2) !important;
 }
-
+/* Pomodoro counter - Pixel style */
+.pomodoro-counter {
+  font-family: "Press Start 2P", monospace;
+  font-size: 6px;
+  color: var(--px-text2);
+  margin-top: 8px;
+  padding: 4px;
+  border-top: 2px solid var(--px-panel);
+}
 /* ═══════════════════════════════════════════════════════
    HIDDEN CONTAINERS (toggled via drawer / dock)
    ═══════════════════════════════════════════════════════ */
@@ -910,50 +1017,153 @@ body {
 /* ═══════════════════════════════════════════════════════
    SETTINGS PANEL — modal overlay
    ═══════════════════════════════════════════════════════ */
-.settings-container {
+/* ═══════════════════════════════════════════════════════
+   PIXEL SETTINGS PANEL — Matching YouTube and Todo widgets
+   ═══════════════════════════════════════════════════════ */
+
+.pixel-settings {
   display: none;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(20, 12, 6, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow);
-  border-radius: var(--radius-lg);
-  padding: clamp(20px, 3vw, 28px) clamp(20px, 3vw, 32px);
-  width: min(340px, 88vw);
-  color: var(--text-primary);
-  z-index: 300;
+  width: min(400px, 90vw);
+  max-height: 80vh;
+  background: var(--px-bg, #0d0d1a);
+  border: 3px solid #000;
+  box-shadow:
+    0 0 0 3px var(--px-purple, #7b2fff),
+    0 0 0 6px #000,
+    0 0 30px rgba(123, 47, 255, 0.3);
+  image-rendering: pixelated;
+  font-family: "Press Start 2P", monospace;
+  z-index: 1000;
+  overflow: hidden;
+  animation: pixelFadeIn 0.2s steps(4);
 }
 
-.settings-container h2 {
-  margin: 0 0 20px;
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--sand);
+@keyframes pixelFadeIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -40%);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
 }
 
-.bi-x-circle {
+/* Scanline overlay */
+.pixel-settings::before {
+  content: "";
   position: absolute;
-  top: 16px;
-  right: 18px;
-  font-size: 20px;
-  color: var(--text-muted);
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.08) 3px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Settings Title Bar (like todo widget) */
+.settings-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--px-bg2, #131326);
+  border-bottom: 3px solid #000;
+  position: relative;
+  z-index: 2;
+}
+
+.settings-titlebar-dots {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.settings-title {
+  flex: 1;
+  margin: 0;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--px-cyan, #00e5ff);
+  text-shadow: 0 0 8px currentColor;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#close-settings {
+  color: var(--px-text2, #8888bb);
+  font-size: 16px;
   cursor: pointer;
-  transition:
-    color var(--transition),
-    transform var(--transition);
+  transition: color 0.15s;
+  flex-shrink: 0;
 }
 
-.bi-x-circle:hover {
-  color: var(--cream);
-  transform: scale(1.2);
+#close-settings:hover {
+  color: var(--px-accent, #ff2d6b);
 }
 
+/* Settings Content */
+.settings-content {
+  padding: 16px;
+  overflow-y: auto;
+  max-height: calc(80vh - 60px);
+  position: relative;
+  z-index: 2;
+  scrollbar-width: thin;
+  scrollbar-color: var(--px-purple, #7b2fff) #000;
+}
+
+.settings-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.settings-content::-webkit-scrollbar-track {
+  background: #000;
+}
+
+.settings-content::-webkit-scrollbar-thumb {
+  background: var(--px-purple, #7b2fff);
+  border: 1px solid #000;
+}
+
+/* Setting Groups */
+.setting-group {
+  margin-bottom: 24px;
+  padding: 12px;
+  border: 2px solid #000;
+  background: var(--px-bg2, #131326);
+  box-shadow: inset 2px 2px 0 #000;
+}
+
+.setting-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #000;
+  font-family: "Press Start 2P", monospace;
+  font-size: 6px;
+  color: var(--px-text, #e8e8ff);
+  letter-spacing: 1px;
+}
+
+.setting-group-header i {
+  color: var(--px-accent, #ff2d6b);
+  font-size: 12px;
+}
+
+/* Setting Options */
 .setting-option {
   display: flex;
   flex-direction: column;
@@ -961,326 +1171,261 @@ body {
   margin-bottom: 16px;
 }
 
+.setting-option:last-child {
+  margin-bottom: 0;
+}
+
 .setting-option label {
-  font-size: 12px;
-  font-weight: 500;
+  font-family: "Press Start 2P", monospace;
+  font-size: 6px;
+  color: var(--px-text2, #8888bb);
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: var(--text-muted);
+}
+
+/* Pixel Select Wrapper */
+.pixel-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.pixel-select-wrapper select {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--px-bg, #0d0d1a);
+  border: 2px solid #000;
+  box-shadow: inset 2px 2px 0 #000;
+  color: var(--px-text, #e8e8ff);
+  font-family: "VT323", monospace;
+  font-size: 16px;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.pixel-select-wrapper select:hover {
+  background: var(--px-bg2, #131326);
+}
+
+.pixel-select-wrapper select:focus {
+  border-color: var(--px-purple, #7b2fff);
+  box-shadow:
+    inset 2px 2px 0 #000,
+    0 0 0 2px var(--px-purple, #7b2fff);
+}
+
+.select-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--px-text2, #8888bb);
+  pointer-events: none;
+  font-size: 12px;
+}
+
+/* (Removed: number inputs, checkbox, range slider, action buttons —
+   settings panel now only contains theme selection) */
+
+/* Mobile Sheet Behavior */
+@media (max-width: 768px) {
+  .pixel-settings {
+    position: fixed !important;
+    bottom: var(--dock-height, 64px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    transform: translateY(110%) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 80vh;
+    border-radius: 20px 20px 0 0 !important;
+    border: 3px solid #000;
+    border-bottom: none;
+    box-shadow:
+      0 -4px 0 3px var(--px-purple, #7b2fff),
+      0 -4px 0 6px #000 !important;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    animation: none !important;
+  }
+
+  .pixel-settings.sheet-open {
+    transform: translateY(0) !important;
+  }
+
+  .pixel-settings::after {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 4px;
+    background: var(--px-purple, #7b2fff);
+    border: 1px solid #000;
+    z-index: 10;
+  }
+}
+
+/* Theme-specific colors for settings panel */
+body.theme-theme1 .pixel-settings {
+  box-shadow:
+    0 0 0 3px #1e5faa,
+    0 0 0 6px #000,
+    0 0 30px rgba(30, 95, 170, 0.3);
+}
+body.theme-theme1 .settings-title {
+  color: #7ab3d9;
+}
+
+body.theme-theme2 .pixel-settings {
+  box-shadow:
+    0 0 0 3px #a0500a,
+    0 0 0 6px #000,
+    0 0 30px rgba(160, 80, 10, 0.3);
+}
+body.theme-theme2 .settings-title {
+  color: #d19d5b;
+}
+
+body.theme-theme3 .pixel-settings {
+  box-shadow:
+    0 0 0 3px #2a7a3a,
+    0 0 0 6px #000,
+    0 0 30px rgba(42, 122, 58, 0.3);
+}
+body.theme-theme3 .settings-title {
+  color: #82c882;
+}
+/* Close button - Pixel style */
+.bi-x-circle {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 20px;
+  color: var(--px-accent);
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    transform 0.1s;
+  z-index: 2;
+}
+
+.bi-x-circle:hover {
+  color: var(--px-accent2);
+  transform: scale(1.1);
+}
+.settings-container h2 {
+  margin: 0 0 20px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 12px;
+  font-weight: normal;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--px-cyan);
+  text-shadow: 0 0 8px var(--px-cyan);
+  position: relative;
+  z-index: 2;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--px-panel);
+}
+
+.setting-option {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.setting-option label {
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--px-text2);
 }
 
 .setting-option select,
 .setting-option input[type="number"] {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid var(--glass-border);
-  border-radius: 8px;
-  color: var(--cream);
-  font-family: "Inter", sans-serif;
-  font-size: 14px;
-  padding: 8px 12px;
+  background: var(--px-bg2);
+  border: 2px solid #000;
+  box-shadow: inset 2px 2px 0 #000;
+  color: var(--px-text);
+  font-family: "VT323", monospace;
+  font-size: 16px;
+  padding: 10px 12px;
   width: 100%;
   outline: none;
-  transition: border-color var(--transition);
+  transition: border-color 0.15s;
   -webkit-appearance: none;
   appearance: none;
+  cursor: pointer;
 }
-
+.setting-option select:hover,
+.setting-option input[type="number"]:hover {
+  background: var(--px-panel);
+}
 .setting-option select:focus,
 .setting-option input[type="number"]:focus {
-  border-color: var(--brown-light);
+  border-color: var(--px-purple);
+  box-shadow:
+    inset 2px 2px 0 #000,
+    0 0 0 2px var(--px-purple);
+}
+/* Custom dropdown arrow for select */
+.setting-option select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238888bb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+}
+
+/* Number input styling */
+.setting-option input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.setting-option input[type="number"]::-webkit-inner-spin-button,
+.setting-option input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
+  height: 24px;
+  background: var(--px-panel);
+  border-left: 2px solid #000;
 }
 
 #save-settings-btn {
   width: 100%;
-  margin-top: 8px;
-  padding: 10px;
-  border-radius: var(--radius-pill);
-  border: 1.5px solid var(--brown-light);
-  background: var(--brown-mid);
-  color: var(--cream);
-  font-family: "Inter", sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 1px;
+  margin-top: 16px;
+  padding: 14px;
+  background: var(--px-purple);
+  color: #fff;
+  border: 2px solid #000;
+  box-shadow: 3px 3px 0 #000;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  font-weight: normal;
+  letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
   transition:
-    background var(--transition),
-    transform var(--transition);
+    transform 0.1s,
+    box-shadow 0.1s,
+    background 0.1s;
+  position: relative;
+  z-index: 2;
 }
 
 #save-settings-btn:hover {
-  background: var(--brown-light);
-  transform: translateY(-1px);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #000;
+  background: var(--px-purple2);
 }
 
-/* ═══════════════════════════════════════════════════════
-   LOFI FAB — floating music button (desktop)
-   ═══════════════════════════════════════════════════════ */
-.lofi-fab {
-  position: fixed;
-  bottom: clamp(16px, 3vh, 28px);
-  right: clamp(16px, 2vw, 28px);
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: var(--glass-bg);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow);
-  color: var(--sand);
-  font-size: 22px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 300;
-  transition:
-    background var(--transition),
-    color var(--transition),
-    transform var(--transition),
-    border-color var(--transition);
-}
-
-.lofi-fab:hover {
-  background: var(--glass-hover);
-  color: var(--cream);
-  transform: scale(1.1);
-}
-
-.lofi-fab.active {
-  background: var(--brown-mid);
-  border-color: var(--brown-light);
-  color: var(--cream);
-  box-shadow: 0 4px 20px rgba(91, 45, 138, 0.5);
-}
-
-/* ═══════════════════════════════════════════════════════
-   LOFI WIDGET — mini floating player (desktop)
-   ═══════════════════════════════════════════════════════ */
-.lofi-widget {
-  position: fixed;
-  bottom: clamp(78px, calc(3vh + 60px), 92px);
-  right: clamp(16px, 2vw, 28px);
-  z-index: 300;
-  background: var(--glass-bg);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  padding: clamp(10px, 1.5vw, 14px) clamp(12px, 1.5vw, 16px);
-  width: clamp(260px, 22vw, 320px);
-  box-shadow: var(--shadow);
-  font-family: "Inter", sans-serif;
-  color: var(--text-primary);
-  display: none;
-  flex-direction: column;
-  gap: 10px;
-  animation: fadeInUp 0.3s ease both;
-}
-
-/* Search row */
-.lofi-search-row {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.lofi-url-input {
-  flex: 1;
-  background: rgba(30, 18, 10, 0.45);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-pill);
-  padding: 6px 12px;
-  color: var(--text-primary);
-  font-family: "Inter", sans-serif;
-  font-size: 11px;
-  outline: none;
-  transition: border-color var(--transition);
-}
-
-.lofi-url-input::placeholder {
-  color: var(--text-muted);
-}
-
-.lofi-url-input:focus {
-  border-color: var(--sand);
-}
-
-.lofi-url-input.error {
-  border-color: #f87171;
-  animation: lofi-shake 0.3s ease;
-}
-
-@keyframes lofi-shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-4px);
-  }
-  75% {
-    transform: translateX(4px);
-  }
-}
-
-.lofi-url-btn,
-.lofi-reset-btn {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-pill);
-  color: var(--sand);
-  font-family: "Inter", sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 6px 12px;
-  transition:
-    background var(--transition),
-    color var(--transition);
-  white-space: nowrap;
-}
-
-.lofi-url-btn:hover,
-.lofi-reset-btn:hover {
-  background: var(--glass-hover);
-  color: var(--cream);
-}
-
-.lofi-reset-btn {
-  padding: 6px 9px;
-}
-
-.lofi-error-msg {
-  font-size: 10px;
-  color: #f87171;
-  display: none;
-  padding: 0 2px;
-}
-
-.lofi-error-msg.visible {
-  display: block;
-}
-
-/* YouTube embed */
-.lofi-player-wrap {
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid var(--glass-border);
-  position: relative;
-}
-
-.lofi-player-wrap iframe {
-  display: block;
-  width: 100%;
-  height: 160px;
-}
-
-/* Loading overlay */
-.lofi-loading-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(20, 12, 8, 0.8);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 8px;
-  border-radius: 10px;
-  font-size: 10px;
-  color: var(--text-muted);
-}
-
-.lofi-loading-overlay.visible {
-  display: flex;
-}
-
-.lofi-spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(196, 122, 58, 0.2);
-  border-top-color: var(--brown-light);
-  border-radius: 50%;
-  animation: lofi-rotate 0.8s linear infinite;
-}
-
-@keyframes lofi-rotate {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Controls */
-.lofi-controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.lofi-btn-main {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-pill);
-  color: var(--sand);
-  font-family: "Inter", sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 6px 16px;
-  white-space: nowrap;
-  transition:
-    background var(--transition),
-    color var(--transition);
-}
-
-.lofi-btn-main:hover {
-  background: var(--glass-hover);
-  color: var(--cream);
-}
-
-.lofi-volume-wrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
-}
-
-.lofi-vol-icon {
-  font-size: 12px;
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
-
-.lofi-widget input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 2px;
-  background: var(--glass-border);
-  border-radius: 2px;
-  outline: none;
-  cursor: pointer;
-}
-
-.lofi-widget input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--sand);
-  cursor: pointer;
-  box-shadow: 0 0 4px rgba(209, 157, 91, 0.5);
-}
-
-.lofi-widget input[type="range"]::-moz-range-thumb {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--sand);
-  cursor: pointer;
-  border: none;
+#save-settings-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -1700,6 +1845,21 @@ body {
   z-index: 11;
   pointer-events: none;
 }
+/* Theme-specific pixel star colors */
+body.theme-theme1 .px-star {
+  background: #3b9eff;
+  box-shadow: 0 0 4px #3b9eff;
+}
+
+body.theme-theme2 .px-star {
+  background: #e07830;
+  box-shadow: 0 0 4px #e07830;
+}
+
+body.theme-theme3 .px-star {
+  background: #50c878;
+  box-shadow: 0 0 4px #50c878;
+}
 
 @keyframes px-twinkle {
   0%,
@@ -2027,12 +2187,6 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════
-   RESPONSIVE — Tablet (≤ 1024px)
-   ═══════════════════════════════════════════════════════ */
-@media (max-width: 1024px) {
-}
-
-/* ═══════════════════════════════════════════════════════
    RESPONSIVE — Small Tablet (≤ 900px)
    ═══════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
@@ -2325,27 +2479,6 @@ body {
    RESPONSIVE — Large Desktop (≥ 1400px)
    ═══════════════════════════════════════════════════════ */
 @media (min-width: 1400px) {
-  .timer-container {
-    width: 480px;
-    padding: 38px 40px 30px;
-    gap: 22px;
-  }
-
-  .timer-display {
-    font-size: 88px;
-    letter-spacing: 6px;
-  }
-
-  .timers button {
-    font-size: 14px;
-    padding: 9px 22px;
-  }
-
-  .start-button {
-    padding: 12px 34px;
-    font-size: 15px;
-  }
-
   #container-4 {
     width: 340px;
     top: 80px;
@@ -2454,34 +2587,4 @@ body.theme-theme3 {
   --px-text2: #608860;
 }
 
-.custom-timer-wrap {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.custom-timer-wrap input[type="number"] {
-  width: 64px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-pill);
-  color: var(--cream);
-  font-family: "Inter", sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 8px 10px;
-  outline: none;
-  text-align: center;
-  transition: border-color var(--transition);
-}
-
-.custom-timer-wrap input[type="number"]:focus {
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-/* Hide the default spinner arrows and use native ones only */
-.custom-timer-wrap input[type="number"]::-webkit-inner-spin-button {
-  opacity: 1;
-  cursor: pointer;
-}
 /* end of file */

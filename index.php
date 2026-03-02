@@ -45,92 +45,82 @@ $jsConfig = json_encode([
 ?>
 <?php require_once __DIR__ . '/includes/header.php'; ?>
 
-<!-- (lofi FAB removed — YouTube is inside the left panel) -->
-
 <!-- ====== POMODORO TIMER SECTION ====== -->
 <section>
-    <div class="timers" role="group" aria-label="Timer Modes">
-        <button id="pomodorobtn" class="active" type="button">25 min</button>
-        <button id="shortbrkbtn" type="button">50 min</button>
-        <button id="custombrkbtn" type="button">Custom</button>
-    </div>
+    <div class="timer-container">
+        <!-- Pixel decorations -->
+        <div class="px-star" style="top:10px;left:30px;animation-delay:0.2s;"></div>
+        <div class="px-star" style="bottom:15px;right:25px;animation-delay:1.1s;"></div>
 
-    <!-- Custom time input — only shows when Custom is selected -->
-    <div id="custom-time-wrap" style="display:none; margin-top: 8px;">
-        <input
-            type="number"
-            id="custom-time-input"
-            min="1"
-            max="999"
-            placeholder="Enter minutes..."
-            style="
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-pill);
-            color: var(--cream);
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            padding: 8px 16px;
-            outline: none;
-            width: 140px;
-        "
-            onkeydown="if(event.key==='Enter') applyCustomTime()" />
-        <button
-            onclick="applyCustomTime()"
-            style="
-            margin-left: 6px;
-            padding: 8px 16px;
-            border-radius: var(--radius-pill);
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.08);
-            color: var(--cream);
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-        ">Set</button>
-    </div>
-    <!-- Timer Countdown Display -->
-    <div class="runner">
-        <span class="timer-display" role="timer" aria-live="polite"><?php
-                                                                    $initialSeconds = $settings['pomodoro_duration'] * 60;
-                                                                    $m = str_pad(intdiv($initialSeconds, 60), 2, '0', STR_PAD_LEFT);
-                                                                    $s = str_pad($initialSeconds % 60, 2, '0', STR_PAD_LEFT);
-                                                                    echo "{$m}:{$s}";
-                                                                    ?></span>
-    </div>
-    <!-- Timer Control Buttons (Start / Pause / Restart / Settings) -->
-    <div class="config">
-        <div class="pomodoro-count" role="group" aria-label="Timer Controls">
-            <button
-                class="start-button"
-                id="start-button"
-                type="button"
-                aria-label="Start Timer">
-                Start
-            </button>
-            <button
-                class="pause-button"
-                id="pause-button"
-                type="button"
-                aria-label="Pause Timer">
-                <i class="bi bi-pause-circle" aria-hidden="true"></i>
-            </button>
-            <button
-                class="restart-button"
-                id="restart-button"
-                type="button"
-                aria-label="Restart Timer">
-                <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-            </button>
-            <button
-                class="timer-settings"
-                id="timer-settings"
-                type="button"
-                aria-label="Open Timer Settings">
-                <i class="bi bi-gear" aria-hidden="true"></i>
-            </button>
+        <!-- Timer mode buttons -->
+        <div class="timers" role="group" aria-label="Timer Modes">
+            <button id="pomodorobtn" class="active" type="button">25 MIN</button>
+            <button id="longpomodorobtn" type="button">50 MIN</button>
+            <button id="shortbrkbtn" type="button">5 MIN</button>
+            <button id="longbrkbtn" type="button">15 MIN</button>
+            <button id="custombrkbtn" type="button">CUSTOM</button>
         </div>
-    </div>
+
+        <!-- Custom time input — only shows when Custom is selected -->
+        <div id="custom-time-wrap" style="display:none;">
+            <input
+                type="number"
+                id="custom-time-input"
+                min="1"
+                max="999"
+                placeholder="MINUTES..."
+                onkeydown="if(event.key==='Enter') applyCustomTime()" />
+            <button onclick="applyCustomTime()">SET</button>
+        </div>
+
+        <!-- Timer Countdown Display -->
+        <div class="runner">
+            <span class="timer-display" role="timer" aria-live="polite"><?php
+                                                                        $initialSeconds = $settings['pomodoro_duration'] * 60;
+                                                                        $m = str_pad(intdiv($initialSeconds, 60), 2, '0', STR_PAD_LEFT);
+                                                                        $s = str_pad($initialSeconds % 60, 2, '0', STR_PAD_LEFT);
+                                                                        echo "{$m}:{$s}";
+                                                                        ?></span>
+        </div>
+
+        <!-- Timer Control Buttons -->
+        <div class="config">
+            <div class="pomodoro-count" role="group" aria-label="Timer Controls">
+                <button
+                    class="start-button"
+                    id="start-button"
+                    type="button"
+                    aria-label="Start Timer">
+                    START
+                </button>
+                <button
+                    class="pause-button"
+                    id="pause-button"
+                    type="button"
+                    aria-label="Pause Timer">
+                    <i class="bi bi-pause-circle" aria-hidden="true"></i>
+                </button>
+                <button
+                    class="restart-button"
+                    id="restart-button"
+                    type="button"
+                    aria-label="Restart Timer">
+                    <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                </button>
+                <button
+                    class="timer-settings"
+                    id="timer-settings"
+                    type="button"
+                    aria-label="Open Timer Settings">
+                    <i class="bi bi-gear" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Pomodoro counter (pixel style) -->
+        <div class="pomodoro-counter">
+            POMODOROS: <span id="pomodoro-counter-display">0</span>/<span id="pomodoro-max-display"><?php echo $settings['pomodoros_until_long_break']; ?></span>
+        </div>
     </div>
 </section>
 
@@ -250,21 +240,72 @@ $jsConfig = json_encode([
     <?php require_once __DIR__ . '/todo_widget.php'; ?>
 </div>
 
-<!-- ====== SETTINGS PANEL (Background Theme Selection) ====== -->
-<div id="settings-container" class="settings-container">
-    <i class="bi bi-x-circle" id="close-settings"></i>
-    <h2>Settings</h2>
-    <div class="setting-option">
-        <label for="background-select">Background Theme:</label>
-        <select id="background-select">
-            <option value="default" <?php echo $settings['background_theme'] === 'default' ? 'selected' : ''; ?>>Default</option>
-            <option value="theme1" <?php echo $settings['background_theme'] === 'theme1'  ? 'selected' : ''; ?>>Theme 1</option>
-            <option value="theme2" <?php echo $settings['background_theme'] === 'theme2'  ? 'selected' : ''; ?>>Theme 2</option>
-            <option value="theme3" <?php echo $settings['background_theme'] === 'theme3'  ? 'selected' : ''; ?>>Theme 3</option>
-        </select>
+<!-- ====== SETTINGS PANEL — Pixel Styled ====== -->
+<div id="settings-container" class="settings-container pixel-settings">
+    <!-- Pixel decorations -->
+    <div class="px-star" style="top:15px;left:20px;animation-delay:0.2s;"></div>
+    <div class="px-star" style="top:40px;right:25px;animation-delay:0.7s;"></div>
+    <div class="px-star" style="bottom:25px;left:35px;animation-delay:1.2s;"></div>
+    <div class="px-star" style="bottom:50px;right:45px;animation-delay:0.4s;"></div>
+
+    <!-- Scanline overlay (added via CSS) -->
+
+    <!-- Title bar like the todo widget -->
+    <div class="settings-titlebar">
+        <div class="settings-titlebar-dots">
+            <span class="px-dot px-dot--red"></span>
+            <span class="px-dot px-dot--yellow"></span>
+            <span class="px-dot px-dot--green"></span>
+        </div>
+        <h2 class="settings-title">THEME SETTINGS</h2>
+        <i class="bi bi-x-circle" id="close-settings"></i>
+    </div>
+
+    <!-- Settings Content — Theme selection only (auto-populated from themes/ folder) -->
+    <div class="settings-content">
+        <div class="setting-group">
+            <div class="setting-group-header">
+                <i class="bi bi-palette"></i>
+                <span>DISPLAY</span>
+            </div>
+
+            <div class="setting-option">
+                <label for="background-select">BACKGROUND THEME:</label>
+                <div class="pixel-select-wrapper">
+                    <select id="background-select">
+                        <?php
+                        /**
+                         * Auto-detect theme files from the themes/ directory.
+                         * Supported extensions: .jpg, .jpeg, .png, .gif, .webp
+                         * The first file found (alphabetically) becomes "default".
+                         * Adding/removing files in themes/ auto-updates this list.
+                         */
+                        $themesDir = __DIR__ . '/themes';
+                        $allowed   = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                        $files     = [];
+                        if (is_dir($themesDir)) {
+                            foreach (scandir($themesDir) as $f) {
+                                $ext = strtolower(pathinfo($f, PATHINFO_EXTENSION));
+                                if (in_array($ext, $allowed)) {
+                                    $files[] = $f;
+                                }
+                            }
+                        }
+                        foreach ($files as $i => $file) {
+                            $name  = pathinfo($file, PATHINFO_FILENAME);
+                            $label = strtoupper(preg_replace('/[_\-]+/', ' ', $name));
+                            $value = ($i === 0) ? 'default' : preg_replace('/[^a-z0-9]+/', '-', strtolower($name));
+                            $path  = 'themes/' . $file;
+                            echo '<option value="' . htmlspecialchars($value) . '" data-file="' . htmlspecialchars($path) . '">' . htmlspecialchars($label) . '</option>' . "\n                        ";
+                        }
+                        ?>
+                    </select>
+                    <i class="bi bi-chevron-down select-arrow"></i>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
 <!-- ====== PHP-TO-JS CONFIGURATION BRIDGE ====== -->
 <!-- Timer duration and config values injected from PHP into JavaScript -->
 <script>
