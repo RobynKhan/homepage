@@ -45,10 +45,10 @@
         <div class="top-bar__actions">
             <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
                 <span class="admin-greeting">👋 <?php echo htmlspecialchars(current_admin()['display_name']); ?></span>
-                <a href="messages.php" class="admin-btn" title="Messages" id="msg-nav-btn">
+                <button class="admin-btn" title="Messages" id="msg-nav-btn" onclick="togglePanel(document.getElementById('container-5'))" style="background:none;border:none;cursor:pointer;">
                     <i class="bi bi-envelope"></i>
                     <span id="msg-nav-badge" style="display:none;background:#f87171;color:#000;border-radius:3px;padding:0 4px;font-size:0.6rem;margin-left:2px;vertical-align:middle;"></span>
-                </a>
+                </button>
                 <a href="logout_admin.php" class="admin-btn" title="Logout">
                     <i class="bi bi-person-check-fill"></i> Logout
                 </a>
@@ -92,7 +92,7 @@
             </li>
             <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
                 <li class="nav-item" style="margin-top:0.5rem;border-top:1px solid rgba(255,255,255,0.07);padding-top:0.5rem;">
-                    <a href="messages.php" class="nav-link">
+                    <a href="#messages" class="nav-link" data-target="container-5">
                         <i class="bi bi-envelope"></i>
                         <span>Messages <span id="msg-drawer-badge" style="display:none;background:#f87171;color:#000;border-radius:3px;padding:0 5px;font-size:0.6rem;margin-left:4px;"></span></span>
                     </a>
@@ -120,13 +120,13 @@
             <span>More</span>
         </button>
         <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
-            <a href="messages.php" class="dock-btn" aria-label="Messages" style="text-decoration:none;color:inherit;">
+            <button class="dock-btn" data-target="container-5" aria-label="Messages">
                 <span style="position:relative;display:inline-block;">
                     <i class="bi bi-envelope"></i>
                     <span id="msg-dock-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:#f87171;color:#000;border-radius:3px;padding:0 3px;font-size:0.55rem;"></span>
                 </span>
                 <span>Messages</span>
-            </a>
+            </button>
         <?php endif; ?>
     </nav>
 

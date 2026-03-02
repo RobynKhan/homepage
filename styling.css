@@ -2178,6 +2178,13 @@ body.theme-theme3 .px-star {
 /* ═══════════════════════════════════════════════════════
    BOTTOM DOCK + SHEET — hidden on desktop
    ═══════════════════════════════════════════════════════ */
+
+/* ── Messages Container (Desktop) ──────────────────── */
+.container-5 {
+  width: min(680px, 92vw);
+  margin: 16px auto;
+  animation: fadeInUp 0.5s ease both;
+}
 .bottom-dock {
   display: none;
 }
@@ -2227,6 +2234,11 @@ body.theme-theme3 .px-star {
 
   .settings-container {
     width: min(360px, 92vw);
+  }
+
+  .container-5 {
+    width: min(400px, 92vw);
+    margin: 16px auto;
   }
 }
 
@@ -2305,6 +2317,7 @@ body.theme-theme3 .px-star {
   /* ── All toggled panels → bottom sheet behavior ── */
   .container-3,
   #container-4,
+  .container-5,
   .settings-container {
     position: fixed !important;
     bottom: var(--dock-height) !important;
@@ -2348,6 +2361,7 @@ body.theme-theme3 .px-star {
   /* Sheet open state */
   .container-3.sheet-open,
   #container-4.sheet-open,
+  .container-5.sheet-open,
   .settings-container.sheet-open {
     transform: translateY(0) !important;
     opacity: 1 !important;
@@ -2357,6 +2371,7 @@ body.theme-theme3 .px-star {
   /* Drag handle via ::before */
   .container-3::before,
   #container-4::before,
+  .container-5::before,
   .settings-container::before {
     content: "";
     display: block;
@@ -2441,6 +2456,31 @@ body.theme-theme3 .px-star {
     display: block;
     opacity: 1;
     pointer-events: auto;
+  }
+
+  /* ── Messages as slide-from-right sheet on mobile ── */
+  .container-5 {
+    left: auto !important;
+    right: 0 !important;
+    width: 85% !important;
+    max-width: 400px !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    border-radius: 20px 0 0 20px !important;
+    transform: translateX(110%) !important;
+    transition:
+      transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.25s ease !important;
+  }
+
+  .container-5.sheet-open {
+    transform: translateX(0) !important;
+  }
+
+  .container-5::before {
+    display: none !important;
   }
 
   /* ── Nav drawer on mobile ── */

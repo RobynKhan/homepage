@@ -130,6 +130,58 @@ const addEventListeners = () => {
 
   if (sheetBackdrop) sheetBackdrop.addEventListener("click", closeAllSheets);
 
+  // ─── Swipe Left/Right to open/close Messages panel (Mobile) ───────────
+  (function () {
+    let touchStartX = 0;
+    let touchStartY = 0;
+    const SWIPE_THRESHOLD = 60;
+
+    document.addEventListener(
+      "touchstart",
+      function (e) {
+        touchStartX = e.changedTouches[0].clientX;
+        touchStartY = e.changedTouches[0].clientY;
+      },
+      { passive: true },
+    );
+
+    document.addEventListener(
+      "touchend",
+      function (e) {
+        if (!isMobile()) return;
+        const msgPanel = document.getElementById("container-5");
+        if (!msgPanel) return;
+
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
+
+        // Only horizontal swipes (ignore vertical scrolling)
+        if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dy) > Math.abs(dx))
+          return;
+
+        if (dx < 0) {
+          // Swipe LEFT → open messages
+          if (!msgPanel.classList.contains("sheet-open")) {
+            closeAllSheets();
+            msgPanel.classList.add("sheet-open");
+            if (sheetBackdrop) sheetBackdrop.classList.add("visible");
+            // Highlight the dock button if it exists
+            document.querySelectorAll(".dock-btn").forEach(function (btn) {
+              if (btn.dataset.target === "container-5")
+                btn.classList.add("active");
+            });
+          }
+        } else {
+          // Swipe RIGHT → close messages
+          if (msgPanel.classList.contains("sheet-open")) {
+            closeAllSheets();
+          }
+        }
+      },
+      { passive: true },
+    );
+  })();
+
   // ─── Settings Panel: Open/Close ───────────────────────────────────────
   const timerSettingsBtn = document.getElementById("timer-settings");
   if (timerSettingsBtn) {
@@ -172,6 +224,39 @@ const addEventListeners = () => {
 // ─── Panel Visibility Toggle Helper ───────────────────────────────────────
 const togglePanel = (targetElement) => {
   if (!targetElement) return;
+
+  // On mobile, use sheet behavior for panels that support it
+  const isMobileView = window.matchMedia("(max-width: 768px)").matches;
+  const sheetTargets = [
+    "container-3",
+    "container-4",
+    "container-5",
+    "settings-container",
+  ];
+  if (isMobileView && sheetTargets.includes(targetElement.id)) {
+    const wasOpen = targetElement.classList.contains("sheet-open");
+    // Close all open sheets
+    document
+      .querySelectorAll(".sheet-open")
+      .forEach((el) => el.classList.remove("sheet-open"));
+    document
+      .querySelectorAll(".dock-btn.active")
+      .forEach((btn) => btn.classList.remove("active"));
+    const backdrop = document.getElementById("sheet-backdrop");
+    if (!wasOpen) {
+      targetElement.classList.add("sheet-open");
+      if (backdrop) backdrop.classList.add("visible");
+      // Activate matching dock button
+      document.querySelectorAll(".dock-btn").forEach((btn) => {
+        if (btn.dataset.target === targetElement.id)
+          btn.classList.add("active");
+      });
+    } else {
+      if (backdrop) backdrop.classList.remove("visible");
+    }
+    return;
+  }
+
   const isHidden =
     targetElement.style.display === "none" ||
     window.getComputedStyle(targetElement).display === "none";

@@ -240,6 +240,13 @@ $jsConfig = json_encode([
     <?php require_once __DIR__ . '/todo_widget.php'; ?>
 </div>
 
+<!-- ====== MESSAGES WIDGET (Admin Only) ====== -->
+<?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
+    <div id="container-5" class="container-5" style="display:none;">
+        <?php require_once __DIR__ . '/messages_widget.php'; ?>
+    </div>
+<?php endif; ?>
+
 <!-- ====== SETTINGS PANEL — Pixel Styled ====== -->
 <div id="settings-container" class="settings-container pixel-settings">
     <!-- Pixel decorations -->
@@ -357,7 +364,7 @@ $jsConfig = json_encode([
 
             // Panel visibility
             snap.panels = {};
-            ['container-3', 'container-4', 'settings-container'].forEach(function(id) {
+            ['container-3', 'container-4', 'container-5', 'settings-container'].forEach(function(id) {
                 const el = document.getElementById(id);
                 if (el) snap.panels[id] = window.getComputedStyle(el).display;
             });
