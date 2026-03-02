@@ -45,6 +45,10 @@
         <div class="top-bar__actions">
             <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
                 <span class="admin-greeting">👋 <?php echo htmlspecialchars(current_admin()['display_name']); ?></span>
+                <a href="messages.php" class="admin-btn" title="Messages" id="msg-nav-btn">
+                    <i class="bi bi-envelope"></i>
+                    <span id="msg-nav-badge" style="display:none;background:#f87171;color:#000;border-radius:3px;padding:0 4px;font-size:0.6rem;margin-left:2px;vertical-align:middle;"></span>
+                </a>
                 <a href="logout_admin.php" class="admin-btn" title="Logout">
                     <i class="bi bi-person-check-fill"></i> Logout
                 </a>
@@ -86,6 +90,14 @@
                     <i class="bi bi-sliders2"></i> <span>Settings</span>
                 </a>
             </li>
+            <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
+                <li class="nav-item" style="margin-top:0.5rem;border-top:1px solid rgba(255,255,255,0.07);padding-top:0.5rem;">
+                    <a href="messages.php" class="nav-link">
+                        <i class="bi bi-envelope"></i>
+                        <span>Messages <span id="msg-drawer-badge" style="display:none;background:#f87171;color:#000;border-radius:3px;padding:0 5px;font-size:0.6rem;margin-left:4px;"></span></span>
+                    </a>
+                </li>
+            <?php endif; ?>
         </ul>
     </nav>
 
@@ -107,7 +119,53 @@
             <i class="bi bi-sliders2"></i>
             <span>More</span>
         </button>
+        <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
+            <a href="messages.php" class="dock-btn" aria-label="Messages" style="text-decoration:none;color:inherit;">
+                <span style="position:relative;display:inline-block;">
+                    <i class="bi bi-envelope"></i>
+                    <span id="msg-dock-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:#f87171;color:#000;border-radius:3px;padding:0 3px;font-size:0.55rem;"></span>
+                </span>
+                <span>Messages</span>
+            </a>
+        <?php endif; ?>
     </nav>
 
     <!-- ── Mobile Bottom Sheet Backdrop Overlay ── -->
     <div class="sheet-backdrop" id="sheet-backdrop"></div>
+
+    <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
+        <!-- ── Live Unread Message Badge (polls every 30s) ── -->
+        <script>
+            (function() {
+                function updateBadges(count) {
+                    const ids = ['msg-nav-badge', 'msg-drawer-badge', 'msg-dock-badge'];
+                    ids.forEach(function(id) {
+                        const el = document.getElementById(id);
+                        if (!el) return;
+                        if (count > 0) {
+                            el.textContent = count;
+                            el.style.display = '';
+                        } else {
+                            el.style.display = 'none';
+                        }
+                    });
+                }
+
+                function fetchUnread() {
+                    fetch('messages_api.php?action=unread_count')
+                        .then(function(r) {
+                            return r.json();
+                        })
+                        .then(function(d) {
+                            if (typeof d.count === 'number') updateBadges(d.count);
+                        })
+                        .catch(function() {});
+                }
+                // Only run if not already on messages page
+                if (!window.location.pathname.includes('messages.php')) {
+                    fetchUnread();
+                    setInterval(fetchUnread, 30000);
+                }
+            }());
+        </script>
+    <?php endif; ?>
