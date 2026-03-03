@@ -247,6 +247,49 @@ $jsConfig = json_encode([
     </div>
 <?php endif; ?>
 
+<!-- ====== BREAKOUT GAME PANEL (Admin Only) ====== -->
+<?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
+    <div id="container-6" class="container-6" data-show-as="flex" style="display:none;">
+        <div class="px-breakout">
+            <div class="px-scanlines"></div>
+
+            <!-- Title Bar -->
+            <div class="px-todo-titlebar">
+                <span class="px-todo-titlebar-dots">
+                    <span class="px-dot px-dot--red"></span>
+                    <span class="px-dot px-dot--yellow"></span>
+                    <span class="px-dot px-dot--green"></span>
+                </span>
+                <h3 class="px-todo-title">BREAKOUT</h3>
+            </div>
+
+            <!-- HUD -->
+            <div class="px-breakout-hud">
+                <div class="px-breakout-hud-row">
+                    <span>SCORE:<span id="bk-hud-score" class="px-breakout-hud-val">00000</span></span>
+                    <span>LV:<span id="bk-hud-level" class="px-breakout-hud-val">01</span></span>
+                </div>
+                <div class="px-breakout-hud-row">
+                    <span>TOTAL:<span id="bk-hud-total" class="px-breakout-hud-val">00000</span></span>
+                    <span id="bk-hud-top" class="px-breakout-hud-top">TOP: 00000 (---)</span>
+                </div>
+            </div>
+
+            <!-- Canvas -->
+            <div class="px-breakout-canvas-wrap">
+                <canvas id="breakout-canvas"></canvas>
+            </div>
+
+            <!-- Controls -->
+            <div class="px-breakout-controls">
+                <button id="bk-start-btn" class="px-breakout-start-btn">
+                    <i class="bi bi-controller" aria-hidden="true"></i> START
+                </button>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 <!-- ====== SETTINGS PANEL — Pixel Styled ====== -->
 <div id="settings-container" class="settings-container pixel-settings">
     <!-- Pixel decorations -->
@@ -364,7 +407,7 @@ $jsConfig = json_encode([
 
             // Panel visibility
             snap.panels = {};
-            ['container-3', 'container-4', 'container-5', 'settings-container'].forEach(function(id) {
+            ['container-3', 'container-4', 'container-5', 'container-6', 'settings-container'].forEach(function(id) {
                 const el = document.getElementById(id);
                 if (el) snap.panels[id] = window.getComputedStyle(el).display;
             });
@@ -459,5 +502,10 @@ $jsConfig = json_encode([
 <!-- ====== YOUTUBE WIDGET CONTROLLER ====== -->
 <!-- Handles YouTube URL input, video swapping, play/pause, and volume -->
 <script src="youtube.js"></script>
+
+<?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
+<!-- ====== BREAKOUT GAME CONTROLLER (Admin Only) ====== -->
+<script src="breakthrough.js"></script>
+<?php endif; ?>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

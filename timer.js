@@ -231,6 +231,7 @@ const togglePanel = (targetElement) => {
     "container-3",
     "container-4",
     "container-5",
+    "container-6",
     "settings-container",
   ];
   if (isMobileView && sheetTargets.includes(targetElement.id)) {
