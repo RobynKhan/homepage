@@ -70,6 +70,25 @@ function sb_patch(string $endpoint): void
 
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
+// ─── Temporary debug — remove after testing ───────────────────────────────
+if ($action === 'debug') {
+    $url = $supabase_url . '/rest/v1/admin_messages';
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            "apikey: $supabase_key",
+            "Authorization: Bearer $supabase_key",
+        ],
+    ]);
+    $res = curl_exec($ch);
+    $err = curl_error($ch);
+    $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    echo json_encode(['url' => $url, 'http_code' => $http, 'response' => $res, 'curl_error' => $err]);
+    exit;
+}
+
 switch ($action) {
 
     case 'inbox':
