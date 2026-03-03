@@ -36,6 +36,9 @@ const state = {
   pomodoroType: "POMODORO",
 };
 
+// When breakout is active, block message panel opens on mobile
+const breakoutLocked = () => !!window.breakoutActive;
+
 // ─── Event Listener Registration ─────────────────────────────────────────
 const addEventListeners = () => {
   elements.startBtn.addEventListener("click", handleStart);
@@ -93,7 +96,15 @@ const addEventListeners = () => {
       link.addEventListener("click", (e) => {
         e.preventDefault();
         const targetEl = document.getElementById(link.dataset.target);
-        if (targetEl) togglePanel(targetEl);
+        if (targetEl) {
+          if (
+            breakoutLocked() &&
+            targetEl.id === "container-5" &&
+            window.matchMedia("(max-width: 768px)").matches
+          )
+            return;
+          togglePanel(targetEl);
+        }
         closeDrawer();
       });
     });
@@ -118,6 +129,7 @@ const addEventListeners = () => {
       if (!isMobile()) return;
       const target = document.getElementById(btn.dataset.target);
       if (!target) return;
+      if (breakoutLocked() && target.id === "container-5") return;
       const wasOpen = target.classList.contains("sheet-open");
       closeAllSheets();
       if (!wasOpen) {
@@ -151,6 +163,7 @@ const addEventListeners = () => {
         if (!isMobile()) return;
         const msgPanel = document.getElementById("container-5");
         if (!msgPanel) return;
+        const isBreakout = breakoutLocked();
 
         const dx = e.changedTouches[0].clientX - touchStartX;
         const dy = e.changedTouches[0].clientY - touchStartY;
@@ -161,6 +174,7 @@ const addEventListeners = () => {
 
         if (dx < 0) {
           // Swipe LEFT → open messages
+          if (isBreakout) return;
           if (!msgPanel.classList.contains("sheet-open")) {
             closeAllSheets();
             msgPanel.classList.add("sheet-open");
@@ -224,6 +238,12 @@ const addEventListeners = () => {
 // ─── Panel Visibility Toggle Helper ───────────────────────────────────────
 const togglePanel = (targetElement) => {
   if (!targetElement) return;
+  if (
+    breakoutLocked() &&
+    targetElement.id === "container-5" &&
+    window.matchMedia("(max-width: 768px)").matches
+  )
+    return;
 
   // On mobile, use sheet behavior for panels that support it
   const isMobileView = window.matchMedia("(max-width: 768px)").matches;

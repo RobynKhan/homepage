@@ -598,6 +598,7 @@ $date    = date('F j, Y · g:i a', strtotime($msg['created_at']));
       const cursor = document.getElementById('cursor');
       let i = 0;
       const speed = 28; // ms per character
+      const REDIRECT_DELAY_MS = 1200;
 
       function type() {
         if (i < fullText.length) {
@@ -608,6 +609,9 @@ $date    = date('F j, Y · g:i a', strtotime($msg['created_at']));
           setTimeout(type, speed + (fullText[i - 1] === '\n' ? 120 : Math.random() * 20));
         } else {
           cursor.classList.add('done');
+          setTimeout(function() {
+            window.location.href = 'index.php';
+          }, REDIRECT_DELAY_MS);
         }
       }
       type();

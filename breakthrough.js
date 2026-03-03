@@ -54,6 +54,18 @@
     top: { username: "", best_run_score: 0 },
   };
   const keys = {};
+  let startBtn = null;
+
+  function setBreakoutActive(flag) {
+    window.breakoutActive = !!flag;
+    if (flag) {
+      document.body.dataset.breakoutActive = "1";
+    } else {
+      document.body.removeAttribute("data-breakout-active");
+    }
+  }
+
+  setBreakoutActive(false);
 
   // Module-level hook: set by initBreakout(), called by onGameOver()
   let _showRetryChooser = null;
@@ -343,10 +355,14 @@
     updateHUD();
     gameStarted = true;
     gameLoop();
+    setBreakoutActive(true);
+    if (startBtn) startBtn.style.display = "none";
   }
 
   // ── Post Run Score to API ────────────────────────────────────────────────
   function onGameOver() {
+    setBreakoutActive(false);
+    gameStarted = false;
     fetch(API + "?action=finish_run", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -369,6 +385,11 @@
     setTimeout(function () {
       if (_showRetryChooser) _showRetryChooser();
     }, 900);
+
+    if (startBtn) {
+      startBtn.textContent = "RETRY";
+      startBtn.style.display = "inline-flex";
+    }
   }
 
   // ── Load Initial Scores from API ─────────────────────────────────────────
@@ -637,7 +658,7 @@
     // Finally, prompt user on mobile if not chosen yet
     chooseControlsIfNeeded();
     // START button
-    const startBtn = document.getElementById("bk-start-btn");
+    startBtn = document.getElementById("bk-start-btn");
     if (startBtn) {
       startBtn.addEventListener("click", function () {
         if (!gameStarted || (state && state.gameOver)) {

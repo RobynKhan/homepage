@@ -88,53 +88,8 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
 
 <script>
     (function() {
-            var ME = <?= json_encode($msg_me) ?>;
-
-            // ── Tab switching ──────────────────────────────────────────
-            window.msgSwitchTab = function(tab) {
-                ['inbox', 'sent', 'compose'].forEach(function(t) {
-                    var panel = document.getElementById('mpanel-' + t);
-                    var btn = document.getElementById('mtab-' + t);
-                    if (panel) panel.style.display = t === tab ? '' : 'none';
-                    if (btn) btn.classList.toggle('active', t === tab);
-                });
-                if (tab === 'inbox') msgLoadInbox();
-                if (tab === 'sent') msgLoadSent();
-            };
-
-            // Touch support for tab switching
-            document.querySelectorAll('.px-msg-tab').forEach(function(btn) {
-                btn.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    btn.click();
-                }, {
-                    passive: false
-                });
-            });
-
-            // Touch support for message row selection
-            function enableMsgRowTouch() {
-                document.querySelectorAll('.px-msg-row').forEach(function(row) {
-                    row.addEventListener('touchstart', function(e) {
-                        e.preventDefault();
-                        row.click();
-                    }, {
-                        passive: false
-                    });
-                });
-            }
-            // Call after inbox/sent loads
-            var origMsgLoadInbox = window.msgLoadInbox;
-            window.msgLoadInbox = function() {
-                origMsgLoadInbox();
-                setTimeout(enableMsgRowTouch, 50);
-            };
-            var origMsgLoadSent = window.msgLoadSent;
-            window.msgLoadSent = function() {
-                origMsgLoadSent();
-                setTimeout(enableMsgRowTouch, 50);
-            };
-        };
+        var ME = <?= json_encode($msg_me) ?>;
+        var TAB_IDS = ['inbox', 'sent', 'compose'];
 
         // ── Helpers ────────────────────────────────────────────────
         function fmtDate(str) {
@@ -180,18 +135,26 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
             return row;
         }
 
+        function enableMsgRowTouch() {
+            document.querySelectorAll('.px-msg-row').forEach(function(row) {
+                row.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    row.click();
+                }, {
+                    passive: false
+                });
+            });
+        }
+
         // ── Update ALL badge locations ─────────────────────────────
         function syncBadges(count) {
-            // Widget badge
             var b = document.getElementById('px-msg-badge');
             if (b) {
                 b.textContent = count;
                 b.style.display = count > 0 ? '' : 'none';
             }
-            // Title bar pip
             var pip = document.getElementById('px-msg-pip');
             if (pip) pip.style.display = count > 0 ? '' : 'none';
-            // Header / drawer / dock badges
             ['msg-nav-badge', 'msg-drawer-badge', 'msg-dock-badge'].forEach(function(id) {
                 var el = document.getElementById(id);
                 if (!el) return;
@@ -204,45 +167,62 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
             });
         }
 
+        // ── Tab switching ──────────────────────────────────────────
+        function msgSwitchTab(tab) {
+            TAB_IDS.forEach(function(t) {
+                var panel = document.getElementById('mpanel-' + t);
+                var btn = document.getElementById('mtab-' + t);
+                if (panel) panel.style.display = t === tab ? '' : 'none';
+                if (btn) btn.classList.toggle('active', t === tab);
+            });
+            if (tab === 'inbox') msgLoadInbox();
+            if (tab === 'sent') msgLoadSent();
+        }
+
         // ── Load inbox ─────────────────────────────────────────────
-        window.msgLoadInbox = function() {
+        function msgLoadInbox() {
             var list = document.getElementById('msg-list');
             var viewer = document.getElementById('msg-viewer');
-            list.innerHTML = '';
-            list.style.display = '';
-            viewer.style.display = 'none';
+            if (list) list.innerHTML = '';
+            if (list) list.style.display = '';
+            if (viewer) viewer.style.display = 'none';
             fetch('messages_api.php?action=inbox')
                 .then(function(r) {
                     return r.json();
                 })
                 .then(function(msgs) {
+                    if (!list) return;
                     list.innerHTML = '';
                     if (!msgs.length) {
                         list.appendChild(emptyMsg('NO MESSAGES YET'));
+                        syncBadges(0);
                         return;
                     }
                     msgs.forEach(function(m) {
                         list.appendChild(buildRow(m, false));
                     });
+                    enableMsgRowTouch();
                     var unread = msgs.filter(function(m) {
                         return !m.is_read;
                     }).length;
                     syncBadges(unread);
                 })
                 .catch(function() {
+                    if (!list) return;
                     list.appendChild(emptyMsg('LOAD ERROR'));
                 });
-        };
+        }
 
         // ── Load sent ──────────────────────────────────────────────
-        window.msgLoadSent = function() {
+        function msgLoadSent() {
             var list = document.getElementById('sent-list');
-            list.innerHTML = '';
+            if (list) list.innerHTML = '';
             fetch('messages_api.php?action=sent')
                 .then(function(r) {
                     return r.json();
                 })
                 .then(function(msgs) {
+                    if (!list) return;
                     list.innerHTML = '';
                     if (!msgs.length) {
                         list.appendChild(emptyMsg('NO SENT MESSAGES'));
@@ -251,19 +231,25 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
                     msgs.forEach(function(m) {
                         list.appendChild(buildRow(m, true));
                     });
+                    enableMsgRowTouch();
                 })
                 .catch(function() {
+                    if (!list) return;
                     list.appendChild(emptyMsg('LOAD ERROR'));
                 });
-        };
+        }
 
         // ── Open message ───────────────────────────────────────────
-        window.msgOpenMsg = function(m) {
+        function msgOpenMsg(m) {
             window.location.href = 'message_view.php?id=' + encodeURIComponent(m.id);
-        };
+        }
+
+        function msgCloseView() {
+            msgSwitchTab('inbox');
+        }
 
         // ── Send ───────────────────────────────────────────────────
-        window.msgSendMessage = function() {
+        function msgSendMessage() {
             var to = document.getElementById('c-to').value;
             var subject = document.getElementById('c-subject').value.trim();
             var body = document.getElementById('c-body').value.trim();
@@ -299,6 +285,7 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
                         setTimeout(function() {
                             status.textContent = '';
                         }, 3000);
+                        msgSwitchTab('sent');
                     } else {
                         status.style.color = 'var(--px-accent)';
                         status.textContent = '\u2717 ' + (res.error || 'FAILED');
@@ -309,7 +296,7 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
                     status.style.color = 'var(--px-accent)';
                     status.textContent = '\u2717 NETWORK ERROR';
                 });
-        };
+        }
 
         // ── Unread count fetch (used by poller + realtime) ─────────
         function fetchUnreadCount() {
@@ -321,6 +308,16 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
                     if (typeof d.count === 'number') syncBadges(d.count);
                 }).catch(function() {});
         }
+
+        // ── Touch support for tab switching ────────────────────────
+        document.querySelectorAll('.px-msg-tab').forEach(function(btn) {
+            btn.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                btn.click();
+            }, {
+                passive: false
+            });
+        });
 
         // ── Polling fallback (every 15s) ───────────────────────────
         setInterval(fetchUnreadCount, 15000);
@@ -335,7 +332,7 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
                         table: 'admin_messages',
                         filter: 'to_username=eq.' + ME
                     },
-                    function(payload) {
+                    function() {
                         fetchUnreadCount();
                         var inboxPanel = document.getElementById('mpanel-inbox');
                         if (inboxPanel && inboxPanel.style.display !== 'none') {
@@ -347,6 +344,15 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
         }
 
         // ── Init ───────────────────────────────────────────────────
-        msgLoadInbox(); fetchUnreadCount();
+        msgLoadInbox();
+        fetchUnreadCount();
+
+        // Expose APIs globally for HTML handlers
+        window.msgSwitchTab = msgSwitchTab;
+        window.msgLoadInbox = msgLoadInbox;
+        window.msgLoadSent = msgLoadSent;
+        window.msgOpenMsg = msgOpenMsg;
+        window.msgSendMessage = msgSendMessage;
+        window.msgCloseView = msgCloseView;
     }());
 </script>
