@@ -2474,6 +2474,8 @@ body.theme-theme3 .px-star {
     transform 0.1s,
     box-shadow 0.1s;
   position: relative;
+  text-decoration: none;
+  color: inherit;
 }
 
 .px-msg-row:hover {
@@ -3068,9 +3070,11 @@ body.theme-theme3 .px-star {
   }
 
   .timer-display {
-    font-size: clamp(28px, 10vw, 48px) !important;
-    padding: 6px 10px;
-    letter-spacing: 2px;
+    font-size: clamp(18px, 6vw, 32px) !important;
+    padding: 4px 8px;
+    letter-spacing: 1px;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   .timers {

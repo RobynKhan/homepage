@@ -118,7 +118,9 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
 
         function buildRow(m, isSent) {
             var unread = !isSent && !m.is_read;
-            var row = document.createElement('div');
+            // Use a native <a> tag so mobile tap-to-navigate always works
+            var row = document.createElement('a');
+            row.href = 'message_view.php?id=' + encodeURIComponent(m.id);
             row.className = 'px-msg-row' + (unread ? ' unread' : '');
             row.innerHTML =
                 '<div class="px-msg-row-left">' +
@@ -129,21 +131,14 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
                 '<div class="px-msg-row-subject">' + esc(m.subject) + '</div>' +
                 '</div>' +
                 '<div class="px-msg-row-date">' + fmtDate(m.created_at) + '</div>' +
-                '<button class="px-msg-delete" data-id="' + esc(m.id) + '" data-box="' + (isSent ? 'sent' : 'inbox') + '">DEL</button>';
-            if (!isSent) row.onclick = function() {
-                msgOpenMsg(m);
-            };
+                '<button class="px-msg-delete" type="button">DEL</button>';
 
             var delBtn = row.querySelector('.px-msg-delete');
             if (delBtn) {
                 delBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
+                    e.preventDefault(); // prevent anchor navigation
                     msgDelete(m.id, isSent ? 'sent' : 'inbox');
-                });
-                delBtn.addEventListener('touchstart', function(e) {
-                    e.stopPropagation();
-                }, {
-                    passive: true
                 });
             }
             return row;
