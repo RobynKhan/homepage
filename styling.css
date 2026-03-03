@@ -2202,7 +2202,9 @@ body.theme-theme3 .px-star {
   flex-direction: column;
   z-index: 200;
   overflow: hidden;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
   image-rendering: pixelated;
   font-family: "Press Start 2P", monospace;
 }
@@ -2222,8 +2224,10 @@ body.theme-theme3 .px-star {
   inset: 0;
   background: repeating-linear-gradient(
     to bottom,
-    transparent 0px, transparent 3px,
-    rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.06) 3px,
+    rgba(0, 0, 0, 0.06) 4px
   );
   pointer-events: none;
   z-index: 2;
@@ -2281,11 +2285,15 @@ body.theme-theme3 .px-star {
   border-right: 2px solid #000;
   color: var(--px-text2);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
   position: relative;
 }
 
-.px-msg-tab:last-child { border-right: none; }
+.px-msg-tab:last-child {
+  border-right: none;
+}
 
 .px-msg-tab:hover {
   background: var(--px-panel);
@@ -2332,9 +2340,16 @@ body.theme-theme3 .px-star {
   scrollbar-color: var(--px-panel2) transparent;
 }
 
-.px-msg-scroll::-webkit-scrollbar { width: 6px; }
-.px-msg-scroll::-webkit-scrollbar-track { background: var(--px-bg); }
-.px-msg-scroll::-webkit-scrollbar-thumb { background: var(--px-purple); border: 1px solid #000; }
+.px-msg-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.px-msg-scroll::-webkit-scrollbar-track {
+  background: var(--px-bg);
+}
+.px-msg-scroll::-webkit-scrollbar-thumb {
+  background: var(--px-purple);
+  border: 1px solid #000;
+}
 
 /* ── Message rows ──────────────────────────────────── */
 .px-msg-row {
@@ -2347,7 +2362,9 @@ body.theme-theme3 .px-star {
   background: var(--px-panel);
   cursor: pointer;
   margin-bottom: 4px;
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
 }
 
 .px-msg-row:hover {
@@ -2419,7 +2436,9 @@ body.theme-theme3 .px-star {
   cursor: pointer;
   letter-spacing: 1px;
   margin-bottom: 10px;
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
 }
 
 .px-msg-back-btn:hover {
@@ -2529,7 +2548,9 @@ body.theme-theme3 .px-star {
   border: 2px solid #000;
   box-shadow: 2px 2px 0 #000;
   cursor: pointer;
-  transition: background 0.1s, transform 0.1s;
+  transition:
+    background 0.1s,
+    transform 0.1s;
   white-space: nowrap;
 }
 

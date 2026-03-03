@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ============================================================================
  * messages_widget.php — Inline Admin Messaging Widget (PixelTune Styled)
@@ -86,200 +87,254 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
 </div><!-- /.px-msg -->
 
 <script>
-(function() {
-    var ME = <?= json_encode($msg_me) ?>;
+    (function() {
+        var ME = <?= json_encode($msg_me) ?>;
 
-    // ── Tab switching ──────────────────────────────────────────
-    window.msgSwitchTab = function(tab) {
-        ['inbox','sent','compose'].forEach(function(t) {
-            var panel = document.getElementById('mpanel-' + t);
-            var btn   = document.getElementById('mtab-' + t);
-            if (panel) panel.style.display = t === tab ? '' : 'none';
-            if (btn)   btn.classList.toggle('active', t === tab);
-        });
-        if (tab === 'inbox')  msgLoadInbox();
-        if (tab === 'sent')   msgLoadSent();
-    };
+        // ── Tab switching ──────────────────────────────────────────
+        window.msgSwitchTab = function(tab) {
+            ['inbox', 'sent', 'compose'].forEach(function(t) {
+                var panel = document.getElementById('mpanel-' + t);
+                var btn = document.getElementById('mtab-' + t);
+                if (panel) panel.style.display = t === tab ? '' : 'none';
+                if (btn) btn.classList.toggle('active', t === tab);
+            });
+            if (tab === 'inbox') msgLoadInbox();
+            if (tab === 'sent') msgLoadSent();
+        };
 
-    // ── Helpers ────────────────────────────────────────────────
-    function fmtDate(str) {
-        var d = new Date(str);
-        return d.toLocaleDateString(undefined, { month:'short', day:'numeric' })
-            + ' ' + d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-    }
-    function esc(s) {
-        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
-            .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-    function emptyMsg(text) {
-        var d = document.createElement('div');
-        d.className = 'px-msg-empty';
-        d.innerHTML = '<i class="bi bi-envelope-open"></i><span>' + esc(text) + '</span>';
-        return d;
-    }
+        // ── Helpers ────────────────────────────────────────────────
+        function fmtDate(str) {
+            var d = new Date(str);
+            return d.toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric'
+                }) +
+                ' ' + d.toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+        }
 
-    function buildRow(m, isSent) {
-        var unread = !isSent && !m.is_read;
-        var row = document.createElement('div');
-        row.className = 'px-msg-row' + (unread ? ' unread' : '');
-        row.innerHTML =
-            '<div class="px-msg-row-left">' +
+        function esc(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function emptyMsg(text) {
+            var d = document.createElement('div');
+            d.className = 'px-msg-empty';
+            d.innerHTML = '<i class="bi bi-envelope-open"></i><span>' + esc(text) + '</span>';
+            return d;
+        }
+
+        function buildRow(m, isSent) {
+            var unread = !isSent && !m.is_read;
+            var row = document.createElement('div');
+            row.className = 'px-msg-row' + (unread ? ' unread' : '');
+            row.innerHTML =
+                '<div class="px-msg-row-left">' +
                 '<div class="px-msg-row-from">' +
-                    (unread ? '<span class="px-msg-dot">&#9679;</span> ' : '') +
-                    esc(isSent ? 'TO: ' + m.to_username : m.from_username) +
+                (unread ? '<span class="px-msg-dot">&#9679;</span> ' : '') +
+                esc(isSent ? 'TO: ' + m.to_username : m.from_username) +
                 '</div>' +
                 '<div class="px-msg-row-subject">' + esc(m.subject) + '</div>' +
-            '</div>' +
-            '<div class="px-msg-row-date">' + fmtDate(m.created_at) + '</div>';
-        if (!isSent) row.onclick = function() { msgOpenMsg(m); };
-        return row;
-    }
-
-    // ── Update ALL badge locations ─────────────────────────────
-    function syncBadges(count) {
-        // Widget badge
-        var b = document.getElementById('px-msg-badge');
-        if (b) { b.textContent = count; b.style.display = count > 0 ? '' : 'none'; }
-        // Title bar pip
-        var pip = document.getElementById('px-msg-pip');
-        if (pip) pip.style.display = count > 0 ? '' : 'none';
-        // Header / drawer / dock badges
-        ['msg-nav-badge','msg-drawer-badge','msg-dock-badge'].forEach(function(id) {
-            var el = document.getElementById(id);
-            if (!el) return;
-            if (count > 0) { el.textContent = count; el.style.display = ''; }
-            else { el.style.display = 'none'; }
-        });
-    }
-
-    // ── Load inbox ─────────────────────────────────────────────
-    window.msgLoadInbox = function() {
-        var list = document.getElementById('msg-list');
-        var viewer = document.getElementById('msg-viewer');
-        list.innerHTML = '';
-        list.style.display = '';
-        viewer.style.display = 'none';
-        fetch('messages_api.php?action=inbox')
-            .then(function(r) { return r.json(); })
-            .then(function(msgs) {
-                list.innerHTML = '';
-                if (!msgs.length) { list.appendChild(emptyMsg('NO MESSAGES YET')); return; }
-                msgs.forEach(function(m) { list.appendChild(buildRow(m, false)); });
-                var unread = msgs.filter(function(m) { return !m.is_read; }).length;
-                syncBadges(unread);
-            })
-            .catch(function() { list.appendChild(emptyMsg('LOAD ERROR')); });
-    };
-
-    // ── Load sent ──────────────────────────────────────────────
-    window.msgLoadSent = function() {
-        var list = document.getElementById('sent-list');
-        list.innerHTML = '';
-        fetch('messages_api.php?action=sent')
-            .then(function(r) { return r.json(); })
-            .then(function(msgs) {
-                list.innerHTML = '';
-                if (!msgs.length) { list.appendChild(emptyMsg('NO SENT MESSAGES')); return; }
-                msgs.forEach(function(m) { list.appendChild(buildRow(m, true)); });
-            })
-            .catch(function() { list.appendChild(emptyMsg('LOAD ERROR')); });
-    };
-
-    // ── Open message ───────────────────────────────────────────
-    window.msgOpenMsg = function(m) {
-        document.getElementById('msg-list').style.display = 'none';
-        var v = document.getElementById('msg-viewer');
-        v.style.display = '';
-        document.getElementById('v-meta').textContent  = 'FROM: ' + m.from_username + '  \u00b7  ' + fmtDate(m.created_at);
-        document.getElementById('v-subject').textContent = m.subject;
-        document.getElementById('v-body').textContent    = m.body;
-        if (!m.is_read) {
-            fetch('messages_api.php', {
-                method:'POST',
-                headers:{'Content-Type':'application/x-www-form-urlencoded'},
-                body:'action=read&id=' + encodeURIComponent(m.id)
-            });
-            m.is_read = true;
-            fetchUnreadCount();
+                '</div>' +
+                '<div class="px-msg-row-date">' + fmtDate(m.created_at) + '</div>';
+            if (!isSent) row.onclick = function() {
+                msgOpenMsg(m);
+            };
+            return row;
         }
-    };
-    window.msgCloseView = function() {
-        document.getElementById('msg-list').style.display = '';
-        document.getElementById('msg-viewer').style.display = 'none';
-        msgLoadInbox();
-    };
 
-    // ── Send ───────────────────────────────────────────────────
-    window.msgSendMessage = function() {
-        var to      = document.getElementById('c-to').value;
-        var subject = document.getElementById('c-subject').value.trim();
-        var body    = document.getElementById('c-body').value.trim();
-        var status  = document.getElementById('send-status');
-        var btn     = document.getElementById('send-btn');
-        if (!subject || !body) {
-            status.style.color = 'var(--px-accent)';
-            status.textContent = '\u26a0 FILL ALL FIELDS';
-            return;
-        }
-        btn.disabled = true;
-        status.style.color = 'var(--px-text2)';
-        status.textContent = 'SENDING...';
-        var fd = new FormData();
-        fd.append('action','send'); fd.append('to',to);
-        fd.append('subject',subject); fd.append('body',body);
-        fetch('messages_api.php', { method:'POST', body:fd })
-            .then(function(r) { return r.json(); })
-            .then(function(res) {
-                btn.disabled = false;
-                if (res.ok) {
-                    status.style.color = 'var(--px-green)';
-                    status.textContent = '\u2713 SENT!';
-                    document.getElementById('c-subject').value = '';
-                    document.getElementById('c-body').value = '';
-                    setTimeout(function() { status.textContent = ''; }, 3000);
+        // ── Update ALL badge locations ─────────────────────────────
+        function syncBadges(count) {
+            // Widget badge
+            var b = document.getElementById('px-msg-badge');
+            if (b) {
+                b.textContent = count;
+                b.style.display = count > 0 ? '' : 'none';
+            }
+            // Title bar pip
+            var pip = document.getElementById('px-msg-pip');
+            if (pip) pip.style.display = count > 0 ? '' : 'none';
+            // Header / drawer / dock badges
+            ['msg-nav-badge', 'msg-drawer-badge', 'msg-dock-badge'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                if (count > 0) {
+                    el.textContent = count;
+                    el.style.display = '';
                 } else {
-                    status.style.color = 'var(--px-accent)';
-                    status.textContent = '\u2717 ' + (res.error || 'FAILED');
+                    el.style.display = 'none';
                 }
-            })
-            .catch(function() {
-                btn.disabled = false;
-                status.style.color = 'var(--px-accent)';
-                status.textContent = '\u2717 NETWORK ERROR';
             });
-    };
+        }
 
-    // ── Unread count fetch (used by poller + realtime) ─────────
-    function fetchUnreadCount() {
-        fetch('messages_api.php?action=unread_count')
-            .then(function(r) { return r.json(); })
-            .then(function(d) {
-                if (typeof d.count === 'number') syncBadges(d.count);
-            }).catch(function(){});
-    }
-
-    // ── Polling fallback (every 15s) ───────────────────────────
-    setInterval(fetchUnreadCount, 15000);
-
-    // ── Supabase Realtime: instant notification on INSERT ──────
-    if (typeof supabaseClient !== 'undefined' && supabaseClient.channel) {
-        supabaseClient
-            .channel('admin_messages_realtime')
-            .on('postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'admin_messages', filter: 'to_username=eq.' + ME },
-                function(payload) {
-                    fetchUnreadCount();
-                    var inboxPanel = document.getElementById('mpanel-inbox');
-                    if (inboxPanel && inboxPanel.style.display !== 'none') {
-                        msgLoadInbox();
+        // ── Load inbox ─────────────────────────────────────────────
+        window.msgLoadInbox = function() {
+            var list = document.getElementById('msg-list');
+            var viewer = document.getElementById('msg-viewer');
+            list.innerHTML = '';
+            list.style.display = '';
+            viewer.style.display = 'none';
+            fetch('messages_api.php?action=inbox')
+                .then(function(r) {
+                    return r.json();
+                })
+                .then(function(msgs) {
+                    list.innerHTML = '';
+                    if (!msgs.length) {
+                        list.appendChild(emptyMsg('NO MESSAGES YET'));
+                        return;
                     }
-                }
-            )
-            .subscribe();
-    }
+                    msgs.forEach(function(m) {
+                        list.appendChild(buildRow(m, false));
+                    });
+                    var unread = msgs.filter(function(m) {
+                        return !m.is_read;
+                    }).length;
+                    syncBadges(unread);
+                })
+                .catch(function() {
+                    list.appendChild(emptyMsg('LOAD ERROR'));
+                });
+        };
 
-    // ── Init ───────────────────────────────────────────────────
-    msgLoadInbox();
-    fetchUnreadCount();
-}());
+        // ── Load sent ──────────────────────────────────────────────
+        window.msgLoadSent = function() {
+            var list = document.getElementById('sent-list');
+            list.innerHTML = '';
+            fetch('messages_api.php?action=sent')
+                .then(function(r) {
+                    return r.json();
+                })
+                .then(function(msgs) {
+                    list.innerHTML = '';
+                    if (!msgs.length) {
+                        list.appendChild(emptyMsg('NO SENT MESSAGES'));
+                        return;
+                    }
+                    msgs.forEach(function(m) {
+                        list.appendChild(buildRow(m, true));
+                    });
+                })
+                .catch(function() {
+                    list.appendChild(emptyMsg('LOAD ERROR'));
+                });
+        };
+
+        // ── Open message ───────────────────────────────────────────
+        window.msgOpenMsg = function(m) {
+            document.getElementById('msg-list').style.display = 'none';
+            var v = document.getElementById('msg-viewer');
+            v.style.display = '';
+            document.getElementById('v-meta').textContent = 'FROM: ' + m.from_username + '  \u00b7  ' + fmtDate(m.created_at);
+            document.getElementById('v-subject').textContent = m.subject;
+            document.getElementById('v-body').textContent = m.body;
+            if (!m.is_read) {
+                fetch('messages_api.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'action=read&id=' + encodeURIComponent(m.id)
+                });
+                m.is_read = true;
+                fetchUnreadCount();
+            }
+        };
+        window.msgCloseView = function() {
+            document.getElementById('msg-list').style.display = '';
+            document.getElementById('msg-viewer').style.display = 'none';
+            msgLoadInbox();
+        };
+
+        // ── Send ───────────────────────────────────────────────────
+        window.msgSendMessage = function() {
+            var to = document.getElementById('c-to').value;
+            var subject = document.getElementById('c-subject').value.trim();
+            var body = document.getElementById('c-body').value.trim();
+            var status = document.getElementById('send-status');
+            var btn = document.getElementById('send-btn');
+            if (!subject || !body) {
+                status.style.color = 'var(--px-accent)';
+                status.textContent = '\u26a0 FILL ALL FIELDS';
+                return;
+            }
+            btn.disabled = true;
+            status.style.color = 'var(--px-text2)';
+            status.textContent = 'SENDING...';
+            var fd = new FormData();
+            fd.append('action', 'send');
+            fd.append('to', to);
+            fd.append('subject', subject);
+            fd.append('body', body);
+            fetch('messages_api.php', {
+                    method: 'POST',
+                    body: fd
+                })
+                .then(function(r) {
+                    return r.json();
+                })
+                .then(function(res) {
+                    btn.disabled = false;
+                    if (res.ok) {
+                        status.style.color = 'var(--px-green)';
+                        status.textContent = '\u2713 SENT!';
+                        document.getElementById('c-subject').value = '';
+                        document.getElementById('c-body').value = '';
+                        setTimeout(function() {
+                            status.textContent = '';
+                        }, 3000);
+                    } else {
+                        status.style.color = 'var(--px-accent)';
+                        status.textContent = '\u2717 ' + (res.error || 'FAILED');
+                    }
+                })
+                .catch(function() {
+                    btn.disabled = false;
+                    status.style.color = 'var(--px-accent)';
+                    status.textContent = '\u2717 NETWORK ERROR';
+                });
+        };
+
+        // ── Unread count fetch (used by poller + realtime) ─────────
+        function fetchUnreadCount() {
+            fetch('messages_api.php?action=unread_count')
+                .then(function(r) {
+                    return r.json();
+                })
+                .then(function(d) {
+                    if (typeof d.count === 'number') syncBadges(d.count);
+                }).catch(function() {});
+        }
+
+        // ── Polling fallback (every 15s) ───────────────────────────
+        setInterval(fetchUnreadCount, 15000);
+
+        // ── Supabase Realtime: instant notification on INSERT ──────
+        if (typeof supabaseClient !== 'undefined' && supabaseClient.channel) {
+            supabaseClient
+                .channel('admin_messages_realtime')
+                .on('postgres_changes', {
+                        event: 'INSERT',
+                        schema: 'public',
+                        table: 'admin_messages',
+                        filter: 'to_username=eq.' + ME
+                    },
+                    function(payload) {
+                        fetchUnreadCount();
+                        var inboxPanel = document.getElementById('mpanel-inbox');
+                        if (inboxPanel && inboxPanel.style.display !== 'none') {
+                            msgLoadInbox();
+                        }
+                    }
+                )
+                .subscribe();
+        }
+
+        // ── Init ───────────────────────────────────────────────────
+        msgLoadInbox();
+        fetchUnreadCount();
+    }());
 </script>
