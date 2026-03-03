@@ -16,7 +16,188 @@ $msg_admin = current_admin();
 $msg_me    = $msg_admin['username'];
 $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $msg_me);
 ?>
+<style>
+    /* MOBILE: full-screen bottom sheet */
+    @media (max-width: 768px) {
+        #container-5 {
+            position: fixed !important;
+            inset: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 100dvh !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+            z-index: 9999 !important;
+            overflow: hidden !important;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
+        #container-5.sheet-open {
+            transform: translateY(0) !important;
+        }
+
+        #container-5 .px-msg {
+            height: 100dvh !important;
+            max-height: 100dvh !important;
+            border-radius: 0 !important;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #container-5 .px-msg-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #container-5 .px-msg-panel {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #container-5 .px-msg-scroll {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #container-5 .px-msg-viewer {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #container-5 .px-msg-titlebar::before {
+            content: '';
+            display: block;
+            width: 44px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 2px;
+            margin: 0 auto 8px auto;
+        }
+
+        .px-msg-mobile-close {
+            display: flex !important;
+        }
+    }
+
+    /* DESKTOP: bigger widget */
+    @media (min-width: 769px) {
+        #container-5 {
+            min-width: 440px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        #container-5 .px-msg {
+            min-height: 540px;
+            max-height: 75vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #container-5 .px-msg-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #container-5 .px-msg-panel {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #container-5 .px-msg-scroll {
+            flex: 1 1 auto;
+            overflow-y: auto;
+        }
+
+        #container-5 .px-msg-viewer {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+        }
+    }
+
+    /* Mobile close button */
+    .px-msg-mobile-close {
+        display: none;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 5px;
+        padding: 2px 14px 6px;
+        cursor: pointer;
+        font-size: 0.6rem;
+        letter-spacing: 1px;
+        color: var(--px-text2, #aaa);
+        background: none;
+        border: none;
+        font-family: inherit;
+    }
+
+    /* Typewriter body */
+    .px-msg-viewer-body {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        line-height: 1.85;
+        font-size: 0.72rem;
+        padding: 8px 2px 32px;
+        color: var(--px-text, #e0e0e0);
+    }
+
+    .px-tw-cursor {
+        display: inline-block;
+        width: 8px;
+        height: 0.82em;
+        background: var(--px-accent, #ff4d6d);
+        margin-left: 3px;
+        vertical-align: middle;
+        border-radius: 1px;
+        animation: px-tw-blink 1s steps(1) infinite;
+    }
+
+    @keyframes px-tw-blink {
+
+        0%,
+        49% {
+            opacity: 1
+        }
+
+        50%,
+        100% {
+            opacity: 0
+        }
+    }
+
+    @keyframes px-viewer-in {
+        from {
+            opacity: 0;
+            transform: translateY(10px)
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0)
+        }
+    }
+
+    .px-msg-viewer.anim-in {
+        animation: px-viewer-in 0.35s ease-out both;
+    }
+</style>
 <!-- ── Pixel-styled Messages Widget ─────────────────────────────── -->
 <div class="px-msg">
     <div class="px-msg-scanlines"></div>
@@ -31,7 +212,12 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
         <h3 class="px-msg-title">MESSAGES</h3>
         <span class="px-msg-unread-pip" id="px-msg-pip" style="display:none;"></span>
     </div>
-
+    <button class="px-msg-mobile-close"
+        ontouchend="event.stopPropagation();event.preventDefault();togglePanel(document.getElementById('container-5'))"
+        onclick="togglePanel(document.getElementById('container-5'))"
+        type="button" aria-label="Close messages">
+        CLOSE <i class="bi bi-x-circle"></i>
+    </button>
     <!-- Tab row -->
     <div class="px-msg-tabs">
         <button class="px-msg-tab active" id="mtab-inbox"
@@ -262,8 +448,8 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
         }
 
         // ── Open message inline (no page navigation) ───────────────
+        // Replace the entire msgOpenMsgInline function:
         function msgOpenMsgInline(m) {
-            // Mark as read via API
             var fd = new FormData();
             fd.append('action', 'read');
             fd.append('id', m.id);
@@ -272,21 +458,81 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
                 body: fd
             });
 
-            // Show inline viewer
             var list = document.getElementById('msg-list');
             var viewer = document.getElementById('msg-viewer');
             if (list) list.style.display = 'none';
             if (viewer) {
                 viewer.style.display = '';
-                document.getElementById('v-meta').textContent =
-                    'FROM: ' + m.from_username + '  ·  ' + fmtDate(m.created_at);
+                viewer.classList.remove('anim-in');
+                void viewer.offsetWidth; // reflow to restart animation
+                viewer.classList.add('anim-in');
+                document.getElementById('v-meta').textContent = 'FROM: ' + m.from_username + '  ·  ' + fmtDate(m.created_at);
                 document.getElementById('v-subject').textContent = m.subject;
-                document.getElementById('v-body').textContent = m.body || '';
-                // Scroll viewer to top
+                typewriter(document.getElementById('v-body'), m.body || '');
                 viewer.scrollTop = 0;
             }
             fetchUnreadCount();
         }
+
+        // Add these BEFORE msgOpenMsgInline (typewriter engine):
+        var _twTimer = null;
+
+        function stopTypewriter() {
+            if (_twTimer) {
+                clearTimeout(_twTimer);
+                _twTimer = null;
+            }
+        }
+
+        function typewriter(targetEl, rawText) {
+            stopTypewriter();
+            targetEl.innerHTML = '';
+            var span = document.createElement('span');
+            var cursor = document.createElement('span');
+            cursor.className = 'px-tw-cursor';
+            targetEl.appendChild(span);
+            targetEl.appendChild(cursor);
+            var i = 0;
+
+            function tick() {
+                if (i >= rawText.length) {
+                    setTimeout(function() {
+                        cursor.style.transition = 'opacity 0.8s';
+                        cursor.style.opacity = '0';
+                    }, 1400);
+                    _twTimer = null;
+                    return;
+                }
+                var ch = rawText.charAt(i++);
+                if (ch === '\n') span.appendChild(document.createElement('br'));
+                else span.appendChild(document.createTextNode(ch));
+                var d = 30;
+                if (ch === '.' || ch === '!' || ch === '?') d = 340;
+                else if (ch === ',') d = 180;
+                else if (ch === '\n') d = 260;
+                else if (ch === ' ') d = 16;
+                _twTimer = setTimeout(tick, d + Math.random() * 22);
+            }
+            _twTimer = setTimeout(tick, 350);
+        }
+
+        // Also update msgCloseView to call stopTypewriter:
+        function msgCloseView() {
+            stopTypewriter();
+            msgSwitchTab('inbox');
+        }
+
+        // Add this MutationObserver block before the Init section:
+        (function() {
+            var c5 = document.getElementById('container-5');
+            if (!c5) return;
+            new MutationObserver(function() {
+                c5.classList.toggle('sheet-open', window.getComputedStyle(c5).display !== 'none');
+            }).observe(c5, {
+                attributes: true,
+                attributeFilter: ['style']
+            });
+        }());
 
         // Keep msgOpenMsg as alias for any external calls
         function msgOpenMsg(m) {
