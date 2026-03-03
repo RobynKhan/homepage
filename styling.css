@@ -2609,8 +2609,8 @@ body.theme-theme3 .px-star {
 
 #container-6 {
   position: fixed;
-  top: auto;
-  bottom: clamp(16px, 3vh, 32px);
+  top: clamp(56px, 8vh, 80px);
+  bottom: auto;
   right: clamp(16px, 2vw, 32px);
   background: var(--px-bg);
   border: 3px solid #000;
