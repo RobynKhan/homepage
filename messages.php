@@ -503,21 +503,7 @@ $other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $me);
 
     // ── Open message viewer ────────────────────────────────────────────────────
     function openMsg(m) {
-        document.getElementById('msg-list').style.display = 'none';
-        document.getElementById('msg-viewer').style.display = '';
-        document.getElementById('v-meta').textContent = 'FROM: ' + m.from_username + '   ·   ' + fmtDate(m.created_at);
-        document.getElementById('v-subject').textContent = m.subject;
-        document.getElementById('v-body').textContent = m.body;
-        if (!m.is_read) {
-            fetch('messages_api.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=read&id=' + encodeURIComponent(m.id)
-            });
-            m.is_read = true;
-        }
+        window.location.href = 'message_view.php?id=' + encodeURIComponent(m.id);
     }
 
     function closeView() {

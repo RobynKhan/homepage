@@ -225,28 +225,7 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
 
         // ── Open message ───────────────────────────────────────────
         window.msgOpenMsg = function(m) {
-            document.getElementById('msg-list').style.display = 'none';
-            var v = document.getElementById('msg-viewer');
-            v.style.display = '';
-            document.getElementById('v-meta').textContent = 'FROM: ' + m.from_username + '  \u00b7  ' + fmtDate(m.created_at);
-            document.getElementById('v-subject').textContent = m.subject;
-            document.getElementById('v-body').textContent = m.body;
-            if (!m.is_read) {
-                fetch('messages_api.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: 'action=read&id=' + encodeURIComponent(m.id)
-                });
-                m.is_read = true;
-                fetchUnreadCount();
-            }
-        };
-        window.msgCloseView = function() {
-            document.getElementById('msg-list').style.display = '';
-            document.getElementById('msg-viewer').style.display = 'none';
-            msgLoadInbox();
+            window.location.href = 'message_view.php?id=' + encodeURIComponent(m.id);
         };
 
         // ── Send ───────────────────────────────────────────────────
