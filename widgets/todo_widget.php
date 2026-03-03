@@ -11,7 +11,7 @@
  *   - Guest (not logged in): Locked state with login prompt
  *
  * The admin mode includes inline JavaScript that communicates with
- * todo_api.php for persistent storage via Supabase PostgreSQL.
+ * todo_api.php (widgets/todo_api.php) for persistent storage via Supabase PostgreSQL.
  *
  * Included by: index.php (inside container-4)
  * ============================================================================
@@ -73,7 +73,7 @@ $isAdmin = function_exists('is_admin_logged_in') && is_admin_logged_in();
 <?php if ($isAdmin): ?>
     <script>
         (function() {
-            const API = 'todo_api.php';
+            const API = 'widgets/todo_api.php';
             let todos = [];
 
             async function api(action, body) {

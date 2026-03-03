@@ -18,7 +18,7 @@
   "use strict";
 
   // ── API ──────────────────────────────────────────────────────────────────
-  const API = "breakout_api.php";
+  const API = "widgets/breakout_api.php";
 
   // ── Game Constants ───────────────────────────────────────────────────────
   const PADDLE_H = 8;

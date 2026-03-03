@@ -6,8 +6,8 @@
  * Uses direct PDO connection via db.php
  */
 session_start();
-require_once __DIR__ . '/auth_config.php';
-require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/../auth_config.php';
+require_once __DIR__ . '/../db.php';
 require_admin_login();
 
 header('Content-Type: application/json');

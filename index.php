@@ -13,7 +13,7 @@
  *   - Settings panel for background theme customization
  *
  * Dependencies: config.php, auth_config.php, includes/header.php,
- *               includes/footer.php, todo_widget.php, youtube.js, timer.js
+ *               includes/footer.php, widgets/todo_widget.php, youtube.js, timer.js
  * ============================================================================
  */
 session_start();
@@ -54,10 +54,10 @@ $jsConfig = json_encode([
 
         <!-- Timer mode buttons -->
         <div class="timers" role="group" aria-label="Timer Modes">
-            <button id="pomodorobtn" class="active" type="button">25 MIN</button>
-            <button id="longpomodorobtn" type="button">50 MIN</button>
-            <button id="shortbrkbtn" type="button">5 MIN</button>
-            <button id="longbrkbtn" type="button">15 MIN</button>
+            <button id="pomodorobtn" class="active" type="button">25</button>
+            <button id="longpomodorobtn" type="button">50</button>
+            <button id="shortbrkbtn" type="button">5</button>
+            <button id="longbrkbtn" type="button">15</button>
             <button id="custombrkbtn" type="button">CUSTOM</button>
         </div>
 
@@ -237,13 +237,13 @@ $jsConfig = json_encode([
 
 <!-- ====== TODO/QUESTS WIDGET SECTION ====== -->
 <div id="container-4" class="container-4" data-show-as="flex" style="display:flex;">
-    <?php require_once __DIR__ . '/todo_widget.php'; ?>
+    <?php require_once __DIR__ . '/widgets/todo_widget.php'; ?>
 </div>
 
 <!-- ====== MESSAGES WIDGET (Admin Only) ====== -->
 <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
     <div id="container-5" class="container-5" data-show-as="flex" style="display:none;">
-        <?php require_once __DIR__ . '/messages_widget.php'; ?>
+        <?php require_once __DIR__ . '/widgets/messages_widget.php'; ?>
     </div>
 <?php endif; ?>
 
@@ -522,7 +522,7 @@ $jsConfig = json_encode([
 
 <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
     <!-- ====== BREAKOUT GAME CONTROLLER (Admin Only) ====== -->
-    <script src="breakthrough.js"></script>
+    <script src="widgets/breakthrough.js"></script>
 <?php endif; ?>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

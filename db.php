@@ -15,7 +15,8 @@
  *   - SSL-required connection (sslmode=require)
  *   - Exception-based error handling
  *
- * Used by: todo_api.php, log_youtube.php
+ * Used by: widgets/todo_api.php, widgets/messages_api.php,
+ *          widgets/breakout_api.php, log_youtube.php
  * ============================================================================
  */
 

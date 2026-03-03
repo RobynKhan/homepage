@@ -143,5 +143,5 @@
     <div class="sheet-backdrop" id="sheet-backdrop"></div>
 
     <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
-        <!-- Badges are updated by messages_widget.php (polling + Supabase realtime) -->
+        <!-- Badges are updated by widgets/messages_widget.php (polling + Supabase realtime) -->
     <?php endif; ?>

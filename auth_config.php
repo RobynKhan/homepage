@@ -12,8 +12,9 @@
  *   - require_admin_login() — Redirect unauthenticated users to login page
  *   - current_admin()       — Retrieve the logged-in admin's data
  *
- * Used by: index.php, login_admin.php, logout_admin.php, todo_api.php,
- *          todo_widget.php, log_youtube.php
+ * Used by: index.php, login_admin.php, logout_admin.php,
+ *          widgets/todo_api.php, widgets/messages_api.php,
+ *          widgets/breakout_api.php, widgets/todo_widget.php, log_youtube.php
  * ============================================================================
  */
 

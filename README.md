@@ -37,43 +37,46 @@ A full-featured Pomodoro productivity dashboard with an integrated YouTube music
 │                        BROWSER (Client)                         │
 │                                                                 │
 │  index.php ──────── Main Dashboard Page                         │
-│    ├── includes/header.php  (top bar, nav, dock)                │
-│    ├── timer.js             (timer + nav + clock + themes)       │
-│    ├── youtube.js           (YouTube embed + search + queue + swap)  │
-│    ├── todo_widget.php      (quest list UI + inline JS)         │
-│    ├── styling.css          (all visual styles)                  │
-│    └── includes/footer.php  (closing tags + timer.js load)      │
+│    ├── includes/header.php        (top bar, nav, dock)          │
+│    ├── timer.js                   (timer + nav + clock + themes)│
+│    ├── youtube.js                 (YouTube embed + search)      │
+│    ├── widgets/todo_widget.php    (quest list UI + inline JS)   │
+│    ├── widgets/messages_widget.php(messaging UI + inline JS)    │
+│    ├── widgets/breakthrough.js    (breakout game engine)        │
+│    ├── styling.css                (all visual styles)           │
+│    └── includes/footer.php        (closing tags + timer.js)     │
 │                                                                 │
-│  player.html ────── Standalone YouTube Player                    │
-│    └── youtube.js           (YouTube embed controller)           │
-│  frerein.html ───── Static Prototype / Development Sandbox       │
 └───────────┬─────────────────────────────────────────────────────┘
             │  AJAX fetch requests
             ▼
-┌───────────────────────────┐
-│   PHP API Endpoints       │
-│                           │
-│  todo_api.php             │
-│  log_youtube.php          │
-│  search_youtube.php       │  ← YouTube Data API proxy
-└───────────┬───────────────┘
+┌───────────────────────────────┐
+│   PHP API Endpoints           │
+│                               │
+│  widgets/todo_api.php         │   ← Todo CRUD
+│  widgets/messages_api.php     │   ← Messaging CRUD
+│  widgets/breakout_api.php     │   ← Breakout scores
+│  log_youtube.php              │   ← Watch logging
+│  search_youtube.php           │   ← YouTube Data API proxy
+└───────────┬───────────────────┘
             │
             ▼
-┌───────────────────────────┐
-│  Shared PHP Libraries     │
-│                           │
-│  config.php               │  ← App constants + timer defaults
-│  auth_config.php          │  ← Admin auth helpers
-│  db.php                   │  ← PostgreSQL connection (PDO)
-└───────────┬───────────────┘
+┌───────────────────────────────┐
+│  Shared PHP Libraries         │
+│                               │
+│  config.php                   │   ← App constants + timer defaults
+│  auth_config.php              │   ← Admin auth helpers
+│  db.php                       │   ← PostgreSQL connection (PDO)
+└───────────┬───────────────────┘
             │
             ▼
-┌───────────────────────────┐
-│  Supabase PostgreSQL DB   │
-│                           │
-│  todos                    │  ← Task/quest items
-│  yt_urls                  │  ← Watched YouTube URLs
-└───────────────────────────┘
+┌───────────────────────────────┐
+│  Supabase PostgreSQL DB       │
+│                               │
+│  todos                        │   ← Task/quest items
+│  yt_urls                      │   ← Watched YouTube URLs
+│  admin_messages               │   ← Admin messages
+│  breakout_scores              │   ← Breakout game scores
+└───────────────────────────────┘
 ```
 
 ---
@@ -82,21 +85,19 @@ A full-featured Pomodoro productivity dashboard with an integrated YouTube music
 
 ### Configuration & Core
 
-| File              | Purpose                                                                                                              | Connected To                                                                                 |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `config.php`      | App name and timer duration defaults                                                                                 | index.php                                                                                    |
-| `auth_config.php` | Admin accounts (from env vars), session helpers (`is_admin_logged_in()`, `require_admin_login()`, `current_admin()`) | index.php, login_admin.php, logout_admin.php, todo_api.php, todo_widget.php, log_youtube.php |
-| `db.php`          | Singleton PDO connection to Supabase PostgreSQL                                                                      | todo_api.php, log_youtube.php                                                                |
-| `Dockerfile`      | PHP 8.2 container with PostgreSQL PDO for Render deployment                                                          | —                                                                                            |
+| File              | Purpose                                                                                                              | Connected To                                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `config.php`      | App name and timer duration defaults                                                                                 | index.php                                                                                                     |
+| `auth_config.php` | Admin accounts (from env vars), session helpers (`is_admin_logged_in()`, `require_admin_login()`, `current_admin()`) | index.php, login_admin.php, logout_admin.php, widgets/todo_api.php, widgets/messages_api.php, log_youtube.php |
+| `db.php`          | Singleton PDO connection to Supabase PostgreSQL                                                                      | widgets/todo_api.php, widgets/messages_api.php, widgets/breakout_api.php, log_youtube.php                     |
+| `Dockerfile`      | PHP 8.2 container with PostgreSQL PDO for Render deployment                                                          | —                                                                                                             |
 
 ### Main Pages
 
-| File              | Purpose                                                            | Connected To                                                                                            |
-| ----------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| `index.php`       | Main dashboard — timer, YouTube music panel, todo widget, settings | config.php, auth_config.php, header.php, footer.php, todo_widget.php, youtube.js, timer.js, styling.css |
-| `player.html`     | Standalone YouTube player page                                     | youtube.js, styling.css                                                                                 |
-| `frerein.html`    | Static prototype/sandbox for layout testing                        | timer.js, styling.css                                                                                   |
-| `login_admin.php` | Admin login form with password verification                        | auth_config.php → redirects to index.php                                                                |
+| File              | Purpose                                                            | Connected To                                                                                                           |
+| ----------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `index.php`       | Main dashboard — timer, YouTube music panel, todo widget, settings | config.php, auth_config.php, header.php, footer.php, widgets/todo_widget.php, widgets/messages_widget.php, styling.css |
+| `login_admin.php` | Admin login form with password verification                        | auth_config.php → redirects to index.php                                                                               |
 
 ### Data Logging Endpoints
 
@@ -105,12 +106,16 @@ A full-featured Pomodoro productivity dashboard with an integrated YouTube music
 | `log_youtube.php`    | Logs YouTube video watches to database                      | auth_config.php, db.php → `yt_urls` table |
 | `search_youtube.php` | Proxies YouTube Data API search (keeps API key server-side) | auth_config.php → YouTube Data API v3     |
 
-### Todo System
+### Widgets (widgets/ folder)
 
-| File              | Purpose                                             | Connected To                                 |
-| ----------------- | --------------------------------------------------- | -------------------------------------------- |
-| `todo_api.php`    | CRUD API for todos (list/add/update/delete)         | auth_config.php, db.php → `todos` table      |
-| `todo_widget.php` | Renders todo widget UI (admin CRUD or guest locked) | auth_config.php, todo_api.php (via JS fetch) |
+| File                          | Purpose                                             | Connected To                                          |
+| ----------------------------- | --------------------------------------------------- | ----------------------------------------------------- |
+| `widgets/todo_widget.php`     | Renders todo widget UI (admin CRUD or guest locked) | auth_config.php, widgets/todo_api.php (via JS fetch)  |
+| `widgets/todo_api.php`        | CRUD API for todos (list/add/update/delete)         | auth_config.php, db.php → `todos` table               |
+| `widgets/messages_widget.php` | Admin messaging widget with compose/inbox/sent tabs | auth_config.php, widgets/messages_api.php (via fetch) |
+| `widgets/messages_api.php`    | Messaging API (send/inbox/sent/read/delete)         | auth_config.php, db.php → `admin_messages` table      |
+| `widgets/breakout_api.php`    | Breakout scores API (state/finish_run)              | auth_config.php, db.php → `breakout_scores` table     |
+| `widgets/breakthrough.js`     | Canvas-based Breakout game engine                   | widgets/breakout_api.php (via JS fetch)               |
 
 ### Admin Authentication
 
@@ -128,20 +133,24 @@ A full-featured Pomodoro productivity dashboard with an integrated YouTube music
 
 ### Client-Side Scripts
 
-| File          | Purpose                                                                                            | Connected To                                    |
-| ------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `youtube.js`  | YouTube embed controller — URL parsing, video swapping, search, queue, play/pause, volume, logging | log_youtube.php, search_youtube.php (via fetch) |
-| `timer.js`    | Pomodoro timer engine, navigation (drawer + dock), theme switcher, live clock                      | DOM elements in index.php / frerein.html        |
-| `styling.css` | All visual styles — layout, glass effects, PixelTune retro theme, responsive breakpoints           | Loaded by index.php, player.html, frerein.html  |
+| File                      | Purpose                                                                                            | Connected To                                    |
+| ------------------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `youtube.js`              | YouTube embed controller — URL parsing, video swapping, search, queue, play/pause, volume, logging | log_youtube.php, search_youtube.php (via fetch) |
+| `timer.js`                | Pomodoro timer engine, navigation (drawer + dock), theme switcher, live clock                      | DOM elements in index.php                       |
+| `widgets/breakthrough.js` | Canvas Breakout game engine with touch/keyboard controls                                           | widgets/breakout_api.php (via fetch)            |
+| `styling.css`             | All visual styles — layout, PixelTune retro theme, responsive breakpoints                          | Loaded by index.php                             |
 
 ### Assets
 
-| File                 | Purpose                                                    |
-| -------------------- | ---------------------------------------------------------- |
-| `themes/theme 2.gif` | Default animated background (purple/lofi aesthetic)        |
-| `themes/theme1.jpg`  | Alternative background theme 1                             |
-| `themes/default.jpg` | Alternative background theme 2 (mapped to "theme2" option) |
-| `themes/theme3.jpg`  | Alternative background theme 3                             |
+| File                 | Purpose                                             |
+| -------------------- | --------------------------------------------------- |
+| `themes/default.gif` | Default animated background (purple/lofi aesthetic) |
+| `themes/snow.gif`    | Animated snow background                            |
+| `themes/theme1.jpg`  | Alternative background theme 1                      |
+| `themes/theme3.jpg`  | Alternative background theme 3                      |
+| `themes/theme4.jpg`  | Alternative background theme 4                      |
+| `themes/theme6.gif`  | Animated background theme 6                         |
+| `themes/theme7.gif`  | Animated background theme 7                         |
 
 ---
 
@@ -151,17 +160,16 @@ A full-featured Pomodoro productivity dashboard with an integrated YouTube music
 
 - Credentials stored as bcrypt hashes in environment variables (`ADMIN1_USERNAME`, `ADMIN1_PASSWORD_HASH`, etc.)
 - Session-based auth via `$_SESSION['admin_user']`
-- Protects: todo_api.php, log_youtube.php, admin UI features
+- Protects: widgets/todo_api.php, widgets/messages_api.php, widgets/breakout_api.php, log_youtube.php, admin UI features
 
 ---
 
 ## YouTube Integration
 
-- YouTube player available on **both** pages: dashboard (index.php) and standalone player (player.html)
+- YouTube player embedded in the dashboard (index.php)
 - **Search** — Type a query to search YouTube via `search_youtube.php` proxy (keeps API key server-side)
 - **Queue** — Add search results to a queue, play songs in sequence
 - **URL input** — Paste any YouTube URL directly → video ID extracted via regex → iframe swapped
-- **Page-aware rendering** — `youtube.js` detects PixelTune (index.php) vs glass (player.html) context and renders appropriate styles
 - Default video: `76GStMlLF_Y` (lofi stream)
 - Each video watch logged to `yt_urls` table (admin only)
 - Search requires `YOUTUBE_API_KEY` environment variable (YouTube Data API v3)
@@ -171,10 +179,31 @@ A full-featured Pomodoro productivity dashboard with an integrated YouTube music
 ## Todo/Quests System
 
 - Admin-only feature (guests see a locked state with login prompt)
-- Full CRUD via `todo_api.php` with Supabase PostgreSQL backend
+- Full CRUD via `widgets/todo_api.php` with Supabase PostgreSQL backend
 - Features: text input, done/undone toggle, priority levels (high/medium/low), due dates
 - Sorted by: incomplete first → priority (high→low) → due date → newest
 - Styled as a retro "Quests" widget with window controls
+
+---
+
+## Messages System
+
+- Admin-only inter-admin messaging with inbox, sent, and compose tabs
+- Full CRUD via `widgets/messages_api.php` with Supabase PostgreSQL backend
+- Supabase Realtime subscription for live "new message" notifications
+- Typewriter-style message viewer with animated cursor
+- Unread badges on nav drawer, bottom dock, and top bar
+- Full-screen bottom sheet on mobile with swipe-to-dismiss
+
+---
+
+## Breakout Game
+
+- Admin-only canvas-based Atari Breakout clone
+- Keyboard (Arrow/A/D) and mobile touch controls (drag, buttons, or both)
+- Progressive difficulty: each level adds a row and increases ball speed
+- Score persistence via `widgets/breakout_api.php` — tracks total, best run, and all-time top
+- Retro pixel art style with neon brick palette
 
 ---
 
@@ -201,6 +230,28 @@ A full-featured Pomodoro productivity dashboard with an integrated YouTube music
 | title      | TEXT      | Video title       |
 | thumbnail  | TEXT      | Thumbnail URL     |
 | watched_at | TIMESTAMP | Watch timestamp   |
+
+### `admin_messages` table
+
+| Column        | Type      | Description                   |
+| ------------- | --------- | ----------------------------- |
+| id            | UUID (PK) | Auto-generated message ID     |
+| from_username | TEXT      | Sender admin username         |
+| to_username   | TEXT      | Recipient admin username      |
+| subject       | TEXT      | Message subject line          |
+| body          | TEXT      | Message body                  |
+| is_read       | BOOLEAN   | Read status (default `false`) |
+| created_at    | TIMESTAMP | Send timestamp                |
+
+### `breakout_scores` table
+
+| Column         | Type      | Description                       |
+| -------------- | --------- | --------------------------------- |
+| username       | TEXT (PK) | Admin username (unique per admin) |
+| total_score    | INTEGER   | Cumulative score across all runs  |
+| best_run_score | INTEGER   | Highest single-run score          |
+| best_run_at    | TIMESTAMP | When the best run was achieved    |
+| updated_at     | TIMESTAMP | Last update timestamp             |
 
 ---
 

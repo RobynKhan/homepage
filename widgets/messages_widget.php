@@ -396,7 +396,7 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
             if (list) list.innerHTML = '';
             if (list) list.style.display = '';
             if (viewer) viewer.style.display = 'none';
-            fetch('messages_api.php?action=inbox')
+            fetch('widgets/messages_api.php?action=inbox')
                 .then(function(r) {
                     return r.json();
                 })
@@ -426,7 +426,7 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
         function msgLoadSent() {
             var list = document.getElementById('sent-list');
             if (list) list.innerHTML = '';
-            fetch('messages_api.php?action=sent')
+            fetch('widgets/messages_api.php?action=sent')
                 .then(function(r) {
                     return r.json();
                 })
@@ -454,7 +454,7 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
             var fd = new FormData();
             fd.append('action', 'read');
             fd.append('id', m.id);
-            fetch('messages_api.php', {
+            fetch('widgets/messages_api.php', {
                 method: 'POST',
                 body: fd
             });
@@ -624,7 +624,7 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
             fd.append('to', to);
             fd.append('subject', subject);
             fd.append('body', body);
-            fetch('messages_api.php', {
+            fetch('widgets/messages_api.php', {
                     method: 'POST',
                     body: fd
                 })
@@ -661,7 +661,7 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
             var fd = new FormData();
             fd.append('action', 'delete');
             fd.append('id', id);
-            fetch('messages_api.php', {
+            fetch('widgets/messages_api.php', {
                     method: 'POST',
                     body: fd
                 })
@@ -682,7 +682,7 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
 
         // ── Unread count fetch (used by poller + realtime) ─────────
         function fetchUnreadCount() {
-            fetch('messages_api.php?action=unread_count')
+            fetch('widgets/messages_api.php?action=unread_count')
                 .then(function(r) {
                     return r.json();
                 })

@@ -18,9 +18,8 @@
  *   - Queue system (add, play-from-queue, render)
  *   - Now-playing bar + player title updates
  *   - Play logging to log_youtube.php (fire-and-forget)
- *   - Page-aware rendering (PixelTune retro vs glass styles)
  *
- * Loaded by: index.php, player.html
+ * Loaded by: index.php
  * ============================================================================
  */
 
@@ -83,12 +82,14 @@ function loadLofiHome() {
 
   LOFI_PICKS.forEach((v) => {
     const li = document.createElement("li");
-    li.onclick = () => { playVideo(v.id, v.title); };
+    li.onclick = () => {
+      playVideo(v.id, v.title);
+    };
     li.innerHTML =
       `<img src="https://img.youtube.com/vi/${v.id}/default.jpg" alt="" />` +
       `<span class="px-lofi-meta">` +
-        `<span class="px-lofi-title">${v.title}</span>` +
-        `<span class="px-lofi-sub">YouTube</span>` +
+      `<span class="px-lofi-title">${v.title}</span>` +
+      `<span class="px-lofi-sub">YouTube</span>` +
       `</span>`;
     list.appendChild(li);
   });
@@ -102,8 +103,7 @@ function loadRecentVideos() {
     .then((r) => r.json())
     .then((data) => {
       if (!data.items || !data.items.length) {
-        list.innerHTML =
-          '<li class="px-empty-hint">No recent videos yet</li>';
+        list.innerHTML = '<li class="px-empty-hint">No recent videos yet</li>';
         return;
       }
       list.innerHTML = "";
@@ -111,12 +111,14 @@ function loadRecentVideos() {
         const videoId = extractIdFromUrl(v.url);
         if (!videoId) return;
         const li = document.createElement("li");
-        li.onclick = () => { playVideo(videoId, v.title); };
+        li.onclick = () => {
+          playVideo(videoId, v.title);
+        };
         li.innerHTML =
-          `<img src="${v.thumbnail || 'https://img.youtube.com/vi/' + videoId + '/default.jpg'}" alt="" />` +
+          `<img src="${v.thumbnail || "https://img.youtube.com/vi/" + videoId + "/default.jpg"}" alt="" />` +
           `<span class="px-lofi-meta">` +
-            `<span class="px-lofi-title">${v.title || 'Untitled'}</span>` +
-            `<span class="px-lofi-sub">${formatTimeAgo(v.watched_at)}</span>` +
+          `<span class="px-lofi-title">${v.title || "Untitled"}</span>` +
+          `<span class="px-lofi-sub">${formatTimeAgo(v.watched_at)}</span>` +
           `</span>`;
         list.appendChild(li);
       });
