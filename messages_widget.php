@@ -1,12 +1,12 @@
 <?php
-
 /**
  * ============================================================================
- * messages_widget.php — Inline Admin Messaging Widget
+ * messages_widget.php — Inline Admin Messaging Widget (PixelTune Styled)
  * ============================================================================
- * Embeds the admin messaging UI directly within index.php.
- * Only renders for authenticated admin users.
+ * Embeds admin messaging directly inside index.php, styled identically to the
+ * QUESTS and PIXELTUNE widgets (retro pixel look, scanlines, Press Start 2P).
  * Calls messages_api.php via fetch for all CRUD operations.
+ * Uses Supabase Realtime for live "new message" notifications.
  * ============================================================================
  */
 if (!function_exists('is_admin_logged_in') || !is_admin_logged_in()) return;
@@ -16,551 +16,270 @@ $msg_me    = $msg_admin['username'];
 $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $msg_me);
 ?>
 
-<style>
-    /* ── Messages Widget (inline in index.php) ─────────────────────────────── */
-    .msg-widget {
-        width: 100%;
-        animation: fadeInUp 0.5s ease both;
-    }
+<!-- ── Pixel-styled Messages Widget ─────────────────────────────── -->
+<div class="px-msg">
+    <div class="px-msg-scanlines"></div>
 
-    .msg-panel {
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        padding: clamp(18px, 3vw, 28px);
-        min-height: 320px;
-    }
-
-    /* Tab bar */
-    .msg-tabs {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-bottom: 1.25rem;
-    }
-
-    .msg-tabs__label {
-        font-family: "Press Start 2P", monospace;
-        font-size: 0.6rem;
-        color: var(--sand);
-        letter-spacing: 2px;
-    }
-
-    .msg-tabs__btns {
-        display: flex;
-        gap: 0.4rem;
-    }
-
-    .msg-tab-btn {
-        font-family: "Press Start 2P", monospace;
-        font-size: 0.55rem;
-        letter-spacing: 1px;
-        padding: 8px 14px;
-        background: var(--px-bg, var(--glass-bg));
-        border: 2px solid var(--glass-border);
-        color: var(--text-muted);
-        cursor: pointer;
-        transition: all var(--transition);
-        position: relative;
-    }
-
-    .msg-tab-btn:hover {
-        background: var(--glass-hover);
-        color: var(--cream);
-        border-color: var(--sand);
-    }
-
-    .msg-tab-btn.active {
-        background: var(--glass-hover);
-        color: var(--cream);
-        border-color: var(--sand);
-        box-shadow: 0 0 10px rgba(156, 95, 192, 0.3);
-    }
-
-    /* Message list rows */
-    .msg-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-        padding: 0.75rem 1rem;
-        margin-bottom: 0.4rem;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        cursor: pointer;
-        transition: background var(--transition), border-color var(--transition);
-        border-radius: 10px;
-    }
-
-    .msg-row:hover {
-        background: var(--glass-hover);
-        border-color: var(--sand);
-    }
-
-    .msg-row.unread {
-        border-color: var(--sand);
-        box-shadow: 0 0 10px rgba(156, 95, 192, 0.2);
-    }
-
-    .msg-row__left {
-        overflow: hidden;
-        flex: 1;
-    }
-
-    .msg-row__from {
-        font-family: "Press Start 2P", monospace;
-        font-size: 0.5rem;
-        letter-spacing: 1px;
-        margin-bottom: 0.35rem;
-        color: var(--text-muted);
-    }
-
-    .msg-row.unread .msg-row__from {
-        color: var(--sand);
-    }
-
-    .msg-row__subject {
-        font-size: 0.85rem;
-        font-weight: 500;
-        color: var(--text-primary);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .msg-row__date {
-        font-family: "Press Start 2P", monospace;
-        font-size: 0.42rem;
-        color: var(--text-muted);
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-
-    /* Message viewer */
-    .msg-viewer {
-        display: none;
-    }
-
-    .msg-viewer__back {
-        font-family: "Press Start 2P", monospace;
-        font-size: 0.55rem;
-        letter-spacing: 1px;
-        padding: 8px 14px;
-        background: transparent;
-        border: 2px solid var(--glass-border);
-        color: var(--text-muted);
-        cursor: pointer;
-        margin-bottom: 1.25rem;
-        transition: all var(--transition);
-    }
-
-    .msg-viewer__back:hover {
-        background: var(--glass-hover);
-        color: var(--cream);
-        border-color: var(--sand);
-    }
-
-    .msg-viewer__meta {
-        font-family: "Press Start 2P", monospace;
-        font-size: 0.48rem;
-        color: var(--text-muted);
-        letter-spacing: 1px;
-        margin-bottom: 0.5rem;
-    }
-
-    .msg-viewer__subject {
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--sand);
-        margin-bottom: 1.25rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 1px solid var(--glass-border);
-    }
-
-    .msg-viewer__body {
-        font-size: 0.88rem;
-        line-height: 1.8;
-        color: var(--text-primary);
-        white-space: pre-wrap;
-    }
-
-    /* Compose form */
-    .msg-compose {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .msg-field label {
-        display: block;
-        font-family: "Press Start 2P", monospace;
-        font-size: 0.48rem;
-        letter-spacing: 1px;
-        color: var(--text-muted);
-        margin-bottom: 0.4rem;
-    }
-
-    .msg-field select,
-    .msg-field input,
-    .msg-field textarea {
-        width: 100%;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: 10px;
-        color: var(--text-primary);
-        padding: 0.6rem 0.9rem;
-        font-family: "Inter", sans-serif;
-        font-size: 0.88rem;
-        box-sizing: border-box;
-        transition: border-color var(--transition), box-shadow var(--transition);
-        outline: none;
-    }
-
-    .msg-field select:focus,
-    .msg-field input:focus,
-    .msg-field textarea:focus {
-        border-color: var(--sand);
-        box-shadow: 0 0 0 3px rgba(156, 95, 192, 0.12);
-    }
-
-    .msg-field textarea {
-        resize: vertical;
-        min-height: 120px;
-    }
-
-    .msg-field select option {
-        background: #1a0d2e;
-        color: var(--text-primary);
-    }
-
-    .msg-send-row {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .msg-send-btn {
-        font-family: "Press Start 2P", monospace;
-        font-size: 0.55rem;
-        letter-spacing: 1px;
-        padding: 10px 20px;
-        background: var(--sand);
-        color: #0f0e17;
-        border: none;
-        cursor: pointer;
-        transition: opacity var(--transition), transform 0.15s;
-        border-radius: 999px;
-    }
-
-    .msg-send-btn:hover {
-        opacity: 0.85;
-        transform: scale(1.02);
-    }
-
-    .msg-send-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    .msg-send-status {
-        font-family: "Press Start 2P", monospace;
-        font-size: 0.48rem;
-        letter-spacing: 1px;
-        color: var(--text-muted);
-    }
-
-    .msg-empty {
-        font-family: "Press Start 2P", monospace;
-        font-size: 0.55rem;
-        color: var(--text-muted);
-        letter-spacing: 1px;
-        padding: 2rem 0;
-        text-align: center;
-    }
-
-    .msg-badge {
-        display: none;
-        background: #f87171;
-        color: #000;
-        border-radius: 4px;
-        padding: 1px 5px;
-        font-size: 0.5rem;
-        margin-left: 5px;
-        vertical-align: middle;
-        font-family: "Press Start 2P", monospace;
-    }
-
-    @media (max-width: 600px) {
-        .msg-tabs__label {
-            display: none;
-        }
-
-        .msg-tab-btn {
-            font-size: 0.45rem;
-            padding: 7px 10px;
-        }
-    }
-</style>
-
-<div class="msg-widget">
-    <div class="msg-panel">
-
-        <!-- Tab Bar -->
-        <div class="msg-tabs">
-            <span class="msg-tabs__label">✉ MESSAGES</span>
-            <div class="msg-tabs__btns">
-                <button id="tab-inbox" class="msg-tab-btn active" onclick="msgSwitchTab('inbox')" type="button">
-                    INBOX <span id="msg-unread-badge" class="msg-badge"></span>
-                </button>
-                <button id="tab-sent" class="msg-tab-btn" onclick="msgSwitchTab('sent')" type="button">SENT</button>
-                <button id="tab-compose" class="msg-tab-btn" onclick="msgSwitchTab('compose')" type="button">+ NEW</button>
-            </div>
-        </div>
-
-        <!-- INBOX panel -->
-        <div id="panel-inbox">
-            <div id="msg-list"></div>
-            <div id="msg-viewer" class="msg-viewer">
-                <button class="msg-viewer__back" onclick="msgCloseView()" type="button">← BACK</button>
-                <div id="v-meta" class="msg-viewer__meta"></div>
-                <div id="v-subject" class="msg-viewer__subject"></div>
-                <div id="v-body" class="msg-viewer__body"></div>
-            </div>
-        </div>
-
-        <!-- SENT panel -->
-        <div id="panel-sent" style="display:none;">
-            <div id="sent-list"></div>
-        </div>
-
-        <!-- COMPOSE panel -->
-        <div id="panel-compose" style="display:none;">
-            <div class="msg-compose">
-                <div class="msg-field">
-                    <label for="c-to">TO</label>
-                    <select id="c-to">
-                        <?php foreach ($msg_other_admins as $u): ?>
-                            <option value="<?= htmlspecialchars($u) ?>"><?= htmlspecialchars($u) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="msg-field">
-                    <label for="c-subject">SUBJECT</label>
-                    <input id="c-subject" type="text" placeholder="subject...">
-                </div>
-                <div class="msg-field">
-                    <label for="c-body">MESSAGE</label>
-                    <textarea id="c-body" placeholder="write your message..."></textarea>
-                </div>
-                <div class="msg-send-row">
-                    <button id="send-btn" class="msg-send-btn" onclick="msgSendMessage()" type="button">SEND ▶</button>
-                    <span id="send-status" class="msg-send-status"></span>
-                </div>
-            </div>
-        </div>
-
+    <!-- Title bar (matches QUESTS widget) -->
+    <div class="px-msg-titlebar">
+        <span class="px-msg-titlebar-dots">
+            <span class="px-dot px-dot--red"></span>
+            <span class="px-dot px-dot--yellow"></span>
+            <span class="px-dot px-dot--green"></span>
+        </span>
+        <h3 class="px-msg-title">MESSAGES</h3>
+        <span class="px-msg-unread-pip" id="px-msg-pip" style="display:none;"></span>
     </div>
-</div>
+
+    <!-- Tab row -->
+    <div class="px-msg-tabs">
+        <button class="px-msg-tab active" id="mtab-inbox" onclick="msgSwitchTab('inbox')" type="button">
+            INBOX <span class="px-msg-badge" id="px-msg-badge"></span>
+        </button>
+        <button class="px-msg-tab" id="mtab-sent" onclick="msgSwitchTab('sent')" type="button">SENT</button>
+        <button class="px-msg-tab" id="mtab-compose" onclick="msgSwitchTab('compose')" type="button">+ NEW</button>
+    </div>
+
+    <!-- Body -->
+    <div class="px-msg-body">
+
+        <!-- Inbox list -->
+        <div id="mpanel-inbox" class="px-msg-panel">
+            <div id="msg-list" class="px-msg-scroll"></div>
+            <div id="msg-viewer" class="px-msg-viewer" style="display:none;">
+                <button class="px-msg-back-btn" onclick="msgCloseView()" type="button">&#9664; BACK</button>
+                <div class="px-msg-viewer-meta" id="v-meta"></div>
+                <div class="px-msg-viewer-subject" id="v-subject"></div>
+                <div class="px-msg-viewer-body" id="v-body"></div>
+            </div>
+        </div>
+
+        <!-- Sent list -->
+        <div id="mpanel-sent" class="px-msg-panel" style="display:none;">
+            <div id="sent-list" class="px-msg-scroll"></div>
+        </div>
+
+        <!-- Compose -->
+        <div id="mpanel-compose" class="px-msg-panel" style="display:none;">
+            <div class="px-msg-compose">
+                <label class="px-msg-label">TO</label>
+                <select id="c-to" class="px-msg-select">
+                    <?php foreach ($msg_other_admins as $u): ?>
+                        <option value="<?= htmlspecialchars($u) ?>"><?= htmlspecialchars($u) ?></option>
+                    <?php endforeach; ?>
+                </select>
+
+                <label class="px-msg-label">SUBJECT</label>
+                <input id="c-subject" class="px-msg-input" type="text" placeholder="subject..." maxlength="120">
+
+                <label class="px-msg-label">MESSAGE</label>
+                <textarea id="c-body" class="px-msg-textarea" placeholder="write your message..."></textarea>
+
+                <div class="px-msg-send-row">
+                    <button id="send-btn" class="px-msg-send-btn" onclick="msgSendMessage()" type="button">SEND &#9654;</button>
+                    <span id="send-status" class="px-msg-status"></span>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /.px-msg-body -->
+</div><!-- /.px-msg -->
 
 <script>
-    (function() {
-        // ── Tab switching ──────────────────────────────────────────────────────
-        window.msgSwitchTab = function(tab) {
-            ['inbox', 'sent', 'compose'].forEach(function(t) {
-                document.getElementById('panel-' + t).style.display = t === tab ? '' : 'none';
-                document.getElementById('tab-' + t).classList.toggle('active', t === tab);
-            });
-            if (tab === 'inbox') msgLoadInbox();
-            if (tab === 'sent') msgLoadSent();
-        };
+(function() {
+    var ME = <?= json_encode($msg_me) ?>;
 
-        // ── Helpers ────────────────────────────────────────────────────────────
-        function fmtDate(str) {
-            var d = new Date(str);
-            return d.toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: 'numeric'
-                }) +
-                ' · ' + d.toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-        }
+    // ── Tab switching ──────────────────────────────────────────
+    window.msgSwitchTab = function(tab) {
+        ['inbox','sent','compose'].forEach(function(t) {
+            var panel = document.getElementById('mpanel-' + t);
+            var btn   = document.getElementById('mtab-' + t);
+            if (panel) panel.style.display = t === tab ? '' : 'none';
+            if (btn)   btn.classList.toggle('active', t === tab);
+        });
+        if (tab === 'inbox')  msgLoadInbox();
+        if (tab === 'sent')   msgLoadSent();
+    };
 
-        function escHtml(s) {
-            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        }
+    // ── Helpers ────────────────────────────────────────────────
+    function fmtDate(str) {
+        var d = new Date(str);
+        return d.toLocaleDateString(undefined, { month:'short', day:'numeric' })
+            + ' ' + d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    }
+    function esc(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function emptyMsg(text) {
+        var d = document.createElement('div');
+        d.className = 'px-msg-empty';
+        d.innerHTML = '<i class="bi bi-envelope-open"></i><span>' + esc(text) + '</span>';
+        return d;
+    }
 
-        function emptyState(text) {
-            var d = document.createElement('div');
-            d.className = 'msg-empty';
-            d.textContent = text;
-            return d;
-        }
-
-        function buildRow(m, isSent) {
-            var unread = !isSent && !m.is_read;
-            var row = document.createElement('div');
-            row.className = 'msg-row' + (unread ? ' unread' : '');
-            row.innerHTML =
-                '<div class="msg-row__left">' +
-                '<div class="msg-row__from">' +
-                (unread ? '● ' : '') +
-                escHtml(isSent ? 'TO: ' + m.to_username : 'FROM: ' + m.from_username) +
+    function buildRow(m, isSent) {
+        var unread = !isSent && !m.is_read;
+        var row = document.createElement('div');
+        row.className = 'px-msg-row' + (unread ? ' unread' : '');
+        row.innerHTML =
+            '<div class="px-msg-row-left">' +
+                '<div class="px-msg-row-from">' +
+                    (unread ? '<span class="px-msg-dot">&#9679;</span> ' : '') +
+                    esc(isSent ? 'TO: ' + m.to_username : m.from_username) +
                 '</div>' +
-                '<div class="msg-row__subject">' + escHtml(m.subject) + '</div>' +
-                '</div>' +
-                '<div class="msg-row__date">' + fmtDate(m.created_at) + '</div>';
-            if (!isSent) row.onclick = function() {
-                msgOpenMsg(m);
-            };
-            return row;
-        }
+                '<div class="px-msg-row-subject">' + esc(m.subject) + '</div>' +
+            '</div>' +
+            '<div class="px-msg-row-date">' + fmtDate(m.created_at) + '</div>';
+        if (!isSent) row.onclick = function() { msgOpenMsg(m); };
+        return row;
+    }
 
-        // ── Load inbox ─────────────────────────────────────────────────────────
-        window.msgLoadInbox = function() {
-            var list = document.getElementById('msg-list');
-            var viewer = document.getElementById('msg-viewer');
-            list.innerHTML = '';
-            list.style.display = '';
-            viewer.style.display = 'none';
+    // ── Update ALL badge locations ─────────────────────────────
+    function syncBadges(count) {
+        // Widget badge
+        var b = document.getElementById('px-msg-badge');
+        if (b) { b.textContent = count; b.style.display = count > 0 ? '' : 'none'; }
+        // Title bar pip
+        var pip = document.getElementById('px-msg-pip');
+        if (pip) pip.style.display = count > 0 ? '' : 'none';
+        // Header / drawer / dock badges
+        ['msg-nav-badge','msg-drawer-badge','msg-dock-badge'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            if (count > 0) { el.textContent = count; el.style.display = ''; }
+            else { el.style.display = 'none'; }
+        });
+    }
 
-            fetch('messages_api.php?action=inbox')
-                .then(function(r) {
-                    return r.json();
-                })
-                .then(function(msgs) {
-                    list.innerHTML = '';
-                    if (!msgs.length) {
-                        list.appendChild(emptyState('NO MESSAGES YET.'));
-                        return;
-                    }
-                    msgs.forEach(function(m) {
-                        list.appendChild(buildRow(m, false));
-                    });
-                    var unread = msgs.filter(function(m) {
-                        return !m.is_read;
-                    }).length;
-                    var badge = document.getElementById('msg-unread-badge');
-                    if (badge) {
-                        badge.textContent = unread;
-                        badge.style.display = unread ? '' : 'none';
-                    }
-                })
-                .catch(function() {
-                    list.appendChild(emptyState('COULD NOT LOAD MESSAGES.'));
-                });
-        };
+    // ── Load inbox ─────────────────────────────────────────────
+    window.msgLoadInbox = function() {
+        var list = document.getElementById('msg-list');
+        var viewer = document.getElementById('msg-viewer');
+        list.innerHTML = '';
+        list.style.display = '';
+        viewer.style.display = 'none';
+        fetch('messages_api.php?action=inbox')
+            .then(function(r) { return r.json(); })
+            .then(function(msgs) {
+                list.innerHTML = '';
+                if (!msgs.length) { list.appendChild(emptyMsg('NO MESSAGES YET')); return; }
+                msgs.forEach(function(m) { list.appendChild(buildRow(m, false)); });
+                var unread = msgs.filter(function(m) { return !m.is_read; }).length;
+                syncBadges(unread);
+            })
+            .catch(function() { list.appendChild(emptyMsg('LOAD ERROR')); });
+    };
 
-        // ── Load sent ──────────────────────────────────────────────────────────
-        window.msgLoadSent = function() {
-            var list = document.getElementById('sent-list');
-            list.innerHTML = '';
-            fetch('messages_api.php?action=sent')
-                .then(function(r) {
-                    return r.json();
-                })
-                .then(function(msgs) {
-                    list.innerHTML = '';
-                    if (!msgs.length) {
-                        list.appendChild(emptyState('NO SENT MESSAGES.'));
-                        return;
-                    }
-                    msgs.forEach(function(m) {
-                        list.appendChild(buildRow(m, true));
-                    });
-                })
-                .catch(function() {
-                    list.appendChild(emptyState('COULD NOT LOAD MESSAGES.'));
-                });
-        };
+    // ── Load sent ──────────────────────────────────────────────
+    window.msgLoadSent = function() {
+        var list = document.getElementById('sent-list');
+        list.innerHTML = '';
+        fetch('messages_api.php?action=sent')
+            .then(function(r) { return r.json(); })
+            .then(function(msgs) {
+                list.innerHTML = '';
+                if (!msgs.length) { list.appendChild(emptyMsg('NO SENT MESSAGES')); return; }
+                msgs.forEach(function(m) { list.appendChild(buildRow(m, true)); });
+            })
+            .catch(function() { list.appendChild(emptyMsg('LOAD ERROR')); });
+    };
 
-        // ── Open message viewer ────────────────────────────────────────────────
-        window.msgOpenMsg = function(m) {
-            document.getElementById('msg-list').style.display = 'none';
-            document.getElementById('msg-viewer').style.display = '';
-            document.getElementById('v-meta').textContent = 'FROM: ' + m.from_username + '   ·   ' + fmtDate(m.created_at);
-            document.getElementById('v-subject').textContent = m.subject;
-            document.getElementById('v-body').textContent = m.body;
-            if (!m.is_read) {
-                fetch('messages_api.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: 'action=read&id=' + encodeURIComponent(m.id)
-                });
-                m.is_read = true;
-            }
-        };
-
-        window.msgCloseView = function() {
-            document.getElementById('msg-list').style.display = '';
-            document.getElementById('msg-viewer').style.display = 'none';
-            msgLoadInbox();
-        };
-
-        // ── Send message ───────────────────────────────────────────────────────
-        window.msgSendMessage = function() {
-            var to = document.getElementById('c-to').value;
-            var subject = document.getElementById('c-subject').value.trim();
-            var body = document.getElementById('c-body').value.trim();
-            var status = document.getElementById('send-status');
-            var btn = document.getElementById('send-btn');
-
-            if (!subject || !body) {
-                status.style.color = '#f87171';
-                status.textContent = '⚠ FILL IN ALL FIELDS.';
-                return;
-            }
-
-            btn.disabled = true;
-            status.style.color = 'var(--text-muted)';
-            status.textContent = 'SENDING...';
-
-            var fd = new FormData();
-            fd.append('action', 'send');
-            fd.append('to', to);
-            fd.append('subject', subject);
-            fd.append('body', body);
-
+    // ── Open message ───────────────────────────────────────────
+    window.msgOpenMsg = function(m) {
+        document.getElementById('msg-list').style.display = 'none';
+        var v = document.getElementById('msg-viewer');
+        v.style.display = '';
+        document.getElementById('v-meta').textContent  = 'FROM: ' + m.from_username + '  \u00b7  ' + fmtDate(m.created_at);
+        document.getElementById('v-subject').textContent = m.subject;
+        document.getElementById('v-body').textContent    = m.body;
+        if (!m.is_read) {
             fetch('messages_api.php', {
-                    method: 'POST',
-                    body: fd
-                })
-                .then(function(r) {
-                    return r.json();
-                })
-                .then(function(res) {
-                    btn.disabled = false;
-                    if (res.ok) {
-                        status.style.color = 'var(--sand)';
-                        status.textContent = '✓ SENT!';
-                        document.getElementById('c-subject').value = '';
-                        document.getElementById('c-body').value = '';
-                        setTimeout(function() {
-                            status.textContent = '';
-                        }, 3000);
-                    } else {
-                        status.style.color = '#f87171';
-                        status.textContent = '✗ ' + (res.error || 'FAILED.');
-                    }
-                })
-                .catch(function() {
-                    btn.disabled = false;
-                    status.style.color = '#f87171';
-                    status.textContent = '✗ NETWORK ERROR.';
-                });
-        };
-
-        // ── Init — load inbox on first render ──────────────────────────────────
+                method:'POST',
+                headers:{'Content-Type':'application/x-www-form-urlencoded'},
+                body:'action=read&id=' + encodeURIComponent(m.id)
+            });
+            m.is_read = true;
+            fetchUnreadCount();
+        }
+    };
+    window.msgCloseView = function() {
+        document.getElementById('msg-list').style.display = '';
+        document.getElementById('msg-viewer').style.display = 'none';
         msgLoadInbox();
-    }());
+    };
+
+    // ── Send ───────────────────────────────────────────────────
+    window.msgSendMessage = function() {
+        var to      = document.getElementById('c-to').value;
+        var subject = document.getElementById('c-subject').value.trim();
+        var body    = document.getElementById('c-body').value.trim();
+        var status  = document.getElementById('send-status');
+        var btn     = document.getElementById('send-btn');
+        if (!subject || !body) {
+            status.style.color = 'var(--px-accent)';
+            status.textContent = '\u26a0 FILL ALL FIELDS';
+            return;
+        }
+        btn.disabled = true;
+        status.style.color = 'var(--px-text2)';
+        status.textContent = 'SENDING...';
+        var fd = new FormData();
+        fd.append('action','send'); fd.append('to',to);
+        fd.append('subject',subject); fd.append('body',body);
+        fetch('messages_api.php', { method:'POST', body:fd })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                btn.disabled = false;
+                if (res.ok) {
+                    status.style.color = 'var(--px-green)';
+                    status.textContent = '\u2713 SENT!';
+                    document.getElementById('c-subject').value = '';
+                    document.getElementById('c-body').value = '';
+                    setTimeout(function() { status.textContent = ''; }, 3000);
+                } else {
+                    status.style.color = 'var(--px-accent)';
+                    status.textContent = '\u2717 ' + (res.error || 'FAILED');
+                }
+            })
+            .catch(function() {
+                btn.disabled = false;
+                status.style.color = 'var(--px-accent)';
+                status.textContent = '\u2717 NETWORK ERROR';
+            });
+    };
+
+    // ── Unread count fetch (used by poller + realtime) ─────────
+    function fetchUnreadCount() {
+        fetch('messages_api.php?action=unread_count')
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                if (typeof d.count === 'number') syncBadges(d.count);
+            }).catch(function(){});
+    }
+
+    // ── Polling fallback (every 15s) ───────────────────────────
+    setInterval(fetchUnreadCount, 15000);
+
+    // ── Supabase Realtime: instant notification on INSERT ──────
+    if (typeof supabaseClient !== 'undefined' && supabaseClient.channel) {
+        supabaseClient
+            .channel('admin_messages_realtime')
+            .on('postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'admin_messages', filter: 'to_username=eq.' + ME },
+                function(payload) {
+                    fetchUnreadCount();
+                    var inboxPanel = document.getElementById('mpanel-inbox');
+                    if (inboxPanel && inboxPanel.style.display !== 'none') {
+                        msgLoadInbox();
+                    }
+                }
+            )
+            .subscribe();
+    }
+
+    // ── Init ───────────────────────────────────────────────────
+    msgLoadInbox();
+    fetchUnreadCount();
+}());
 </script>

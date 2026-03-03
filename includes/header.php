@@ -134,38 +134,5 @@
     <div class="sheet-backdrop" id="sheet-backdrop"></div>
 
     <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
-        <!-- ── Live Unread Message Badge (polls every 30s) ── -->
-        <script>
-            (function() {
-                function updateBadges(count) {
-                    const ids = ['msg-nav-badge', 'msg-drawer-badge', 'msg-dock-badge'];
-                    ids.forEach(function(id) {
-                        const el = document.getElementById(id);
-                        if (!el) return;
-                        if (count > 0) {
-                            el.textContent = count;
-                            el.style.display = '';
-                        } else {
-                            el.style.display = 'none';
-                        }
-                    });
-                }
-
-                function fetchUnread() {
-                    fetch('messages_api.php?action=unread_count')
-                        .then(function(r) {
-                            return r.json();
-                        })
-                        .then(function(d) {
-                            if (typeof d.count === 'number') updateBadges(d.count);
-                        })
-                        .catch(function() {});
-                }
-                // Only run if not already on messages page
-                if (!window.location.pathname.includes('messages.php')) {
-                    fetchUnread();
-                    setInterval(fetchUnread, 30000);
-                }
-            }());
-        </script>
+        <!-- Badges are updated by messages_widget.php (polling + Supabase realtime) -->
     <?php endif; ?>

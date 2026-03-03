@@ -242,9 +242,7 @@ $jsConfig = json_encode([
 
 <!-- ====== MESSAGES WIDGET (Admin Only) ====== -->
 <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
-    <div id="container-5" class="container-5" style="display:none;">
-        <?php require_once __DIR__ . '/messages_widget.php'; ?>
-    </div>
+<div id="container-5" class="container-5" data-show-as="flex" style="display:none;">
 <?php endif; ?>
 
 <!-- ====== SETTINGS PANEL — Pixel Styled ====== -->
