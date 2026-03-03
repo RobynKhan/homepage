@@ -12,7 +12,7 @@ require_admin_login();
 header('Content-Type: application/json');
 
 $supabase_url = getenv('SUPABASE_URL');
-$supabase_key = getenv('SUPABASE_ANON_KEY'); // service role key
+$supabase_key = getenv('SUPABASE_SERVICE_KEY'); // service role key
 $me = current_admin()['username'];
 
 function sb_get(string $endpoint): array
