@@ -508,6 +508,36 @@
       bkPointerDown = false;
     });
 
+    canvas.addEventListener(
+      "touchstart",
+      function (e) {
+        if (!canvas._bkDragEnabled) return;
+        if (!e.touches || !e.touches.length) return;
+        bkPointerDown = true;
+        setPaddleFromClientX(e.touches[0].clientX);
+        if (state && !state.launched && !state.gameOver && !state.won)
+          state.launched = true;
+      },
+      { passive: true },
+    );
+
+    canvas.addEventListener(
+      "touchmove",
+      function (e) {
+        if (!canvas._bkDragEnabled || !bkPointerDown) return;
+        if (!e.touches || !e.touches.length) return;
+        setPaddleFromClientX(e.touches[0].clientX);
+      },
+      { passive: true },
+    );
+
+    canvas.addEventListener("touchend", function () {
+      bkPointerDown = false;
+    });
+    canvas.addEventListener("touchcancel", function () {
+      bkPointerDown = false;
+    });
+
     // On-screen buttons (hold to move)
     const leftBtn = document.getElementById("bk-btn-left");
     const rightBtn = document.getElementById("bk-btn-right");
@@ -527,6 +557,9 @@
       btn.addEventListener("pointerup", up);
       btn.addEventListener("pointercancel", up);
       btn.addEventListener("pointerleave", up);
+      btn.addEventListener("touchstart", down, { passive: false });
+      btn.addEventListener("touchend", up, { passive: false });
+      btn.addEventListener("touchcancel", up, { passive: false });
     }
 
     bindHold(leftBtn, "ArrowLeft");
@@ -565,6 +598,12 @@
     // Re-size canvas on window resize
     window.addEventListener("resize", function () {
       if (gameStarted) resizeCanvas();
+      if (isMobileLike()) {
+        const mode = localStorage.getItem(CONTROL_KEY) || "both";
+        applyControlMode(mode);
+      } else {
+        applyControlMode("drag");
+      }
     });
 
     // Pre-load scores

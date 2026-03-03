@@ -520,7 +520,7 @@ $date    = date('F j, Y · g:i a', strtotime($msg['created_at']));
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
 
-  <a href="messages.php" class="back">← back to messages</a>
+  <a href="index.php" class="back">← back to messages</a>
 
   <!-- ENVELOPE SCENE -->
   <div class="scene" id="scene">
