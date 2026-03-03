@@ -498,7 +498,7 @@ body {
 .timers button {
   padding: 8px 12px;
   font-family: "Press Start 2P", monospace;
-  font-size: 8px;
+  font-size: clamp(6px, 2vw, 12px);
   background: var(--px-panel);
   color: var(--px-text);
   border: 2px solid #000;
@@ -2476,6 +2476,9 @@ body.theme-theme3 .px-star {
   position: relative;
   text-decoration: none;
   color: inherit;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 .px-msg-row:hover {

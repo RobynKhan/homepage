@@ -34,11 +34,17 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
 
     <!-- Tab row -->
     <div class="px-msg-tabs">
-        <button class="px-msg-tab active" id="mtab-inbox" onclick="msgSwitchTab('inbox')" type="button">
+        <button class="px-msg-tab active" id="mtab-inbox"
+            ontouchend="event.stopPropagation();event.preventDefault();msgSwitchTab('inbox')"
+            onclick="msgSwitchTab('inbox')" type="button">
             INBOX <span class="px-msg-badge" id="px-msg-badge"></span>
         </button>
-        <button class="px-msg-tab" id="mtab-sent" onclick="msgSwitchTab('sent')" type="button">SENT</button>
-        <button class="px-msg-tab" id="mtab-compose" onclick="msgSwitchTab('compose')" type="button">+ NEW</button>
+        <button class="px-msg-tab" id="mtab-sent"
+            ontouchend="event.stopPropagation();event.preventDefault();msgSwitchTab('sent')"
+            onclick="msgSwitchTab('sent')" type="button">SENT</button>
+        <button class="px-msg-tab" id="mtab-compose"
+            ontouchend="event.stopPropagation();event.preventDefault();msgSwitchTab('compose')"
+            onclick="msgSwitchTab('compose')" type="button">+ NEW</button>
     </div>
 
     <!-- Body -->
@@ -118,10 +124,10 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
 
         function buildRow(m, isSent) {
             var unread = !isSent && !m.is_read;
-            // Use a native <a> tag so mobile tap-to-navigate always works
-            var row = document.createElement('a');
-            row.href = 'message_view.php?id=' + encodeURIComponent(m.id);
+            var row = document.createElement('div');
             row.className = 'px-msg-row' + (unread ? ' unread' : '');
+            row.setAttribute('role', 'button');
+            row.setAttribute('tabindex', '0');
             row.innerHTML =
                 '<div class="px-msg-row-left">' +
                 '<div class="px-msg-row-from">' +
@@ -135,10 +141,28 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
 
             var delBtn = row.querySelector('.px-msg-delete');
             if (delBtn) {
+                delBtn.addEventListener('touchend', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    msgDelete(m.id, isSent ? 'sent' : 'inbox');
+                });
                 delBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    e.preventDefault(); // prevent anchor navigation
+                    e.preventDefault();
                     msgDelete(m.id, isSent ? 'sent' : 'inbox');
+                });
+            }
+
+            // Open message inline on tap/click (not navigate away)
+            if (!isSent) {
+                row.addEventListener('touchend', function(e) {
+                    if (e.target.classList.contains('px-msg-delete')) return;
+                    e.preventDefault();
+                    msgOpenMsgInline(m);
+                });
+                row.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('px-msg-delete')) return;
+                    msgOpenMsgInline(m);
                 });
             }
             return row;
@@ -237,9 +261,36 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
                 });
         }
 
-        // ── Open message ───────────────────────────────────────────
+        // ── Open message inline (no page navigation) ───────────────
+        function msgOpenMsgInline(m) {
+            // Mark as read via API
+            var fd = new FormData();
+            fd.append('action', 'read');
+            fd.append('id', m.id);
+            fetch('messages_api.php', {
+                method: 'POST',
+                body: fd
+            });
+
+            // Show inline viewer
+            var list = document.getElementById('msg-list');
+            var viewer = document.getElementById('msg-viewer');
+            if (list) list.style.display = 'none';
+            if (viewer) {
+                viewer.style.display = '';
+                document.getElementById('v-meta').textContent =
+                    'FROM: ' + m.from_username + '  ·  ' + fmtDate(m.created_at);
+                document.getElementById('v-subject').textContent = m.subject;
+                document.getElementById('v-body').textContent = m.body || '';
+                // Scroll viewer to top
+                viewer.scrollTop = 0;
+            }
+            fetchUnreadCount();
+        }
+
+        // Keep msgOpenMsg as alias for any external calls
         function msgOpenMsg(m) {
-            window.location.href = 'message_view.php?id=' + encodeURIComponent(m.id);
+            msgOpenMsgInline(m);
         }
 
         function msgCloseView() {
@@ -365,6 +416,7 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
 
         // Expose APIs globally for HTML handlers
         window.msgSwitchTab = msgSwitchTab;
+        window.msgOpenMsgInline = msgOpenMsgInline;
         window.msgLoadInbox = msgLoadInbox;
         window.msgLoadSent = msgLoadSent;
         window.msgOpenMsg = msgOpenMsg;
