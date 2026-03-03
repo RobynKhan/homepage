@@ -263,6 +263,16 @@ $jsConfig = json_encode([
                 <h3 class="px-todo-title">BREAKOUT</h3>
             </div>
 
+            <!-- (NEW) Mobile control chooser (only shown on mobile by JS/CSS) -->
+            <div id="bk-control-chooser" class="bk-control-chooser" style="display:none;">
+                <div class="bk-control-chooser-title">CHOOSE CONTROLS</div>
+                <div class="bk-choices">
+                    <button id="bk-choose-drag" class="bk-choice-btn" type="button">DRAG</button>
+                    <button id="bk-choose-buttons" class="bk-choice-btn" type="button">BUTTONS</button>
+                    <button id="bk-choose-both" class="bk-choice-btn" type="button">BOTH</button>
+                </div>
+            </div>
+
             <!-- HUD -->
             <div class="px-breakout-hud">
                 <div class="px-breakout-hud-row">
@@ -282,10 +292,17 @@ $jsConfig = json_encode([
 
             <!-- Controls -->
             <div class="px-breakout-controls">
-                <button id="bk-start-btn" class="px-breakout-start-btn">
+                <button id="bk-start-btn" class="px-breakout-start-btn" type="button">
                     <i class="bi bi-controller" aria-hidden="true"></i> START
                 </button>
             </div>
+
+            <!-- (NEW) On-screen mobile buttons (JS will show for Buttons/Both) -->
+            <div id="bk-touch-controls" class="bk-touch-controls" style="display:none;">
+                <button id="bk-btn-left" class="bk-touch-btn" type="button" aria-label="Move left">◀</button>
+                <button id="bk-btn-right" class="bk-touch-btn" type="button" aria-label="Move right">▶</button>
+            </div>
+
         </div>
     </div>
 <?php endif; ?>
@@ -504,8 +521,8 @@ $jsConfig = json_encode([
 <script src="youtube.js"></script>
 
 <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
-<!-- ====== BREAKOUT GAME CONTROLLER (Admin Only) ====== -->
-<script src="breakthrough.js"></script>
+    <!-- ====== BREAKOUT GAME CONTROLLER (Admin Only) ====== -->
+    <script src="breakthrough.js"></script>
 <?php endif; ?>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

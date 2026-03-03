@@ -2669,7 +2669,59 @@ body.theme-theme3 .px-star {
   text-overflow: ellipsis;
   max-width: 55%;
 }
+/* Breakout mobile controls + chooser */
+#bk-control-chooser {
+  display: none;
+  padding: 10px;
+  border-bottom: 2px solid #000;
+  background: var(--px-bg2);
+  font-size: 7px;
+}
 
+#bk-control-chooser .bk-choices {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.bk-choice-btn {
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  background: var(--px-accent);
+  color: #000;
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 #000;
+  padding: 6px 10px;
+}
+
+#bk-touch-controls {
+  display: none; /* JS will enable for buttons/both */
+  gap: 10px;
+  justify-content: space-between;
+  padding: 10px;
+  background: var(--px-bg2);
+  border-top: 2px solid #000;
+}
+
+.bk-touch-btn {
+  flex: 1;
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  background: #00e5ff;
+  color: #000;
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 #000;
+  padding: 10px 0;
+  touch-action: none; /* prevent scroll while pressing */
+}
+
+/* Optional: only show chooser by default on mobile */
+@media (max-width: 800px) {
+  #container-6 {
+    top: clamp(96px, 14vh, 160px); /* from earlier: push down on mobile */
+  }
+}
 /* ── Canvas wrapper ────────────────────────────────── */
 .px-breakout-canvas-wrap {
   flex: 1;
@@ -2703,7 +2755,9 @@ body.theme-theme3 .px-star {
   cursor: pointer;
   letter-spacing: 0.05em;
   image-rendering: pixelated;
-  transition: box-shadow 0.1s, transform 0.1s;
+  transition:
+    box-shadow 0.1s,
+    transform 0.1s;
 }
 
 .px-breakout-start-btn:hover {
