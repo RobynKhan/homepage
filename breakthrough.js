@@ -361,6 +361,13 @@
         console.error("Breakout API error:", err);
         if (hudTop) hudTop.textContent = "SAVE ERR";
       });
+    // Show control chooser after game over (mobile only)
+    setTimeout(function() {
+      if (typeof isMobileLike === 'function' && isMobileLike()) {
+        var chooser = document.getElementById("bk-control-chooser");
+        if (chooser) chooser.style.display = "block";
+      }
+    }, 600);
   }
 
   // ── Load Initial Scores from API ─────────────────────────────────────────

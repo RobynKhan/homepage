@@ -100,6 +100,36 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
             });
             if (tab === 'inbox') msgLoadInbox();
             if (tab === 'sent') msgLoadSent();
+            };
+
+            // Touch support for tab switching
+            document.querySelectorAll('.px-msg-tab').forEach(function(btn) {
+                btn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    btn.click();
+                }, {passive: false});
+            });
+
+            // Touch support for message row selection
+            function enableMsgRowTouch() {
+                document.querySelectorAll('.px-msg-row').forEach(function(row) {
+                    row.addEventListener('touchstart', function(e) {
+                        e.preventDefault();
+                        row.click();
+                    }, {passive: false});
+                });
+            }
+            // Call after inbox/sent loads
+            var origMsgLoadInbox = window.msgLoadInbox;
+            window.msgLoadInbox = function() {
+                origMsgLoadInbox();
+                setTimeout(enableMsgRowTouch, 50);
+            };
+            var origMsgLoadSent = window.msgLoadSent;
+            window.msgLoadSent = function() {
+                origMsgLoadSent();
+                setTimeout(enableMsgRowTouch, 50);
+            };
         };
 
         // ── Helpers ────────────────────────────────────────────────
