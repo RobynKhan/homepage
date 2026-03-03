@@ -243,219 +243,221 @@ $jsConfig = json_encode([
 <!-- ====== MESSAGES WIDGET (Admin Only) ====== -->
 <?php if (function_exists('is_admin_logged_in') && is_admin_logged_in()): ?>
     <div id="container-5" class="container-5" data-show-as="flex" style="display:none;">
-    <?php endif; ?>
+        <?php require_once __DIR__ . '/messages_widget.php'; ?>
+    </div>
+<?php endif; ?>
 
-    <!-- ====== SETTINGS PANEL — Pixel Styled ====== -->
-    <div id="settings-container" class="settings-container pixel-settings">
-        <!-- Pixel decorations -->
-        <div class="px-star" style="top:15px;left:20px;animation-delay:0.2s;"></div>
-        <div class="px-star" style="top:40px;right:25px;animation-delay:0.7s;"></div>
-        <div class="px-star" style="bottom:25px;left:35px;animation-delay:1.2s;"></div>
-        <div class="px-star" style="bottom:50px;right:45px;animation-delay:0.4s;"></div>
+<!-- ====== SETTINGS PANEL — Pixel Styled ====== -->
+<div id="settings-container" class="settings-container pixel-settings">
+    <!-- Pixel decorations -->
+    <div class="px-star" style="top:15px;left:20px;animation-delay:0.2s;"></div>
+    <div class="px-star" style="top:40px;right:25px;animation-delay:0.7s;"></div>
+    <div class="px-star" style="bottom:25px;left:35px;animation-delay:1.2s;"></div>
+    <div class="px-star" style="bottom:50px;right:45px;animation-delay:0.4s;"></div>
 
-        <!-- Scanline overlay (added via CSS) -->
+    <!-- Scanline overlay (added via CSS) -->
 
-        <!-- Title bar like the todo widget -->
-        <div class="settings-titlebar">
-            <div class="settings-titlebar-dots">
-                <span class="px-dot px-dot--red"></span>
-                <span class="px-dot px-dot--yellow"></span>
-                <span class="px-dot px-dot--green"></span>
-            </div>
-            <h2 class="settings-title">THEME SETTINGS</h2>
-            <i class="bi bi-x-circle" id="close-settings"></i>
+    <!-- Title bar like the todo widget -->
+    <div class="settings-titlebar">
+        <div class="settings-titlebar-dots">
+            <span class="px-dot px-dot--red"></span>
+            <span class="px-dot px-dot--yellow"></span>
+            <span class="px-dot px-dot--green"></span>
         </div>
+        <h2 class="settings-title">THEME SETTINGS</h2>
+        <i class="bi bi-x-circle" id="close-settings"></i>
+    </div>
 
-        <!-- Settings Content — Theme selection only (auto-populated from themes/ folder) -->
-        <div class="settings-content">
-            <div class="setting-group">
-                <div class="setting-group-header">
-                    <i class="bi bi-palette"></i>
-                    <span>DISPLAY</span>
-                </div>
+    <!-- Settings Content — Theme selection only (auto-populated from themes/ folder) -->
+    <div class="settings-content">
+        <div class="setting-group">
+            <div class="setting-group-header">
+                <i class="bi bi-palette"></i>
+                <span>DISPLAY</span>
+            </div>
 
-                <div class="setting-option">
-                    <label for="background-select">BACKGROUND THEME:</label>
-                    <div class="pixel-select-wrapper">
-                        <select id="background-select">
-                            <?php
-                            /**
-                             * Auto-detect theme files from the themes/ directory.
-                             * Supported extensions: .jpg, .jpeg, .png, .gif, .webp
-                             * The first file found (alphabetically) becomes "default".
-                             * Adding/removing files in themes/ auto-updates this list.
-                             */
-                            $themesDir = __DIR__ . '/themes';
-                            $allowed   = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-                            $files     = [];
-                            if (is_dir($themesDir)) {
-                                foreach (scandir($themesDir) as $f) {
-                                    $ext = strtolower(pathinfo($f, PATHINFO_EXTENSION));
-                                    if (in_array($ext, $allowed)) {
-                                        $files[] = $f;
-                                    }
+            <div class="setting-option">
+                <label for="background-select">BACKGROUND THEME:</label>
+                <div class="pixel-select-wrapper">
+                    <select id="background-select">
+                        <?php
+                        /**
+                         * Auto-detect theme files from the themes/ directory.
+                         * Supported extensions: .jpg, .jpeg, .png, .gif, .webp
+                         * The first file found (alphabetically) becomes "default".
+                         * Adding/removing files in themes/ auto-updates this list.
+                         */
+                        $themesDir = __DIR__ . '/themes';
+                        $allowed   = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                        $files     = [];
+                        if (is_dir($themesDir)) {
+                            foreach (scandir($themesDir) as $f) {
+                                $ext = strtolower(pathinfo($f, PATHINFO_EXTENSION));
+                                if (in_array($ext, $allowed)) {
+                                    $files[] = $f;
                                 }
                             }
-                            foreach ($files as $i => $file) {
-                                $name  = pathinfo($file, PATHINFO_FILENAME);
-                                $label = strtoupper(preg_replace('/[_\-]+/', ' ', $name));
-                                $value = ($i === 0) ? 'default' : preg_replace('/[^a-z0-9]+/', '-', strtolower($name));
-                                $path  = 'themes/' . $file;
-                                echo '<option value="' . htmlspecialchars($value) . '" data-file="' . htmlspecialchars($path) . '">' . htmlspecialchars($label) . '</option>' . "\n                        ";
-                            }
-                            ?>
-                        </select>
-                        <i class="bi bi-chevron-down select-arrow"></i>
-                    </div>
+                        }
+                        foreach ($files as $i => $file) {
+                            $name  = pathinfo($file, PATHINFO_FILENAME);
+                            $label = strtoupper(preg_replace('/[_\-]+/', ' ', $name));
+                            $value = ($i === 0) ? 'default' : preg_replace('/[^a-z0-9]+/', '-', strtolower($name));
+                            $path  = 'themes/' . $file;
+                            echo '<option value="' . htmlspecialchars($value) . '" data-file="' . htmlspecialchars($path) . '">' . htmlspecialchars($label) . '</option>' . "\n                        ";
+                        }
+                        ?>
+                    </select>
+                    <i class="bi bi-chevron-down select-arrow"></i>
                 </div>
             </div>
         </div>
     </div>
-    <!-- ====== PHP-TO-JS CONFIGURATION BRIDGE ====== -->
-    <!-- Timer duration and config values injected from PHP into JavaScript -->
-    <script>
-        const PHP_TIMERS = <?php echo $jsTimers; ?>;
-        const PHP_CONFIG = <?php echo $jsConfig; ?>;
-    </script>
+</div>
+<!-- ====== PHP-TO-JS CONFIGURATION BRIDGE ====== -->
+<!-- Timer duration and config values injected from PHP into JavaScript -->
+<script>
+    const PHP_TIMERS = <?php echo $jsTimers; ?>;
+    const PHP_CONFIG = <?php echo $jsConfig; ?>;
+</script>
 
-    <!-- ====== APP STATE SAVE/RESTORE ====== -->
-    <!-- Preserves app state (timer, YouTube video, todos, panels) across page reloads -->
-    <script>
-        (function() {
-            const STATE_KEY = 'appState';
+<!-- ====== APP STATE SAVE/RESTORE ====== -->
+<!-- Preserves app state (timer, YouTube video, todos, panels) across page reloads -->
+<script>
+    (function() {
+        const STATE_KEY = 'appState';
 
-            // ── Save App State Before Navigation ──
-            window.addEventListener('beforeunload', function() {
-                const snap = {};
+        // ── Save App State Before Navigation ──
+        window.addEventListener('beforeunload', function() {
+            const snap = {};
 
-                // Timer state
-                if (typeof state !== 'undefined') {
-                    snap.timer = {
-                        pomodoroType: state.pomodoroType,
-                        timerValue: state.timerValue,
-                        isPaused: state.isPaused,
-                        pomodoroCount: state.pomodoroCount,
-                        wasRunning: !!state.timerInterval
-                    };
-                }
-
-                // YouTube widget state
-                const lofiVol = document.getElementById('lofi-vol');
-                const lofiIframe = document.getElementById('lofi-yt-player');
-                snap.youtube = {
-                    volume: lofiVol ? parseInt(lofiVol.value) : 70,
-                    videoId: null,
+            // Timer state
+            if (typeof state !== 'undefined') {
+                snap.timer = {
+                    pomodoroType: state.pomodoroType,
+                    timerValue: state.timerValue,
+                    isPaused: state.isPaused,
+                    pomodoroCount: state.pomodoroCount,
+                    wasRunning: !!state.timerInterval
                 };
-                if (lofiIframe && lofiIframe.src) {
-                    const m = lofiIframe.src.match(/embed\/([a-zA-Z0-9_-]{11})/);
-                    if (m) snap.youtube.videoId = m[1];
-                }
+            }
 
-                // Background theme
-                const bgSelect = document.getElementById('background-select');
-                if (bgSelect) snap.theme = bgSelect.value;
+            // YouTube widget state
+            const lofiVol = document.getElementById('lofi-vol');
+            const lofiIframe = document.getElementById('lofi-yt-player');
+            snap.youtube = {
+                volume: lofiVol ? parseInt(lofiVol.value) : 70,
+                videoId: null,
+            };
+            if (lofiIframe && lofiIframe.src) {
+                const m = lofiIframe.src.match(/embed\/([a-zA-Z0-9_-]{11})/);
+                if (m) snap.youtube.videoId = m[1];
+            }
 
-                // Guest todos (non-admin in-memory list)
-                if (typeof todos !== 'undefined' && Array.isArray(todos)) {
-                    snap.guestTodos = todos;
-                }
+            // Background theme
+            const bgSelect = document.getElementById('background-select');
+            if (bgSelect) snap.theme = bgSelect.value;
 
-                // Panel visibility
-                snap.panels = {};
-                ['container-3', 'container-4', 'container-5', 'settings-container'].forEach(function(id) {
-                    const el = document.getElementById(id);
-                    if (el) snap.panels[id] = window.getComputedStyle(el).display;
-                });
+            // Guest todos (non-admin in-memory list)
+            if (typeof todos !== 'undefined' && Array.isArray(todos)) {
+                snap.guestTodos = todos;
+            }
 
-                try {
-                    localStorage.setItem(STATE_KEY, JSON.stringify(snap));
-                } catch (e) {}
+            // Panel visibility
+            snap.panels = {};
+            ['container-3', 'container-4', 'container-5', 'settings-container'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) snap.panels[id] = window.getComputedStyle(el).display;
             });
 
-            // ── Restore App State After Page Load ──
-            function restoreState() {
-                let raw;
-                try {
-                    raw = localStorage.getItem(STATE_KEY);
-                } catch (e) {}
-                if (!raw) return;
-                localStorage.removeItem(STATE_KEY);
+            try {
+                localStorage.setItem(STATE_KEY, JSON.stringify(snap));
+            } catch (e) {}
+        });
 
-                let snap;
-                try {
-                    snap = JSON.parse(raw);
-                } catch (e) {
-                    return;
+        // ── Restore App State After Page Load ──
+        function restoreState() {
+            let raw;
+            try {
+                raw = localStorage.getItem(STATE_KEY);
+            } catch (e) {}
+            if (!raw) return;
+            localStorage.removeItem(STATE_KEY);
+
+            let snap;
+            try {
+                snap = JSON.parse(raw);
+            } catch (e) {
+                return;
+            }
+
+            // Theme
+            if (snap.theme && typeof applyTheme === 'function') {
+                applyTheme(snap.theme);
+            }
+
+            // Timer
+            if (snap.timer && typeof state !== 'undefined') {
+                if (snap.timer.pomodoroType && typeof setTimeType === 'function') {
+                    setTimeType(snap.timer.pomodoroType);
                 }
+                state.timerValue = snap.timer.timerValue;
+                state.pomodoroCount = snap.timer.pomodoroCount || 0;
+                state.isPaused = snap.timer.isPaused || false;
+                if (typeof updateTimerDisplay === 'function') updateTimerDisplay();
+            }
 
-                // Theme
-                if (snap.theme && typeof applyTheme === 'function') {
-                    applyTheme(snap.theme);
-                }
-
-                // Timer
-                if (snap.timer && typeof state !== 'undefined') {
-                    if (snap.timer.pomodoroType && typeof setTimeType === 'function') {
-                        setTimeType(snap.timer.pomodoroType);
-                    }
-                    state.timerValue = snap.timer.timerValue;
-                    state.pomodoroCount = snap.timer.pomodoroCount || 0;
-                    state.isPaused = snap.timer.isPaused || false;
-                    if (typeof updateTimerDisplay === 'function') updateTimerDisplay();
-                }
-
-                // YouTube widget
-                if (snap.youtube) {
-                    const lofiVol = document.getElementById('lofi-vol');
-                    if (lofiVol) lofiVol.value = snap.youtube.volume;
-                    if (snap.youtube.videoId) {
-                        const currentIframe = document.getElementById('lofi-yt-player');
-                        if (currentIframe && currentIframe.src) {
-                            const cm = currentIframe.src.match(/embed\/([a-zA-Z0-9_-]{11})/);
-                            if (!cm || cm[1] !== snap.youtube.videoId) {
-                                currentIframe.src = 'https://www.youtube.com/embed/' + snap.youtube.videoId + '?autoplay=0&rel=0&modestbranding=1';
-                            }
+            // YouTube widget
+            if (snap.youtube) {
+                const lofiVol = document.getElementById('lofi-vol');
+                if (lofiVol) lofiVol.value = snap.youtube.volume;
+                if (snap.youtube.videoId) {
+                    const currentIframe = document.getElementById('lofi-yt-player');
+                    if (currentIframe && currentIframe.src) {
+                        const cm = currentIframe.src.match(/embed\/([a-zA-Z0-9_-]{11})/);
+                        if (!cm || cm[1] !== snap.youtube.videoId) {
+                            currentIframe.src = 'https://www.youtube.com/embed/' + snap.youtube.videoId + '?autoplay=0&rel=0&modestbranding=1';
                         }
                     }
                 }
-
-                // Guest todos
-                if (snap.guestTodos && typeof todos !== 'undefined' && typeof render === 'function') {
-                    todos = snap.guestTodos;
-                    render();
-                }
-
-                // Panel visibility
-                if (snap.panels) {
-                    Object.keys(snap.panels).forEach(function(id) {
-                        const el = document.getElementById(id);
-                        if (el) el.style.display = snap.panels[id];
-                    });
-                }
             }
 
-            // Run restore after everything else has initialized
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', function() {
-                    setTimeout(restoreState, 100);
+            // Guest todos
+            if (snap.guestTodos && typeof todos !== 'undefined' && typeof render === 'function') {
+                todos = snap.guestTodos;
+                render();
+            }
+
+            // Panel visibility
+            if (snap.panels) {
+                Object.keys(snap.panels).forEach(function(id) {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = snap.panels[id];
                 });
-            } else {
-                setTimeout(restoreState, 100);
             }
-        }());
-    </script>
+        }
 
-    <!-- ====== SUPABASE CLIENT SETUP ====== -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        const supabaseClient = window.supabase.createClient(
-            '<?php echo getenv("SUPABASE_URL"); ?>',
-            '<?php echo getenv("SUPABASE_ANON_KEY"); ?>'
-        );
-    </script>
+        // Run restore after everything else has initialized
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(restoreState, 100);
+            });
+        } else {
+            setTimeout(restoreState, 100);
+        }
+    }());
+</script>
 
-    <!-- ====== YOUTUBE WIDGET CONTROLLER ====== -->
-    <!-- Handles YouTube URL input, video swapping, play/pause, and volume -->
-    <script src="youtube.js"></script>
+<!-- ====== SUPABASE CLIENT SETUP ====== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const supabaseClient = window.supabase.createClient(
+        '<?php echo getenv("SUPABASE_URL"); ?>',
+        '<?php echo getenv("SUPABASE_ANON_KEY"); ?>'
+    );
+</script>
 
-    <?php require_once __DIR__ . '/includes/footer.php'; ?>
+<!-- ====== YOUTUBE WIDGET CONTROLLER ====== -->
+<!-- Handles YouTube URL input, video swapping, play/pause, and volume -->
+<script src="youtube.js"></script>
+
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
