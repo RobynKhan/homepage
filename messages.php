@@ -57,25 +57,26 @@ $other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $me);
         font-size: 0.55rem;
         letter-spacing: 1px;
         padding: 8px 14px;
-        background: var(--px-bg, var(--glass-bg));
-        border: 2px solid var(--glass-border);
+        background: var(--px-bg2, var(--glass-bg));
+        border: 3px solid #000;
         color: var(--text-muted);
         cursor: pointer;
         transition: all var(--transition);
         position: relative;
+        border-radius: 0;
     }
 
     .msg-tab-btn:hover {
-        background: var(--glass-hover);
-        color: var(--cream);
-        border-color: var(--sand);
+        background: var(--px-accent, var(--glass-hover));
+        color: #000;
+        border-color: #000;
     }
 
     .msg-tab-btn.active {
-        background: var(--glass-hover);
-        color: var(--cream);
-        border-color: var(--sand);
-        box-shadow: 0 0 10px rgba(156, 95, 192, 0.3);
+        background: var(--px-accent, var(--glass-hover));
+        color: #000;
+        border-color: #000;
+        box-shadow: 2px 2px 0 #000;
     }
 
     /* Message list rows */
@@ -86,21 +87,22 @@ $other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $me);
         gap: 1rem;
         padding: 0.75rem 1rem;
         margin-bottom: 0.4rem;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
+        background: var(--px-bg2, var(--glass-bg));
+        border: 2px solid #000;
         cursor: pointer;
         transition: background var(--transition), border-color var(--transition);
-        border-radius: 10px;
+        border-radius: 0;
     }
 
     .msg-row:hover {
-        background: var(--glass-hover);
-        border-color: var(--sand);
+        background: var(--px-accent, var(--glass-hover));
+        color: #000;
+        border-color: #000;
     }
 
     .msg-row.unread {
-        border-color: var(--sand);
-        box-shadow: 0 0 10px rgba(156, 95, 192, 0.2);
+        border-color: var(--px-accent, var(--sand));
+        box-shadow: 2px 2px 0 #000;
     }
 
     .msg-row__left {
@@ -147,18 +149,19 @@ $other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $me);
         font-size: 0.55rem;
         letter-spacing: 1px;
         padding: 8px 14px;
-        background: transparent;
-        border: 2px solid var(--glass-border);
+        background: var(--px-bg2, transparent);
+        border: 3px solid #000;
         color: var(--text-muted);
         cursor: pointer;
         margin-bottom: 1.25rem;
         transition: all var(--transition);
+        border-radius: 0;
     }
 
     .msg-viewer__back:hover {
-        background: var(--glass-hover);
-        color: var(--cream);
-        border-color: var(--sand);
+        background: var(--px-accent, var(--glass-hover));
+        color: #000;
+        border-color: #000;
     }
 
     .msg-viewer__meta {
@@ -172,10 +175,10 @@ $other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $me);
     .msg-viewer__subject {
         font-size: 1rem;
         font-weight: 600;
-        color: var(--sand);
+        color: var(--px-accent, var(--sand));
         margin-bottom: 1.25rem;
         padding-bottom: 0.75rem;
-        border-bottom: 1px solid var(--glass-border);
+        border-bottom: 2px solid #000;
     }
 
     .msg-viewer__body {
@@ -205,13 +208,13 @@ $other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $me);
     .msg-field input,
     .msg-field textarea {
         width: 100%;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: 10px;
+        background: var(--px-bg2, var(--glass-bg));
+        border: 2px solid #000;
+        border-radius: 0;
         color: var(--text-primary);
         padding: 0.6rem 0.9rem;
-        font-family: "Inter", sans-serif;
-        font-size: 0.88rem;
+        font-family: "VT323", "Courier New", monospace;
+        font-size: 1rem;
         box-sizing: border-box;
         transition: border-color var(--transition), box-shadow var(--transition);
         outline: none;
@@ -220,8 +223,8 @@ $other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $me);
     .msg-field select:focus,
     .msg-field input:focus,
     .msg-field textarea:focus {
-        border-color: var(--sand);
-        box-shadow: 0 0 0 3px rgba(156, 95, 192, 0.12);
+        border-color: var(--px-accent, var(--sand));
+        box-shadow: 2px 2px 0 #000;
     }
 
     .msg-field textarea {
@@ -246,17 +249,19 @@ $other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $me);
         font-size: 0.55rem;
         letter-spacing: 1px;
         padding: 10px 20px;
-        background: var(--sand);
-        color: #0f0e17;
-        border: none;
+        background: var(--px-accent, var(--sand));
+        color: #000;
+        border: 3px solid #000;
         cursor: pointer;
         transition: opacity var(--transition), transform 0.15s;
-        border-radius: 999px;
+        border-radius: 0;
+        box-shadow: 3px 3px 0 #000;
     }
 
     .msg-send-btn:hover {
         opacity: 0.85;
-        transform: scale(1.02);
+        transform: translate(1px, 1px);
+        box-shadow: 2px 2px 0 #000;
     }
 
     .msg-send-btn:disabled {
@@ -287,7 +292,8 @@ $other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $me);
         display: none;
         background: #f87171;
         color: #000;
-        border-radius: 4px;
+        border-radius: 0;
+        border: 2px solid #000;
         padding: 1px 5px;
         font-size: 0.5rem;
         margin-left: 5px;
@@ -295,16 +301,15 @@ $other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $me);
         font-family: "Press Start 2P", monospace;
     }
 
-    /* Panel container — matches timer-container glass style */
+    /* Panel container — pixel theme matching other containers */
     .msg-panel {
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
+        background: var(--px-bg, var(--glass-bg));
+        border: 3px solid #000;
+        border-radius: 0;
+        box-shadow: 4px 4px 0 #000;
         padding: clamp(18px, 3vw, 28px);
         min-height: 400px;
+        image-rendering: pixelated;
     }
 
     @media (max-width: 600px) {
@@ -503,13 +508,27 @@ $other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $me);
 
     // ── Open message viewer ────────────────────────────────────────────────────
     function openMsg(m) {
-        window.location.href = 'message_view.php?id=' + encodeURIComponent(m.id);
+        // Mark as read via API
+        var fd = new FormData();
+        fd.append('action', 'read');
+        fd.append('id', m.id);
+        fetch('messages_api.php', {
+            method: 'POST',
+            body: fd
+        });
+
+        // Show inline viewer
+        document.getElementById('msg-list').style.display = 'none';
+        var viewer = document.getElementById('msg-viewer');
+        viewer.style.display = '';
+        document.getElementById('v-meta').textContent = 'FROM: ' + m.from_username + '  ·  ' + fmtDate(m.created_at);
+        document.getElementById('v-subject').textContent = m.subject;
+        document.getElementById('v-body').textContent = m.body || '';
     }
 
     function closeView() {
-        document.getElementById('msg-list').style.display = '';
-        document.getElementById('msg-viewer').style.display = 'none';
-        loadInbox();
+        // Go back to index.php instead of staying on messages.php
+        window.location.href = 'index.php';
     }
 
     // ── Send message ───────────────────────────────────────────────────────────
