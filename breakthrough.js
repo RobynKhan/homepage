@@ -674,11 +674,16 @@
     if (panel) {
       const mo = new MutationObserver(function () {
         alignBreakoutUnderTodo();
-        if (gameStarted) return;
         const isVisible =
           panel.classList.contains("sheet-open") ||
           (panel.style.display && panel.style.display !== "none");
-        if (isVisible) startGame();
+        if (!isVisible) {
+          setBreakoutActive(false);
+          if (startBtn) startBtn.style.display = "inline-flex";
+          return;
+        }
+        if (gameStarted) return;
+        startGame();
       });
       mo.observe(panel, {
         attributes: true,

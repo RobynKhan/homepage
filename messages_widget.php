@@ -128,10 +128,24 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
                 '</div>' +
                 '<div class="px-msg-row-subject">' + esc(m.subject) + '</div>' +
                 '</div>' +
-                '<div class="px-msg-row-date">' + fmtDate(m.created_at) + '</div>';
+                '<div class="px-msg-row-date">' + fmtDate(m.created_at) + '</div>' +
+                '<button class="px-msg-delete" data-id="' + esc(m.id) + '" data-box="' + (isSent ? 'sent' : 'inbox') + '">DEL</button>';
             if (!isSent) row.onclick = function() {
                 msgOpenMsg(m);
             };
+
+            var delBtn = row.querySelector('.px-msg-delete');
+            if (delBtn) {
+                delBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    msgDelete(m.id, isSent ? 'sent' : 'inbox');
+                });
+                delBtn.addEventListener('touchstart', function(e) {
+                    e.stopPropagation();
+                }, {
+                    passive: true
+                });
+            }
             return row;
         }
 
@@ -298,6 +312,32 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
                 });
         }
 
+        function msgDelete(id, box) {
+            if (!id) return;
+            var sure = confirm('Delete this message?');
+            if (!sure) return;
+            var fd = new FormData();
+            fd.append('action', 'delete');
+            fd.append('id', id);
+            fetch('messages_api.php', {
+                    method: 'POST',
+                    body: fd
+                })
+                .then(function(r) {
+                    return r.json();
+                })
+                .then(function(res) {
+                    if (!res.ok) return;
+                    if (box === 'sent') {
+                        msgLoadSent();
+                    } else {
+                        msgLoadInbox();
+                    }
+                    fetchUnreadCount();
+                })
+                .catch(function() {});
+        }
+
         // ── Unread count fetch (used by poller + realtime) ─────────
         function fetchUnreadCount() {
             fetch('messages_api.php?action=unread_count')
@@ -354,5 +394,6 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
         window.msgOpenMsg = msgOpenMsg;
         window.msgSendMessage = msgSendMessage;
         window.msgCloseView = msgCloseView;
+        window.msgDelete = msgDelete;
     }());
 </script>

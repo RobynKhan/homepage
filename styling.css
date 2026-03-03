@@ -2448,6 +2448,7 @@ body.theme-theme3 .px-star {
   padding: 8px;
   scrollbar-width: thin;
   scrollbar-color: var(--px-panel2) transparent;
+  -webkit-overflow-scrolling: touch;
 }
 
 .px-msg-scroll::-webkit-scrollbar {
@@ -2475,6 +2476,7 @@ body.theme-theme3 .px-star {
   transition:
     transform 0.1s,
     box-shadow 0.1s;
+  position: relative;
 }
 
 .px-msg-row:hover {
@@ -2527,6 +2529,25 @@ body.theme-theme3 .px-star {
   white-space: nowrap;
   flex-shrink: 0;
   letter-spacing: 0.5px;
+}
+
+.px-msg-delete {
+  font-family: "Press Start 2P", monospace;
+  font-size: 7px;
+  letter-spacing: 1px;
+  padding: 6px 8px;
+  border: 2px solid #000;
+  background: #ff6b6b;
+  color: #000;
+  margin-left: 6px;
+  flex-shrink: 0;
+  cursor: pointer;
+  box-shadow: 1px 1px 0 #000;
+}
+
+.px-msg-delete:active {
+  transform: translate(1px, 1px);
+  box-shadow: none;
 }
 
 /* ── Viewer ────────────────────────────────────────── */

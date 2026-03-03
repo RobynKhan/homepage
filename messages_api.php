@@ -79,6 +79,23 @@ switch ($action) {
         echo json_encode(['ok' => true]);
         break;
 
+    case 'delete':
+        $id = $_POST['id'] ?? '';
+        if (!$id) {
+            echo json_encode(['ok' => false, 'error' => 'Missing id']);
+            break;
+        }
+        $stmt = $pdo->prepare(
+            'DELETE FROM admin_messages WHERE id = ? AND (to_username = ? OR from_username = ?)'
+        );
+        $stmt->execute([$id, $me, $me]);
+        if ($stmt->rowCount() === 0) {
+            echo json_encode(['ok' => false, 'error' => 'Not found or not allowed']);
+        } else {
+            echo json_encode(['ok' => true]);
+        }
+        break;
+
     default:
         echo json_encode(['error' => 'Unknown action']);
 }
