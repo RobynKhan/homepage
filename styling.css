@@ -89,7 +89,9 @@
     font-size: 12px;
     margin-top: 10px;
   }
-  .px-msg-select, .px-msg-input, .px-msg-textarea {
+  .px-msg-select,
+  .px-msg-input,
+  .px-msg-textarea {
     font-size: 16px;
     padding: 12px 10px;
     border-radius: 8px;

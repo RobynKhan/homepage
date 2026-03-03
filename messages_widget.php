@@ -88,18 +88,18 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
 
 <script>
     (function() {
-        var ME = <?= json_encode($msg_me) ?>;
+            var ME = <?= json_encode($msg_me) ?>;
 
-        // ── Tab switching ──────────────────────────────────────────
-        window.msgSwitchTab = function(tab) {
-            ['inbox', 'sent', 'compose'].forEach(function(t) {
-                var panel = document.getElementById('mpanel-' + t);
-                var btn = document.getElementById('mtab-' + t);
-                if (panel) panel.style.display = t === tab ? '' : 'none';
-                if (btn) btn.classList.toggle('active', t === tab);
-            });
-            if (tab === 'inbox') msgLoadInbox();
-            if (tab === 'sent') msgLoadSent();
+            // ── Tab switching ──────────────────────────────────────────
+            window.msgSwitchTab = function(tab) {
+                ['inbox', 'sent', 'compose'].forEach(function(t) {
+                    var panel = document.getElementById('mpanel-' + t);
+                    var btn = document.getElementById('mtab-' + t);
+                    if (panel) panel.style.display = t === tab ? '' : 'none';
+                    if (btn) btn.classList.toggle('active', t === tab);
+                });
+                if (tab === 'inbox') msgLoadInbox();
+                if (tab === 'sent') msgLoadSent();
             };
 
             // Touch support for tab switching
@@ -107,7 +107,9 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
                 btn.addEventListener('touchstart', function(e) {
                     e.preventDefault();
                     btn.click();
-                }, {passive: false});
+                }, {
+                    passive: false
+                });
             });
 
             // Touch support for message row selection
@@ -116,7 +118,9 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
                     row.addEventListener('touchstart', function(e) {
                         e.preventDefault();
                         row.click();
-                    }, {passive: false});
+                    }, {
+                        passive: false
+                    });
                 });
             }
             // Call after inbox/sent loads
@@ -343,7 +347,6 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
         }
 
         // ── Init ───────────────────────────────────────────────────
-        msgLoadInbox();
-        fetchUnreadCount();
+        msgLoadInbox(); fetchUnreadCount();
     }());
 </script>
