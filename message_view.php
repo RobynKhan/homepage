@@ -488,6 +488,19 @@ $date    = date('F j, Y · g:i a', strtotime($msg['created_at']));
       letter-spacing: 0.04em;
     }
 
+    /* Hide letter until the envelope is opened */
+    #letterWrap {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.6s ease;
+    }
+
+    /* When rising starts, reveal it */
+    #letterWrap.rising {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     @keyframes pulse {
 
       0%,
