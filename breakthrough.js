@@ -388,7 +388,9 @@
     const DESKTOP_GAP = 16;
 
     function isDesktopLayout() {
-      return window.matchMedia && window.matchMedia("(min-width: 901px)").matches;
+      return (
+        window.matchMedia && window.matchMedia("(min-width: 901px)").matches
+      );
     }
 
     function isPanelVisible(el) {
@@ -408,7 +410,11 @@
         breakoutPanel.style.right = "";
         return;
       }
-      if (!todoPanel || !isPanelVisible(todoPanel) || !isPanelVisible(breakoutPanel)) {
+      if (
+        !todoPanel ||
+        !isPanelVisible(todoPanel) ||
+        !isPanelVisible(breakoutPanel)
+      ) {
         breakoutPanel.style.top = "";
         breakoutPanel.style.bottom = "";
         breakoutPanel.style.right = "";
@@ -418,7 +424,10 @@
       const todoRect = todoPanel.getBoundingClientRect();
       const breakoutHeight = breakoutPanel.offsetHeight || 0;
       const minTop = 56;
-      const maxTop = Math.max(minTop, window.innerHeight - breakoutHeight - DESKTOP_GAP);
+      const maxTop = Math.max(
+        minTop,
+        window.innerHeight - breakoutHeight - DESKTOP_GAP,
+      );
       const desiredTop = todoRect.bottom + DESKTOP_GAP;
       const clampedTop = Math.min(Math.max(desiredTop, minTop), maxTop);
 
