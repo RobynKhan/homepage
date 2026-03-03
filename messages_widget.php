@@ -484,38 +484,67 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
             }
         }
 
-        function typewriter(targetEl, rawText) {
-            stopTypewriter();
-            targetEl.innerHTML = '';
-            var span = document.createElement('span');
-            var cursor = document.createElement('span');
-            cursor.className = 'px-tw-cursor';
-            targetEl.appendChild(span);
-            targetEl.appendChild(cursor);
-            var i = 0;
+        // Emoji detection regex
+        var EMOJI_RE = /\p{Emoji_Presentation}|\p{Extended_Pictographic}/u;
 
-            function tick() {
-                if (i >= rawText.length) {
-                    setTimeout(function() {
-                        cursor.style.transition = 'opacity 0.8s';
-                        cursor.style.opacity = '0';
-                    }, 1400);
-                    _twTimer = null;
-                    return;
-                }
-                var ch = rawText.charAt(i++);
-                if (ch === '\n') span.appendChild(document.createElement('br'));
-                else span.appendChild(document.createTextNode(ch));
-                var d = 30;
-                if (ch === '.' || ch === '!' || ch === '?') d = 340;
-                else if (ch === ',') d = 180;
-                else if (ch === '\n') d = 260;
-                else if (ch === ' ') d = 16;
-                _twTimer = setTimeout(tick, d + Math.random() * 22);
+        function tick() {
+            if (i >= rawText.length) {
+                setTimeout(function() {
+                    cursor.style.transition = 'opacity 0.8s';
+                    cursor.style.opacity = '0';
+                }, 1400);
+                _twTimer = null;
+                return;
             }
-            _twTimer = setTimeout(tick, 350);
-        }
 
+            var ch = rawText.charAt(i);
+
+            // Handle multi-codepoint emoji sequences (e.g. 👨‍👩‍👧, skin tones)
+            // by consuming the full grapheme cluster
+            var cluster = ch;
+            var code = rawText.codePointAt(i);
+            if (code > 0xFFFF) {
+                // Surrogate pair — consume 2 JS chars
+                cluster = rawText.slice(i, i + 2);
+                i += 2;
+            } else {
+                i++;
+                // Check for variation selector or ZWJ that follows
+                while (i < rawText.length) {
+                    var next = rawText.codePointAt(i);
+                    // ZWJ (0x200D), variation selectors, combining marks
+                    if (next === 0x200D || (next >= 0xFE00 && next <= 0xFE0F) ||
+                        (next >= 0x1F3FB && next <= 0x1F3FF)) {
+                        var nextLen = next > 0xFFFF ? 2 : 1;
+                        cluster += rawText.slice(i, i + nextLen + 1);
+                        i += nextLen + 1;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            if (cluster === '\n') {
+                span.appendChild(document.createElement('br'));
+            } else if (EMOJI_RE.test(cluster)) {
+                // Wrap emoji in animated span
+                var eSpan = document.createElement('span');
+                eSpan.className = 'px-emoji';
+                eSpan.textContent = cluster;
+                span.appendChild(eSpan);
+            } else {
+                span.appendChild(document.createTextNode(cluster));
+            }
+
+            var d = 30;
+            if (ch === '.' || ch === '!' || ch === '?') d = 340;
+            else if (ch === ',') d = 180;
+            else if (ch === '\n') d = 260;
+            else if (ch === ' ') d = 16;
+            d += Math.random() * 22;
+
+            _twTimer = setTimeout(tick, d);
+        }
         // Also update msgCloseView to call stopTypewriter:
         function msgCloseView() {
             stopTypewriter();
