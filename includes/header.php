@@ -97,6 +97,11 @@
                         <span>Messages <span id="msg-drawer-badge" style="display:none;background:#f87171;color:#000;border-radius:3px;padding:0 5px;font-size:0.6rem;margin-left:4px;"></span></span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="#breakout" class="nav-link" data-target="container-6">
+                        <i class="bi bi-controller"></i> <span>Breakout</span>
+                    </a>
+                </li>
             <?php endif; ?>
         </ul>
     </nav>
@@ -126,6 +131,10 @@
                     <span id="msg-dock-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:#f87171;color:#000;border-radius:3px;padding:0 3px;font-size:0.55rem;"></span>
                 </span>
                 <span>Messages</span>
+            </button>
+            <button class="dock-btn" data-target="container-6" aria-label="Breakout">
+                <i class="bi bi-controller"></i>
+                <span>Breakout</span>
             </button>
         <?php endif; ?>
     </nav>

@@ -2598,6 +2598,126 @@ body.theme-theme3 .px-star {
 }
 
 /* ═══════════════════════════════════════════════════════
+   BREAKOUT GAME PANEL — floating pixel card (desktop)
+   ═══════════════════════════════════════════════════════ */
+.container-6 {
+  display: none;
+  text-align: center;
+  padding: 0;
+  animation: fadeInUp 0.4s ease both;
+}
+
+#container-6 {
+  position: fixed;
+  top: clamp(56px, 8vh, 80px);
+  right: clamp(16px, 2vw, 32px);
+  background: var(--px-bg);
+  border: 3px solid #000;
+  box-shadow:
+    0 0 0 3px var(--px-accent),
+    0 0 0 6px #000,
+    0 0 24px rgba(255, 45, 107, 0.2);
+  padding: 0;
+  width: clamp(260px, 22vw, 320px);
+  max-height: calc(100vh - clamp(80px, 12vh, 120px));
+  display: none;
+  flex-direction: column;
+  z-index: 200;
+  overflow: hidden;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+  image-rendering: pixelated;
+  font-family: "Press Start 2P", monospace;
+}
+
+/* ── Breakout panel inner wrapper ──────────────────── */
+.px-breakout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  background: var(--px-bg);
+  color: var(--px-text);
+}
+
+/* ── HUD row ───────────────────────────────────────── */
+.px-breakout-hud {
+  padding: 6px 10px 4px;
+  background: var(--px-bg2);
+  border-bottom: 2px solid #000;
+  font-size: 7px;
+  line-height: 1.6;
+}
+
+.px-breakout-hud-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.px-breakout-hud-val {
+  color: var(--px-cyan);
+  margin-left: 4px;
+}
+
+.px-breakout-hud-top {
+  color: var(--px-accent);
+  font-size: 6.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 55%;
+}
+
+/* ── Canvas wrapper ────────────────────────────────── */
+.px-breakout-canvas-wrap {
+  flex: 1;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.px-breakout-canvas-wrap canvas {
+  display: block;
+  width: 100%;
+  image-rendering: pixelated;
+}
+
+/* ── Start / launch button ─────────────────────────── */
+.px-breakout-controls {
+  padding: 6px 10px 8px;
+  background: var(--px-bg2);
+  border-top: 2px solid #000;
+  display: flex;
+  justify-content: center;
+}
+
+.px-breakout-start-btn {
+  font-family: "Press Start 2P", monospace;
+  font-size: 9px;
+  background: var(--px-accent);
+  color: #000;
+  border: 2px solid #000;
+  box-shadow: 3px 3px 0 #000;
+  padding: 6px 16px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  image-rendering: pixelated;
+  transition: box-shadow 0.1s, transform 0.1s;
+}
+
+.px-breakout-start-btn:hover {
+  background: var(--px-accent2);
+  box-shadow: 2px 2px 0 #000;
+  transform: translate(1px, 1px);
+}
+
+.px-breakout-start-btn:active {
+  box-shadow: 0 0 0 #000;
+  transform: translate(3px, 3px);
+}
+
+/* ═══════════════════════════════════════════════════════
    BOTTOM DOCK + SHEET — hidden on desktop
    ═══════════════════════════════════════════════════════ */
 .bottom-dock {
@@ -2662,6 +2782,19 @@ body.theme-theme3 .px-star {
       0 0 0 3px var(--px-purple),
       0 0 0 6px #000,
       0 0 16px rgba(123, 47, 255, 0.15);
+  }
+
+  #container-6 {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: min(340px, 90vw);
+    max-height: 70vh;
+    margin: 16px auto;
+    box-shadow:
+      0 0 0 3px var(--px-accent),
+      0 0 0 6px #000,
+      0 0 16px rgba(255, 45, 107, 0.15);
   }
 }
 
@@ -2741,6 +2874,7 @@ body.theme-theme3 .px-star {
   .container-3,
   #container-4,
   .container-5,
+  #container-6,
   .settings-container {
     position: fixed !important;
     bottom: var(--dock-height) !important;
@@ -2791,10 +2925,21 @@ body.theme-theme3 .px-star {
     border-radius: 0 !important;
   }
 
+  /* Pixel-themed sheet override for breakout */
+  #container-6 {
+    background: var(--px-bg) !important;
+    border: 3px solid #000 !important;
+    box-shadow:
+      0 0 0 3px var(--px-accent),
+      0 -8px 30px rgba(255, 45, 107, 0.15) !important;
+    border-radius: 0 !important;
+  }
+
   /* Sheet open state */
   .container-3.sheet-open,
   #container-4.sheet-open,
   .container-5.sheet-open,
+  #container-6.sheet-open,
   .settings-container.sheet-open {
     transform: translateY(0) !important;
     opacity: 1 !important;
@@ -2805,6 +2950,7 @@ body.theme-theme3 .px-star {
   .container-3::before,
   #container-4::before,
   .container-5::before,
+  #container-6::before,
   .settings-container::before {
     content: "";
     display: block;
@@ -2825,6 +2971,13 @@ body.theme-theme3 .px-star {
 
   #container-5::before {
     background: var(--px-purple);
+    border-radius: 0;
+    width: 28px;
+    height: 3px;
+  }
+
+  #container-6::before {
+    background: var(--px-accent);
     border-radius: 0;
     width: 28px;
     height: 3px;
@@ -2975,6 +3128,12 @@ body.theme-theme3 .px-star {
     width: 380px;
     top: 80px;
     left: 36px;
+  }
+
+  #container-6 {
+    width: 340px;
+    top: 80px;
+    right: 36px;
   }
 
   .settings-container {
