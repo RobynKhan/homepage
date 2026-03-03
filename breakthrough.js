@@ -383,6 +383,49 @@
     canvas = document.getElementById("breakout-canvas");
     if (!canvas) return;
     ctx = canvas.getContext("2d");
+    const breakoutPanel = document.getElementById("container-6");
+    const todoPanel = document.getElementById("container-4");
+    const DESKTOP_GAP = 16;
+
+    function isDesktopLayout() {
+      return window.matchMedia && window.matchMedia("(min-width: 901px)").matches;
+    }
+
+    function isPanelVisible(el) {
+      return !!(
+        el &&
+        (el.classList.contains("sheet-open") ||
+          (window.getComputedStyle(el).display !== "none" &&
+            window.getComputedStyle(el).visibility !== "hidden"))
+      );
+    }
+
+    function alignBreakoutUnderTodo() {
+      if (!breakoutPanel) return;
+      if (!isDesktopLayout()) {
+        breakoutPanel.style.top = "";
+        breakoutPanel.style.bottom = "";
+        breakoutPanel.style.right = "";
+        return;
+      }
+      if (!todoPanel || !isPanelVisible(todoPanel) || !isPanelVisible(breakoutPanel)) {
+        breakoutPanel.style.top = "";
+        breakoutPanel.style.bottom = "";
+        breakoutPanel.style.right = "";
+        return;
+      }
+
+      const todoRect = todoPanel.getBoundingClientRect();
+      const breakoutHeight = breakoutPanel.offsetHeight || 0;
+      const minTop = 56;
+      const maxTop = Math.max(minTop, window.innerHeight - breakoutHeight - DESKTOP_GAP);
+      const desiredTop = todoRect.bottom + DESKTOP_GAP;
+      const clampedTop = Math.min(Math.max(desiredTop, minTop), maxTop);
+
+      breakoutPanel.style.top = Math.round(clampedTop) + "px";
+      breakoutPanel.style.bottom = "auto";
+      breakoutPanel.style.right = window.getComputedStyle(todoPanel).right;
+    }
 
     // Important for mobile: prevent scrolling while dragging on the canvas
     canvas.style.touchAction = "none";
@@ -508,6 +551,36 @@
       bkPointerDown = false;
     });
 
+    canvas.addEventListener(
+      "touchstart",
+      function (e) {
+        if (!canvas._bkDragEnabled) return;
+        if (!e.touches || !e.touches.length) return;
+        bkPointerDown = true;
+        setPaddleFromClientX(e.touches[0].clientX);
+        if (state && !state.launched && !state.gameOver && !state.won)
+          state.launched = true;
+      },
+      { passive: true },
+    );
+
+    canvas.addEventListener(
+      "touchmove",
+      function (e) {
+        if (!canvas._bkDragEnabled || !bkPointerDown) return;
+        if (!e.touches || !e.touches.length) return;
+        setPaddleFromClientX(e.touches[0].clientX);
+      },
+      { passive: true },
+    );
+
+    canvas.addEventListener("touchend", function () {
+      bkPointerDown = false;
+    });
+    canvas.addEventListener("touchcancel", function () {
+      bkPointerDown = false;
+    });
+
     // On-screen buttons (hold to move)
     const leftBtn = document.getElementById("bk-btn-left");
     const rightBtn = document.getElementById("bk-btn-right");
@@ -527,6 +600,9 @@
       btn.addEventListener("pointerup", up);
       btn.addEventListener("pointercancel", up);
       btn.addEventListener("pointerleave", up);
+      btn.addEventListener("touchstart", down, { passive: false });
+      btn.addEventListener("touchend", up, { passive: false });
+      btn.addEventListener("touchcancel", up, { passive: false });
     }
 
     bindHold(leftBtn, "ArrowLeft");
@@ -547,9 +623,10 @@
     }
 
     // Watch for the panel becoming visible (lazy first-start)
-    const panel = document.getElementById("container-6");
+    const panel = breakoutPanel;
     if (panel) {
       const mo = new MutationObserver(function () {
+        alignBreakoutUnderTodo();
         if (gameStarted) return;
         const isVisible =
           panel.classList.contains("sheet-open") ||
@@ -562,10 +639,30 @@
       });
     }
 
+    if (todoPanel) {
+      const todoObserver = new MutationObserver(function () {
+        alignBreakoutUnderTodo();
+      });
+      todoObserver.observe(todoPanel, {
+        attributes: true,
+        attributeFilter: ["style", "class"],
+      });
+    }
+
     // Re-size canvas on window resize
     window.addEventListener("resize", function () {
       if (gameStarted) resizeCanvas();
+      if (isMobileLike()) {
+        const mode = localStorage.getItem(CONTROL_KEY) || "both";
+        applyControlMode(mode);
+      } else {
+        applyControlMode("drag");
+      }
+      alignBreakoutUnderTodo();
     });
+
+    setTimeout(alignBreakoutUnderTodo, 0);
+    setTimeout(alignBreakoutUnderTodo, 120);
 
     // Pre-load scores
     loadAPIState();
