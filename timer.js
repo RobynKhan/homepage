@@ -142,59 +142,7 @@ const addEventListeners = () => {
 
   if (sheetBackdrop) sheetBackdrop.addEventListener("click", closeAllSheets);
 
-  // ─── Swipe Left/Right to open/close Messages panel (Mobile) ───────────
-  (function () {
-    let touchStartX = 0;
-    let touchStartY = 0;
-    const SWIPE_THRESHOLD = 60;
-
-    document.addEventListener(
-      "touchstart",
-      function (e) {
-        touchStartX = e.changedTouches[0].clientX;
-        touchStartY = e.changedTouches[0].clientY;
-      },
-      { passive: true },
-    );
-
-    document.addEventListener(
-      "touchend",
-      function (e) {
-        if (!isMobile()) return;
-        const msgPanel = document.getElementById("container-5");
-        if (!msgPanel) return;
-        const isBreakout = breakoutLocked();
-
-        const dx = e.changedTouches[0].clientX - touchStartX;
-        const dy = e.changedTouches[0].clientY - touchStartY;
-
-        // Only horizontal swipes (ignore vertical scrolling)
-        if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dy) > Math.abs(dx))
-          return;
-
-        if (dx < 0) {
-          // Swipe LEFT → open messages
-          if (isBreakout) return;
-          if (!msgPanel.classList.contains("sheet-open")) {
-            closeAllSheets();
-            msgPanel.classList.add("sheet-open");
-            if (sheetBackdrop) sheetBackdrop.classList.add("visible");
-            // Highlight the dock button if it exists
-            document.querySelectorAll(".dock-btn").forEach(function (btn) {
-              if (btn.dataset.target === "container-5")
-                btn.classList.add("active");
-            });
-          }
-        } else {
-          // Swipe RIGHT → close messages
-          if (msgPanel.classList.contains("sheet-open")) {
-            closeAllSheets();
-          }
-        }
-      },
-      { passive: true },
-    );
-  })();
+  // (Swipe gesture removed — messages now uses bottom-sheet like other panels)
 
   // ─── Settings Panel: Open/Close ───────────────────────────────────────
   const timerSettingsBtn = document.getElementById("timer-settings");

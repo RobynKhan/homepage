@@ -3293,41 +3293,13 @@ body.theme-theme3 .px-star {
     pointer-events: auto;
   }
 
-  /* ── Messages as slide-from-right sheet on mobile ── */
-  .container-5 {
-    left: auto !important;
-    right: 0 !important;
-    width: 85% !important;
-    max-width: 400px !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    height: 100vh !important;
-    max-height: 100vh !important;
-    border-radius: 0 !important;
-    border: 3px solid #000 !important;
-    border-right: none !important;
-    background: var(--px-bg) !important;
-    box-shadow:
-      -3px 0 0 3px var(--px-purple),
-      -8px 0 30px rgba(123, 47, 255, 0.2) !important;
-    transform: translateX(110%) !important;
-    transition:
-      transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.25s ease !important;
-    /* Remove sheet padding so .px-msg manages its own layout */
+  /* ── Messages as bottom-sheet (like breakout/music) ── */
+  #container-5 {
     padding: 0 !important;
     overflow: hidden !important;
+    max-height: 80vh;
   }
 
-  .container-5.sheet-open {
-    transform: translateX(0) !important;
-  }
-
-  .container-5::before {
-    display: none !important;
-  }
-
-  /* Fix messages widget filling its container */
   #container-5 .px-msg {
     height: 100%;
     flex: 1;
