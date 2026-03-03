@@ -149,16 +149,7 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
             return row;
         }
 
-        function enableMsgRowTouch() {
-            document.querySelectorAll('.px-msg-row').forEach(function(row) {
-                row.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    row.click();
-                }, {
-                    passive: false
-                });
-            });
-        }
+
 
         // ── Update ALL badge locations ─────────────────────────────
         function syncBadges(count) {
@@ -215,7 +206,6 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
                     msgs.forEach(function(m) {
                         list.appendChild(buildRow(m, false));
                     });
-                    enableMsgRowTouch();
                     var unread = msgs.filter(function(m) {
                         return !m.is_read;
                     }).length;
@@ -245,7 +235,6 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
                     msgs.forEach(function(m) {
                         list.appendChild(buildRow(m, true));
                     });
-                    enableMsgRowTouch();
                 })
                 .catch(function() {
                     if (!list) return;
@@ -349,15 +338,7 @@ $msg_other_admins = array_filter(array_keys(ADMIN_ACCOUNTS), fn($u) => $u !== $m
                 }).catch(function() {});
         }
 
-        // ── Touch support for tab switching ────────────────────────
-        document.querySelectorAll('.px-msg-tab').forEach(function(btn) {
-            btn.addEventListener('touchstart', function(e) {
-                e.preventDefault();
-                btn.click();
-            }, {
-                passive: false
-            });
-        });
+
 
         // ── Polling fallback (every 15s) ───────────────────────────
         setInterval(fetchUnreadCount, 15000);
