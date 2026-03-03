@@ -55,6 +55,9 @@
   };
   const keys = {};
 
+  // Module-level hook: set by initBreakout(), called by onGameOver()
+  let _showRetryChooser = null;
+
   // ── HUD Element References ───────────────────────────────────────────────
   let hudScore, hudLevel, hudTotal, hudTop;
 
@@ -361,6 +364,11 @@
         console.error("Breakout API error:", err);
         if (hudTop) hudTop.textContent = "SAVE ERR";
       });
+
+    // On mobile: show the control chooser after the game-over screen appears
+    setTimeout(function () {
+      if (_showRetryChooser) _showRetryChooser();
+    }, 900);
   }
 
   // ── Load Initial Scores from API ─────────────────────────────────────────
@@ -616,6 +624,15 @@
 
     bindHold(leftBtn, "ArrowLeft");
     bindHold(rightBtn, "ArrowRight");
+
+    // Module-level hook: lets onGameOver() re-open the chooser after each run
+    _showRetryChooser = function () {
+      if (!isMobileLike()) return;
+      // Clear saved preference so the full chooser re-appears
+      localStorage.removeItem(CONTROL_KEY);
+      var chooser = document.getElementById("bk-control-chooser");
+      if (chooser) chooser.style.display = "block";
+    };
 
     // Finally, prompt user on mobile if not chosen yet
     chooseControlsIfNeeded();
